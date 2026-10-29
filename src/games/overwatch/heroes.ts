@@ -1,7 +1,6 @@
 import type { Hero } from '../../types/game';
 
 export const OVERWATCH_HEROES: Hero[] = [
-  // TANKS
   {
     id: 'dva',
     name: 'D.Va',
@@ -13,16 +12,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Corto',
     style: 'dive',
-    subrole: 'Dive / Off-Tank',
+    subrole: 'Iniciador / Dive',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/df5a5532862d9292634fb3dc0e51a4705aa601de65e5e815513ccc663d84de56.png',
     description: 'Tanque móvil con propulsores, micro misiles y Matriz de Defensa para anular proyectiles y ultimates.',
-    perks: ['Matriz extendida', 'Propulsores con microaturdimiento', 'Recarga veloz de misiles'],
+    perks: [
+          "Matriz extendida",
+          "Propulsores con microaturdimiento",
+          "Recarga veloz de misiles"
+    ],
     counters: {
-      strongAgainst: ['winston', 'pharah', 'widowmaker', 'reaper', 'ashe', 'soldier76', 'junkrat'],
-      weakAgainst: ['zarya', 'mei', 'symmetra', 'roadhog', 'doomfist']
+      strongAgainst: ["winston","pharah","widowmaker","reaper","ashe","soldier76","junkrat"],
+      weakAgainst: ["zarya","mei","symmetra","roadhog","doomfist"]
     },
-    synergies: ['winston', 'tracer', 'genji', 'kiriko', 'lucio', 'sombra']
+    synergies: ["winston","tracer","genji","kiriko","lucio","sombra"]
   },
   {
     id: 'doomfist',
@@ -35,60 +38,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2017,
     range: 'Melee',
     style: 'dive',
-    subrole: 'Dive / Brawler',
+    subrole: 'Iniciador / Dive',
     difficulty: 3,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ff5c54f43ad253c7faeda9c4ed31d42582ea6b19205d197866f3dd0c0aa14c16.png',
     description: 'Tanque brawler de alta movilidad y control de masas que genera sobreescudos al golpear con sus habilidades.',
-    perks: ['Bloqueo reforzado', 'Salto sísmico de largo alcance', 'Puño cohete cargado rápido'],
+    perks: [
+          "Bloqueo reforzado",
+          "Salto sísmico de largo alcance",
+          "Puño cohete cargado rápido"
+    ],
     counters: {
-      strongAgainst: ['widowmaker', 'zenyatta', 'ana', 'reinhardt', 'ashe', 'soldier76'],
-      weakAgainst: ['sombra', 'ana', 'roadhog', 'cassidy', 'orisa']
+      strongAgainst: ["widowmaker","zenyatta","ana","reinhardt","ashe","soldier76"],
+      weakAgainst: ["sombra","ana","roadhog","cassidy","orisa"]
     },
-    synergies: ['tracer', 'genji', 'kiriko', 'lucio', 'venture']
-  },
-  {
-    id: 'dmon',
-    name: 'D.Mon',
-    role: 'tank',
-    gender: 'Femenino',
-    age: 21,
-    country: 'Corea del Sur',
-    affiliation: 'MEKA',
-    releaseYear: 2025,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'MEKA Melee / Brawler',
-    difficulty: 2,
-    icon: 'https://tonikiraw.com/assets/img/heroes/dmon.webp',
-    description: 'Miembro de MEKA armada con mecha acorazado con Sable de plasma, Barrera de energía, Golpe arrollador con robo de salud y Fusión concentrada.',
-    perks: ['Bestia interior: Golpes de sable sanan 40 a Barrera', 'Golpetazo con 150% de robo de salud', 'Fusión concentrada de alta potencia'],
-    counters: {
-      strongAgainst: ['reinhardt', 'roadhog', 'mauga', 'doomfist', 'junker-queen'],
-      weakAgainst: ['ana', 'zenyatta', 'sombra', 'symmetra', 'echo']
-    },
-    synergies: ['lucio', 'kiriko', 'genji', 'reaper', 'doctrine']
-  },
-  {
-    id: 'domina',
-    name: 'Domina',
-    role: 'tank',
-    gender: 'Femenino',
-    age: 36,
-    country: 'Italia',
-    affiliation: 'Vishkar',
-    releaseYear: 2025,
-    range: 'Medio',
-    style: 'poke',
-    subrole: 'Hard-light Shield / Controller',
-    difficulty: 1,
-    icon: 'https://tonikiraw.com/assets/img/heroes/domina.webp',
-    description: 'Comandante de tecnología de luz sólida con Matriz de barrera reposicionable, Cañón de fotones de largo alcance y Cargas de cristal con detonación disruptiva.',
-    perks: ['Diseño eficiente con restauración de escudo', 'Detonación disruptiva con ralentización del 30%', 'Retiro corporativo para reposicionar la barrera'],
-    counters: {
-      strongAgainst: ['soldier76', 'ashe', 'cassidy', 'widowmaker', 'ana'],
-      weakAgainst: ['sombra', 'bastion', 'sojourn', 'ramattra', 'tracer', 'hazard']
-    },
-    synergies: ['baptiste', 'zenyatta', 'sigma', 'ashe', 'soldier76']
+    synergies: ["tracer","genji","kiriko","lucio","venture"]
   },
   {
     id: 'hazard',
@@ -101,170 +64,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2024,
     range: 'Corto',
     style: 'brawl',
-    subrole: 'Initiator / Spikes',
+    subrole: 'Iniciador / Dive',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ca48b96dbae6ea7f58ce8a5e73513c8c62b1685bdbf258020fb78bb21a008b5f.png',
     description: 'Líder de The Phreaks armado con púas de vanadio, guardia de espinas que absorbe daño frontal, salto violento y muro dentado.',
-    perks: ['Muro de púas con derribo y empuje', 'Guardia de espinas con recarga de munición', 'Salto violento con doble tajo'],
+    perks: [
+          "Muro de púas con derribo y empuje",
+          "Guardia de espinas con recarga de munición",
+          "Salto violento con doble tajo"
+    ],
     counters: {
-      strongAgainst: ['reinhardt', 'winston', 'doomfist', 'tracer', 'genji', 'roadhog'],
-      weakAgainst: ['ana', 'zenyatta', 'pharah', 'echo', 'sigma']
+      strongAgainst: ["reinhardt","winston","doomfist","tracer","genji","roadhog"],
+      weakAgainst: ["ana","zenyatta","pharah","echo","sigma"]
     },
-    synergies: ['lucio', 'kiriko', 'reaper', 'sombra', 'baptiste', 'doctrine']
-  },
-  {
-    id: 'junker-queen',
-    name: 'Junker Queen',
-    role: 'tank',
-    gender: 'Femenino',
-    age: 31,
-    country: 'Australia',
-    affiliation: 'Junkers',
-    releaseYear: 2022,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'Brawl / Bruiser',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/06eeecb359f311f43a8f5121d4f9f3a93c565d70b30e94ef543c05596c9a39dc.png',
-    description: 'Luchadora agresiva que inflige sangrado y se cura a través de las heridas de sus enemigos.',
-    perks: ['Grito de mando con más velocidad', 'Cuchillo magnético con sangrado extra', 'Golpe de carnicero amplio'],
-    counters: {
-      strongAgainst: ['reinhardt', 'roadhog', 'winston', 'doomfist', 'moira'],
-      weakAgainst: ['ana', 'widowmaker', 'pharah', 'kiriko', 'sigma']
-    },
-    synergies: ['lucio', 'genji', 'reaper', 'brigitte', 'baptiste']
-  },
-  {
-    id: 'mauga',
-    name: 'Mauga',
-    role: 'tank',
-    gender: 'Masculino',
-    age: 37,
-    country: 'Samoa',
-    affiliation: 'Talon',
-    releaseYear: 2023,
-    range: 'Medio',
-    style: 'brawl',
-    subrole: 'Brawl / Anti-Tanque',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/33d39bb439c08975197fc52eff4874716839711b5356c4fdc174f9c24bac1d0e.png',
-    description: 'Tanque colosal con ametralladoras gemelas que incendian y asestan golpes críticos, con robo de vida en área.',
-    perks: ['Embestida con aturdimiento largo', 'Aura de sobremarcha con resistencia ampliada', 'Encendido rápido'],
-    counters: {
-      strongAgainst: ['reinhardt', 'roadhog', 'winston', 'doomfist', 'wrecking-ball'],
-      weakAgainst: ['ana', 'zenyatta', 'dva', 'sigma', 'sombra']
-    },
-    synergies: ['lucio', 'kiriko', 'bastion', 'baptiste', 'reaper']
-  },
-  {
-    id: 'orisa',
-    name: 'Orisa',
-    role: 'tank',
-    gender: 'Ómnico',
-    age: 1,
-    country: 'Numbani',
-    affiliation: 'Numbani',
-    releaseYear: 2017,
-    range: 'Medio',
-    style: 'brawl',
-    subrole: 'Brawl / Anti-CC',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a73958a28551f5254f3ab3f97c5f5f8d698a95c0b6a515d1a2b1caac169205a6.png',
-    description: 'Ancla inamovible con Fortificación inmune a CC, lanza de jabalina y giro de lanza defensivo.',
-    perks: ['Jabalina con daño de empuje', 'Fortificación de mayor duración', 'Enfriamiento reducido'],
-    counters: {
-      strongAgainst: ['reinhardt', 'doomfist', 'roadhog', 'wrecking-ball', 'junker-queen'],
-      weakAgainst: ['zarya', 'sigma', 'zenyatta', 'symmetra', 'sojourn']
-    },
-    synergies: ['baptiste', 'torbjorn', 'bastion', 'ana', 'cassidy']
-  },
-  {
-    id: 'ramattra',
-    name: 'Ramattra',
-    role: 'tank',
-    gender: 'Ómnico',
-    age: 28,
-    country: 'Nepal',
-    affiliation: 'Null Sector',
-    releaseYear: 2022,
-    range: 'Medio',
-    style: 'brawl',
-    subrole: 'Brawl / Tempo Tank',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ddef7c9fb8ce4256e8508196b486f81950efe7aaa6cf27fec4668beb4cd15774.png',
-    description: 'Líder de Null Sector con modo Ómnico táctico a distancia y forma Némesis para golpear a través de escudos.',
-    perks: ['Vórtice voraz ralentizante', 'Forma Némesis con armadura extra', 'Bloqueo con reducción del 80%'],
-    counters: {
-      strongAgainst: ['reinhardt', 'dva', 'brigitte', 'genji', 'tracer'],
-      weakAgainst: ['ana', 'zenyatta', 'roadhog', 'reaper', 'bastion']
-    },
-    synergies: ['lucio', 'baptiste', 'mei', 'reaper', 'kiriko']
-  },
-  {
-    id: 'reinhardt',
-    name: 'Reinhardt',
-    role: 'tank',
-    gender: 'Masculino',
-    age: 63,
-    country: 'Alemania',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Melee',
-    style: 'brawl',
-    subrole: 'Brawl / Main Shield',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/551fbe070c16fdfcc17f7f1de63af22c53e7d2f1340fc2f3172441504527bc4e.png',
-    description: 'Caballero con escudo de barrera masivo y martillo propulsado; el pilar clásico del juego de avance cuerpo a cuerpo.',
-    perks: ['Doble onda de fuego', 'Cancelación de carga precisa', 'Escudo con regeneración acelerada'],
-    counters: {
-      strongAgainst: ['soldier76', 'widowmaker', 'ashe', 'zenyatta', 'cassidy'],
-      weakAgainst: ['ramattra', 'orisa', 'mauga', 'bastion', 'pharah', 'reaper', 'tracer']
-    },
-    synergies: ['lucio', 'ana', 'brigitte', 'mei', 'cassidy', 'reaper']
-  },
-  {
-    id: 'roadhog',
-    name: 'Roadhog',
-    role: 'tank',
-    gender: 'Masculino',
-    age: 50,
-    country: 'Australia',
-    affiliation: 'Junkers',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'Brawl / Pick Tank',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/89ddf07e4b619ed96169042e296a1b8856d102746f35add88284b44a9a5a6a03.png',
-    description: 'Superviviente despiadado con un gancho mortal, trampa de cerdos y autocuración con inhalador recargable.',
-    perks: ['Inhalador con resistencia al daño', 'Gancho con mayor alcance', 'Trampa electrificada'],
-    counters: {
-      strongAgainst: ['winston', 'doomfist', 'wrecking-ball', 'reaper', 'mercy'],
-      weakAgainst: ['ana', 'zenyatta', 'mauga', 'dva', 'orisa']
-    },
-    synergies: ['kiriko', 'baptiste', 'junkrat', 'cassidy', 'ashe']
-  },
-  {
-    id: 'sigma',
-    name: 'Sigma',
-    role: 'tank',
-    gender: 'Masculino',
-    age: 64,
-    country: 'Países Bajos',
-    affiliation: 'Talon',
-    releaseYear: 2019,
-    range: 'Largo',
-    style: 'poke',
-    subrole: 'Poke / Main Shield',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a4c032fa466c9a6d9c6974747635d7ef910027f91cd58892af0c899db565f92d.png',
-    description: 'Astrofísico brillante con control de la gravedad, barrera móvil reposicionable y absorción de proyectiles.',
-    perks: ['Acreción con daño de choque', 'Absorción con sobreescudos ampliados', 'Barrera con recarga instantánea'],
-    counters: {
-      strongAgainst: ['bastion', 'torbjorn', 'soldier76', 'ashe', 'widowmaker', 'mauga'],
-      weakAgainst: ['winston', 'zarya', 'symmetra', 'reinhardt', 'moira', 'doomfist']
-    },
-    synergies: ['baptiste', 'zenyatta', 'ashe', 'widowmaker', 'hanzo', 'soldier76']
+    synergies: ["lucio","kiriko","reaper","sombra","baptiste","doctrine"]
   },
   {
     id: 'winston',
@@ -277,16 +90,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Corto',
     style: 'dive',
-    subrole: 'Dive / Main Tank',
+    subrole: 'Iniciador / Dive',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/46a10db3aa908c590ddc4e7606376a88143d1f1306ecfbea043263040f9529a5.png',
     description: 'Científico gorila genéticamente modificado, maestro del salto propulsado y cañón tesla para desarticular francotiradores y apoyos.',
-    perks: ['Disparo secundario cargado a distancia', 'Escudo burbuja con más durabilidad', 'Salto con daño sísmico'],
+    perks: [
+          "Disparo secundario cargado a distancia",
+          "Escudo burbuja con más durabilidad",
+          "Salto con daño sísmico"
+    ],
     counters: {
-      strongAgainst: ['widowmaker', 'genji', 'hanzo', 'zenyatta', 'ana', 'ashe'],
-      weakAgainst: ['reaper', 'bastion', 'roadhog', 'mauga', 'dva', 'torbjorn']
+      strongAgainst: ["widowmaker","genji","hanzo","zenyatta","ana","ashe"],
+      weakAgainst: ["reaper","bastion","roadhog","mauga","dva","torbjorn"]
     },
-    synergies: ['tracer', 'genji', 'sombra', 'ana', 'kiriko', 'lucio']
+    synergies: ["tracer","genji","sombra","ana","kiriko","lucio"]
   },
   {
     id: 'wrecking-ball',
@@ -299,16 +116,254 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2018,
     range: 'Corto',
     style: 'dive',
-    subrole: 'Dive / Disruptor',
+    subrole: 'Iniciador / Dive',
     difficulty: 3,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/9ef1d58867136e0b26f928d896000b9dab216118f6e2f59e53f2e975e1e27afa.png',
     description: 'Hámster hiperinteligente (Hammond) que pilota un meca esférico veloz con gancho, martinete y escudos adaptativos.',
-    perks: ['Escudos adaptativos compartidos', 'Gancho retráctil continuo', 'Martinete de amplio radio'],
+    perks: [
+          "Escudos adaptativos compartidos",
+          "Gancho retráctil continuo",
+          "Martinete de amplio radio"
+    ],
     counters: {
-      strongAgainst: ['widowmaker', 'ashe', 'zenyatta', 'hanzo', 'ana'],
-      weakAgainst: ['sombra', 'roadhog', 'cassidy', 'mei', 'ana', 'junkrat']
+      strongAgainst: ["widowmaker","ashe","zenyatta","hanzo","ana"],
+      weakAgainst: ["sombra","roadhog","cassidy","mei","ana","junkrat"]
     },
-    synergies: ['tracer', 'sombra', 'zenyatta', 'kiriko', 'pharah']
+    synergies: ["tracer","sombra","zenyatta","kiriko","pharah"]
+  },
+  {
+    id: 'domina',
+    name: 'Domina',
+    role: 'tank',
+    gender: 'Femenino',
+    age: 36,
+    country: 'Italia',
+    affiliation: 'Vishkar',
+    releaseYear: 2025,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Escudo & Control',
+    difficulty: 1,
+    icon: 'https://tonikiraw.com/assets/img/heroes/domina.webp',
+    description: 'Comandante de tecnología de luz sólida con Matriz de barrera reposicionable, Cañón de fotones de largo alcance y Cargas de cristal con detonación disruptiva.',
+    perks: [
+          "Diseño eficiente con restauración de escudo",
+          "Detonación disruptiva con ralentización del 30%",
+          "Retiro corporativo para reposicionar la barrera"
+    ],
+    counters: {
+      strongAgainst: ["soldier76","ashe","cassidy","widowmaker","ana"],
+      weakAgainst: ["sombra","bastion","sojourn","ramattra","tracer","hazard"]
+    },
+    synergies: ["baptiste","zenyatta","sigma","ashe","soldier76"]
+  },
+  {
+    id: 'ramattra',
+    name: 'Ramattra',
+    role: 'tank',
+    gender: 'Ómnico',
+    age: 28,
+    country: 'Nepal',
+    affiliation: 'Null Sector',
+    releaseYear: 2022,
+    range: 'Medio',
+    style: 'brawl',
+    subrole: 'Escudo & Control',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ddef7c9fb8ce4256e8508196b486f81950efe7aaa6cf27fec4668beb4cd15774.png',
+    description: 'Líder de Null Sector con modo Ómnico táctico a distancia y forma Némesis para golpear a través de escudos.',
+    perks: [
+          "Vórtice voraz ralentizante",
+          "Forma Némesis con armadura extra",
+          "Bloqueo con reducción del 80%"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","dva","brigitte","genji","tracer"],
+      weakAgainst: ["ana","zenyatta","roadhog","reaper","bastion"]
+    },
+    synergies: ["lucio","baptiste","mei","reaper","kiriko"]
+  },
+  {
+    id: 'reinhardt',
+    name: 'Reinhardt',
+    role: 'tank',
+    gender: 'Masculino',
+    age: 63,
+    country: 'Alemania',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Melee',
+    style: 'brawl',
+    subrole: 'Escudo & Control',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/551fbe070c16fdfcc17f7f1de63af22c53e7d2f1340fc2f3172441504527bc4e.png',
+    description: 'Caballero con escudo de barrera masivo y martillo propulsado; el pilar clásico del juego de avance cuerpo a cuerpo.',
+    perks: [
+          "Doble onda de fuego",
+          "Cancelación de carga precisa",
+          "Escudo con regeneración acelerada"
+    ],
+    counters: {
+      strongAgainst: ["soldier76","widowmaker","ashe","zenyatta","cassidy"],
+      weakAgainst: ["ramattra","orisa","mauga","bastion","pharah","reaper","tracer"]
+    },
+    synergies: ["lucio","ana","brigitte","mei","cassidy","reaper"]
+  },
+  {
+    id: 'sigma',
+    name: 'Sigma',
+    role: 'tank',
+    gender: 'Masculino',
+    age: 64,
+    country: 'Países Bajos',
+    affiliation: 'Talon',
+    releaseYear: 2019,
+    range: 'Largo',
+    style: 'poke',
+    subrole: 'Escudo & Control',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a4c032fa466c9a6d9c6974747635d7ef910027f91cd58892af0c899db565f92d.png',
+    description: 'Astrofísico brillante con control de la gravedad, barrera móvil reposicionable y absorción de proyectiles.',
+    perks: [
+          "Acreción con daño de choque",
+          "Absorción con sobreescudos ampliados",
+          "Barrera con recarga instantánea"
+    ],
+    counters: {
+      strongAgainst: ["bastion","torbjorn","soldier76","ashe","widowmaker","mauga"],
+      weakAgainst: ["winston","zarya","symmetra","reinhardt","moira","doomfist"]
+    },
+    synergies: ["baptiste","zenyatta","ashe","widowmaker","hanzo","soldier76"]
+  },
+  {
+    id: 'dmon',
+    name: 'D.Mon',
+    role: 'tank',
+    gender: 'Femenino',
+    age: 21,
+    country: 'Corea del Sur',
+    affiliation: 'MEKA',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Brawler / Asalto',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/dmon.webp',
+    description: 'Miembro de MEKA armada con mecha acorazado con Sable de plasma, Barrera de energía, Golpe arrollador con robo de salud y Fusión concentrada.',
+    perks: [
+          "Bestia interior: Golpes de sable sanan 40 a Barrera",
+          "Golpetazo con 150% de robo de salud",
+          "Fusión concentrada de alta potencia"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","roadhog","mauga","doomfist","junker-queen"],
+      weakAgainst: ["ana","zenyatta","sombra","symmetra","echo"]
+    },
+    synergies: ["lucio","kiriko","genji","reaper","doctrine"]
+  },
+  {
+    id: 'junker-queen',
+    name: 'Junker Queen',
+    role: 'tank',
+    gender: 'Femenino',
+    age: 31,
+    country: 'Australia',
+    affiliation: 'Junkers',
+    releaseYear: 2022,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Brawler / Asalto',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/06eeecb359f311f43a8f5121d4f9f3a93c565d70b30e94ef543c05596c9a39dc.png',
+    description: 'Luchadora agresiva que inflige sangrado y se cura a través de las heridas de sus enemigos.',
+    perks: [
+          "Grito de mando con más velocidad",
+          "Cuchillo magnético con sangrado extra",
+          "Golpe de carnicero amplio"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","roadhog","winston","doomfist","moira"],
+      weakAgainst: ["ana","widowmaker","pharah","kiriko","sigma"]
+    },
+    synergies: ["lucio","genji","reaper","brigitte","baptiste"]
+  },
+  {
+    id: 'mauga',
+    name: 'Mauga',
+    role: 'tank',
+    gender: 'Masculino',
+    age: 37,
+    country: 'Samoa',
+    affiliation: 'Talon',
+    releaseYear: 2023,
+    range: 'Medio',
+    style: 'brawl',
+    subrole: 'Brawler / Asalto',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/33d39bb439c08975197fc52eff4874716839711b5356c4fdc174f9c24bac1d0e.png',
+    description: 'Tanque colosal con ametralladoras gemelas que incendian y asestan golpes críticos, con robo de vida en área.',
+    perks: [
+          "Embestida con aturdimiento largo",
+          "Aura de sobremarcha con resistencia ampliada",
+          "Encendido rápido"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","roadhog","winston","doomfist","wrecking-ball"],
+      weakAgainst: ["ana","zenyatta","dva","sigma","sombra"]
+    },
+    synergies: ["lucio","kiriko","bastion","baptiste","reaper"]
+  },
+  {
+    id: 'orisa',
+    name: 'Orisa',
+    role: 'tank',
+    gender: 'Ómnico',
+    age: 1,
+    country: 'Numbani',
+    affiliation: 'Numbani',
+    releaseYear: 2017,
+    range: 'Medio',
+    style: 'brawl',
+    subrole: 'Brawler / Asalto',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a73958a28551f5254f3ab3f97c5f5f8d698a95c0b6a515d1a2b1caac169205a6.png',
+    description: 'Ancla inamovible con Fortificación inmune a CC, lanza de jabalina y giro de lanza defensivo.',
+    perks: [
+          "Jabalina con daño de empuje",
+          "Fortificación de mayor duración",
+          "Enfriamiento reducido"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","doomfist","roadhog","wrecking-ball","junker-queen"],
+      weakAgainst: ["zarya","sigma","zenyatta","symmetra","sojourn"]
+    },
+    synergies: ["baptiste","torbjorn","bastion","ana","cassidy"]
+  },
+  {
+    id: 'roadhog',
+    name: 'Roadhog',
+    role: 'tank',
+    gender: 'Masculino',
+    age: 50,
+    country: 'Australia',
+    affiliation: 'Junkers',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Brawler / Asalto',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/89ddf07e4b619ed96169042e296a1b8856d102746f35add88284b44a9a5a6a03.png',
+    description: 'Superviviente despiadado con un gancho mortal, trampa de cerdos y autocuración con inhalador recargable.',
+    perks: [
+          "Inhalador con resistencia al daño",
+          "Gancho con mayor alcance",
+          "Trampa electrificada"
+    ],
+    counters: {
+      strongAgainst: ["winston","doomfist","wrecking-ball","reaper","mercy"],
+      weakAgainst: ["ana","zenyatta","mauga","dva","orisa"]
+    },
+    synergies: ["kiriko","baptiste","junkrat","cassidy","ashe"]
   },
   {
     id: 'zarya',
@@ -321,19 +376,21 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Corto',
     style: 'brawl',
-    subrole: 'Brawl / Off-Tank',
+    subrole: 'Brawler / Asalto',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/9b6f63cc66ddf9d5e0862173c733cc0d2e574c5c89357798d91b93b2f95a7080.png',
     description: 'Una de las mujeres más fuertes del mundo; absorbe daño con sus burbujas de partículas para potenciar su rayo letal.',
-    perks: ['Burbuja con enfriamiento reducido', 'Retención de energía al morir', 'Doble carga gravitatoria'],
+    perks: [
+          "Burbuja con enfriamiento reducido",
+          "Retención de energía al morir",
+          "Doble carga gravitatoria"
+    ],
     counters: {
-      strongAgainst: ['dva', 'orisa', 'genji', 'junkrat', 'sigma'],
-      weakAgainst: ['reinhardt', 'winston', 'pharah', 'widowmaker', 'bastion']
+      strongAgainst: ["dva","orisa","genji","junkrat","sigma"],
+      weakAgainst: ["reinhardt","winston","pharah","widowmaker","bastion"]
     },
-    synergies: ['reaper', 'genji', 'hanzo', 'lucio', 'ana', 'baptiste']
+    synergies: ["reaper","genji","hanzo","lucio","ana","baptiste"]
   },
-
-  // DAMAGE (DPS)
   {
     id: 'ashe',
     name: 'Ashe',
@@ -345,38 +402,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2018,
     range: 'Largo',
     style: 'poke',
-    subrole: 'Hitscan / Sniper',
+    subrole: 'Hitscan / Tirador',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4076bbaa2eb52a0bfe612434071e56e7702d5454473dbbea2f9e392a9d997a94.png',
     description: 'Líder de la banda Deadlock armada con rifle de palanca Viper, dinamita detonable y su fiel secuaz B.O.B.',
-    perks: ['Dinamita con propagación mayor', 'Disparo de escopeta con retroceso seguro', 'Carga veloz de B.O.B.'],
+    perks: [
+          "Dinamita con propagación mayor",
+          "Disparo de escopeta con retroceso seguro",
+          "Carga veloz de B.O.B."
+    ],
     counters: {
-      strongAgainst: ['pharah', 'echo', 'mercy', 'reaper', 'junkrat'],
-      weakAgainst: ['widowmaker', 'genji', 'tracer', 'winston', 'dva', 'sombra']
+      strongAgainst: ["pharah","echo","mercy","reaper","junkrat"],
+      weakAgainst: ["widowmaker","genji","tracer","winston","dva","sombra"]
     },
-    synergies: ['mercy', 'sigma', 'baptiste', 'zenyatta', 'reinhardt']
-  },
-  {
-    id: 'bastion',
-    name: 'Bastion',
-    role: 'damage',
-    gender: 'Ómnico',
-    age: 32,
-    country: 'Bosque Negro',
-    affiliation: 'Independiente',
-    releaseYear: 2016,
-    range: 'Medio',
-    style: 'poke',
-    subrole: 'Asedio / Shredder',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4ede795c2a681aaccfa72d0c901cba0cb8a2c292fd6a97b2ba9faed161c2d184.png',
-    description: 'Unidad de asedio ómnica capaz de transformarse en una torreta ametralladora móvil con granada táctica.',
-    perks: ['Modo asalto con mayor velocidad', 'Granada de rebote aumentada', 'Blindaje reactivo'],
-    counters: {
-      strongAgainst: ['reinhardt', 'winston', 'mauga', 'roadhog', 'ramattra'],
-      weakAgainst: ['genji', 'tracer', 'hanzo', 'sigma', 'sombra', 'ana']
-    },
-    synergies: ['baptiste', 'sigma', 'orisa', 'mercy', 'mei']
+    synergies: ["mercy","sigma","baptiste","zenyatta","reinhardt"]
   },
   {
     id: 'cassidy',
@@ -389,390 +428,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Medio',
     style: 'brawl',
-    subrole: 'Hitscan / Anti-Flanker',
+    subrole: 'Hitscan / Tirador',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/9240cd64cc8ef58df9acbf55204ab1b5d8578f743fda5931f0dbccbd75ab841b.png',
     description: 'Pistolero justiciero con revólver Pacifista, granada magnética que anula habilidades de movimiento y tiro certero.',
-    perks: ['Voltereta con recarga doble', 'Granada con efecto de anclaje pesado', 'Tiro certero veloz'],
+    perks: [
+          "Voltereta con recarga doble",
+          "Granada con efecto de anclaje pesado",
+          "Tiro certero veloz"
+    ],
     counters: {
-      strongAgainst: ['tracer', 'genji', 'doomfist', 'pharah', 'echo', 'wrecking-ball', 'sombra'],
-      weakAgainst: ['widowmaker', 'ashe', 'sigma', 'hanzo']
+      strongAgainst: ["tracer","genji","doomfist","pharah","echo","wrecking-ball","sombra"],
+      weakAgainst: ["widowmaker","ashe","sigma","hanzo"]
     },
-    synergies: ['reinhardt', 'lucio', 'ana', 'brigitte', 'junker-queen']
-  },
-  {
-    id: 'echo',
-    name: 'Echo',
-    role: 'damage',
-    gender: 'Ómnico',
-    age: 14,
-    country: 'Suiza',
-    affiliation: 'Overwatch',
-    releaseYear: 2020,
-    range: 'Medio',
-    style: 'dive',
-    subrole: 'Proyectil Aéreo / Burst',
-    difficulty: 3,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/d4f2d5b0c2b7e82d61353186c5f23152ccba9d3569b50839aa580dca3e9114ba.png',
-    description: 'Robot evolutiva con vuelo libre, bombas pegajosas, haz de enfoque ejecutor y capacidad de duplicar a cualquier enemigo.',
-    perks: ['Haz de enfoque ejecutor anticipado', 'Planeo aerodinámico prolongado', 'Recarga veloz al duplicar'],
-    counters: {
-      strongAgainst: ['reinhardt', 'junkrat', 'reaper', 'roadhog', 'torbjorn'],
-      weakAgainst: ['cassidy', 'ashe', 'soldier76', 'widowmaker', 'dva']
-    },
-    synergies: ['mercy', 'zenyatta', 'winston', 'tracer', 'pharah']
-  },
-  {
-    id: 'genji',
-    name: 'Genji',
-    role: 'damage',
-    gender: 'Masculino',
-    age: 37,
-    country: 'Japón',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Flanker / Assassin',
-    difficulty: 3,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/156b12c20b1aea872c1eeb5bb37a7de1047b2ab30ecefd0663a8925badde1ea8.png',
-    description: 'Ninja cibernético con shurikens, desvío de proyectiles, corte veloz reseteable con bajas y Hoja del Dragón.',
-    perks: ['Desvío de proyectiles extendido', 'Corte con daño de sangrado', 'Shurikens adicionales'],
-    counters: {
-      strongAgainst: ['widowmaker', 'hanzo', 'bastion', 'zenyatta', 'ana', 'ashe'],
-      weakAgainst: ['winston', 'zarya', 'mei', 'symmetra', 'moira', 'brigitte']
-    },
-    synergies: ['ana', 'winston', 'tracer', 'kiriko', 'lucio']
-  },
-  {
-    id: 'hanzo',
-    name: 'Hanzo',
-    role: 'damage',
-    gender: 'Masculino',
-    age: 40,
-    country: 'Japón',
-    affiliation: 'Clan Shimada',
-    releaseYear: 2016,
-    range: 'Largo',
-    style: 'poke',
-    subrole: 'Sniper / Proyectil',
-    difficulty: 3,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/78b61c3e806fb26b02b8980fba62189155074fc15bd865b0883268e546030be5.png',
-    description: 'Arquero maestro que dispara flechas sónicas rastreadoras, ráfagas tormentosas y convoca dragones espectrales.',
-    perks: ['Flecha sónica con pulso ampliado', 'Flechas de tormenta con rebote', 'Salto acrobático doble'],
-    counters: {
-      strongAgainst: ['bastion', 'torbjorn', 'roadhog', 'cassidy', 'zenyatta'],
-      weakAgainst: ['genji', 'tracer', 'winston', 'dva', 'sombra', 'widowmaker']
-    },
-    synergies: ['zarya', 'sigma', 'mercy', 'baptiste', 'zenyatta']
-  },
-  {
-    id: 'junkrat',
-    name: 'Junkrat',
-    role: 'damage',
-    gender: 'Masculino',
-    age: 27,
-    country: 'Australia',
-    affiliation: 'Junkers',
-    releaseYear: 2016,
-    range: 'Medio',
-    style: 'brawl',
-    subrole: 'Spam / Control de Área',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/7660b9fc6f25f30858fdd8797fe0d52b2306f1e78fef99843f58a274e69af046.png',
-    description: 'Anarquista demente obsesionado con explosivos de rebote, cepos inmovilizadores y minas de conmoción.',
-    perks: ['Triple mina de choque', 'Cepo reforzado con daño aumentado', 'Neumático con turbo'],
-    counters: {
-      strongAgainst: ['reinhardt', 'orisa', 'bastion', 'brigitte', 'torbjorn'],
-      weakAgainst: ['pharah', 'echo', 'widowmaker', 'ashe', 'zarya', 'dva']
-    },
-    synergies: ['reinhardt', 'roadhog', 'baptiste', 'mei']
-  },
-  {
-    id: 'mei',
-    name: 'Mei',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 33,
-    country: 'China',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'Brawler / Control de Zona',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4a55ced3bd597fb08e0fde9dc007f8543ac616ba98ca3db9b0e4d871a8ae17f8.png',
-    description: 'Climatologist armada con un cañón endotérmico para aislar tanques con muros de hielo y congelar zonas.',
-    perks: ['Muro de hielo con más pilares', 'Bloque de hielo con explosión térmica', 'Carámbano perforante'],
-    counters: {
-      strongAgainst: ['dva', 'genji', 'wrecking-ball', 'reinhardt', 'lucio'],
-      weakAgainst: ['pharah', 'echo', 'widowmaker', 'ashe', 'sombra']
-    },
-    synergies: ['reinhardt', 'ramattra', 'lucio', 'baptiste', 'reaper']
-  },
-  {
-    id: 'pharah',
-    name: 'Pharah',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 34,
-    country: 'Egipto',
-    affiliation: 'Helix Security',
-    releaseYear: 2016,
-    range: 'Largo',
-    style: 'poke',
-    subrole: 'Proyectil Aéreo / Bombardero',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/60ac2d5de4a6d34644d8872233da402f1436c87f804bb11a21661bb30bf4a51f.png',
-    description: 'Oficial de seguridad con traje Raptor capaz de surcar los cielos lanzando cohetes devastadores y ráfagas concusivas.',
-    perks: ['Propulsión lateral continua', 'Cohetes con daño concusivo de impacto', 'Bombardeo protegido'],
-    counters: {
-      strongAgainst: ['reinhardt', 'junkrat', 'reaper', 'mei', 'brigitte', 'symmetra'],
-      weakAgainst: ['widowmaker', 'ashe', 'cassidy', 'soldier76', 'dva', 'ana']
-    },
-    synergies: ['mercy', 'zenyatta', 'winston', 'wrecking-ball']
-  },
-  {
-    id: 'reaper',
-    name: 'Reaper',
-    role: 'damage',
-    gender: 'Masculino',
-    age: 60,
-    country: 'Estados Unidos',
-    affiliation: 'Talon',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'Brawler / Tank Buster',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/dc6ff07ac790c00dc95a40882449617bb6e0e38906b353a630cffe0c815270a9.png',
-    description: 'Espectro ejecutor con escopetas Hellfire gemelas, robo de vida pasivo, forma fantasmal invulnerable y teletransporte.',
-    perks: ['Paso de las sombras instantáneo', 'Robo de vida aumentado', 'Forma fantasmal veloz'],
-    counters: {
-      strongAgainst: ['winston', 'reinhardt', 'roadhog', 'ramattra', 'mauga'],
-      weakAgainst: ['pharah', 'echo', 'widowmaker', 'ashe', 'dva', 'cassidy']
-    },
-    synergies: ['lucio', 'reinhardt', 'junker-queen', 'kiriko', 'mei']
-  },
-  {
-    id: 'sojourn',
-    name: 'Sojourn',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 47,
-    country: 'Canadá',
-    affiliation: 'Overwatch',
-    releaseYear: 2022,
-    range: 'Medio',
-    style: 'poke',
-    subrole: 'Hitscan / Tempo DPS',
-    difficulty: 3,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/82b8c1b8765dcb9a0ba16e343c3516bf324c771ac81e9878473280216e70a889.png',
-    description: 'Comandante cibernética con cañón de riel de precisión alimentado por energía, disparo disruptor y deslizamiento potente.',
-    perks: ['Deslizamiento con super salto', 'Disparo disruptor con efecto ralentizante', 'Riel con carga pasiva'],
-    counters: {
-      strongAgainst: ['pharah', 'torbjorn', 'bastion', 'mercy', 'roadhog'],
-      weakAgainst: ['widowmaker', 'genji', 'tracer', 'dva', 'winston']
-    },
-    synergies: ['mercy', 'sigma', 'winston', 'lucio', 'baptiste']
-  },
-  {
-    id: 'soldier76',
-    name: 'Soldier: 76',
-    role: 'damage',
-    gender: 'Masculino',
-    age: 58,
-    country: 'Estados Unidos',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Medio',
-    style: 'poke',
-    subrole: 'Hitscan / Ráfaga Continua',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c93b5f0a528c40473188f77cc2a267aee7d5b6cf5c9e104105d634b4388674e2.png',
-    description: 'Super-soldado vigilante con rifle de pulsos, cohetes Helix de impacto, sprint táctico infinito y campo biótico curativo.',
-    perks: ['Sprint con disparo continuo', 'Campo biótico de mayor radio', 'Cohetes Helix con doble carga'],
-    counters: {
-      strongAgainst: ['pharah', 'echo', 'mercy', 'torbjorn', 'reaper'],
-      weakAgainst: ['widowmaker', 'dva', 'sigma', 'genji', 'doomfist']
-    },
-    synergies: ['mercy', 'baptiste', 'sigma', 'reinhardt', 'ana']
-  },
-  {
-    id: 'symmetra',
-    name: 'Symmetra',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 30,
-    country: 'India',
-    affiliation: 'Vishkar Corporation',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'Control / Rayo de Escudo',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ebec57e8bd68b3d4383edfeb34f8f52dd0b94a6467d594c2fee722e8a97c32aa.png',
-    description: 'Arquitecta de luz sólida armada con proyector de fotones que se recarga con escudos, torretas centinela y teletransportador.',
-    perks: ['Torretas con curación/ralentización', 'Rayo de fotones con alcance extendido', 'Teletransportador instantáneo'],
-    counters: {
-      strongAgainst: ['dva', 'sigma', 'genji', 'reinhardt', 'orisa'],
-      weakAgainst: ['pharah', 'echo', 'widowmaker', 'winston', 'ashe']
-    },
-    synergies: ['reinhardt', 'ramattra', 'mei', 'baptiste', 'lucio']
-  },
-  {
-    id: 'torbjorn',
-    name: 'Torbjörn',
-    role: 'damage',
-    gender: 'Masculino',
-    age: 59,
-    country: 'Suecia',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Medio',
-    style: 'brawl',
-    subrole: 'Defensa / Anti-Dive',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ce17118cedc29b0d2ac1e059666bed36b9531c85079b0b894bb402d12c917ba9.png',
-    description: 'Maestro armero con pistola de remaches, sobrecarga con armadura y velocidad, torreta automática defensiva y lava fundida.',
-    perks: ['Torreta con misiles menores', 'Sobrecarga de doble duración', 'Remaches incendiarios'],
-    counters: {
-      strongAgainst: ['tracer', 'genji', 'sombra', 'winston', 'wrecking-ball'],
-      weakAgainst: ['widowmaker', 'hanzo', 'pharah', 'ana', 'sigma']
-    },
-    synergies: ['orisa', 'sigma', 'reinhardt', 'baptiste', 'bastion']
-  },
-  {
-    id: 'tracer',
-    name: 'Tracer',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 28,
-    country: 'Reino Unido',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Flanker / Velocidad Pura',
-    difficulty: 3,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4504f6f15cb3feaa92ecd38e01dcf751cb5abdac2e0bb52d0555727e53277502.png',
-    description: 'Piloto que desafía el tiempo con traslaciones hiperactivas, regresión temporal curativa, pistolas de pulsos y bomba de pulsos.',
-    perks: ['Cuarta traslación temporal', 'Regresión con curación completa', 'Bomba de pulsos con mayor imán'],
-    counters: {
-      strongAgainst: ['zenyatta', 'ana', 'widowmaker', 'ashe', 'hanzo', 'reinhardt'],
-      weakAgainst: ['cassidy', 'torbjorn', 'brigitte', 'sombra', 'moira']
-    },
-    synergies: ['winston', 'genji', 'sombra', 'kiriko', 'lucio']
-  },
-  {
-    id: 'venture',
-    name: 'Venture',
-    role: 'damage',
-    gender: 'No binario',
-    age: 26,
-    country: 'Canadá',
-    affiliation: 'Sociedad Wayfinder',
-    releaseYear: 2024,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Flanker / Brawler Subterráneo',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/dcab9123f5f55df22e54d4e797de43c71b917e0149dd059a7fd6136f48464cd0.png',
-    description: 'Arqueólogue intrépide con excavador inteligente que dispara cargas sísmicas, se sumerge bajo tierra y embiste.',
-    perks: ['Excavación subterránea veloz', 'Escudos pasivos aumentados al usar habilidades', 'Onda de choque mayor'],
-    counters: {
-      strongAgainst: ['zenyatta', 'ana', 'widowmaker', 'ashe', 'reinhardt'],
-      weakAgainst: ['pharah', 'echo', 'cassidy', 'dva', 'roadhog']
-    },
-    synergies: ['winston', 'doomfist', 'tracer', 'kiriko', 'lucio']
-  },
-  {
-    id: 'shion',
-    name: 'Shion',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 23,
-    country: 'Japón',
-    affiliation: 'Neo-Tokyo Drifters',
-    releaseYear: 2025,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Flanker / Motorcyclist',
-    difficulty: 2,
-    icon: 'https://tonikiraw.com/assets/img/heroes/shion.webp',
-    description: 'Piloto urbana con moto cibernética y cuchillas sopladoras, dotada de Evasión con exceso de salud, Ejecución demoledora y Vuelta salvaje con regeneración activa.',
-    perks: ['Instinto de supervivencia con mayor duración de salud', 'Máquina X: 20% más daño en objetivos <50% vida', 'Vuelta salvaje con regeneración continua'],
-    counters: {
-      strongAgainst: ['widowmaker', 'zenyatta', 'ana', 'hanzo', 'ashe', 'lifeweaver'],
-      weakAgainst: ['tracer', 'cassidy', 'torbjorn', 'brigitte', 'winston']
-    },
-    synergies: ['winston', 'sombra', 'kiriko', 'lucio', 'genji']
-  },
-  {
-    id: 'vendetta',
-    name: 'Vendetta',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 29,
-    country: 'Italia',
-    affiliation: 'Talon',
-    releaseYear: 2025,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Duelist / Melee Flanker',
-    difficulty: 2,
-    icon: 'https://tonikiraw.com/assets/img/heroes/vendetta.webp',
-    description: 'Espadachina asesina de Talon con Corte proyectado, Espiral de tajos con daño en área, Arremetida veloz acumulable y Golpe drenante con robo de salud.',
-    perks: ['Filo extra con reducción de coste energético', 'Golpe drenante con 40% de robo de salud', 'Implacable: acumula velocidad de ataque y movimiento'],
-    counters: {
-      strongAgainst: ['reinhardt', 'roadhog', 'orisa', 'sigma', 'zenyatta', 'ana'],
-      weakAgainst: ['pharah', 'echo', 'freja', 'cassidy', 'torbjorn', 'tracer']
-    },
-    synergies: ['zarya', 'sombra', 'doctrine', 'lucio', 'kiriko']
-  },
-  {
-    id: 'freja',
-    name: 'Freja',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 26,
-    country: 'Noruega',
-    affiliation: 'Valkyrie Aerospace',
-    releaseYear: 2025,
-    range: 'Largo',
-    style: 'poke',
-    subrole: 'Aerial Marksman / Crossbow',
-    difficulty: 2,
-    icon: 'https://tonikiraw.com/assets/img/heroes/freja.webp',
-    description: 'Tiradora aérea armada con virote automático de precisión, Corriente ascendente con planeo sostenido, Desplazamiento veloz y sanación aérea pasiva.',
-    perks: ['Andanada implacable: recarga virote al impactar', 'Recuperación aérea con sanación activa planeando', 'Vientos crecientes con carga adicional'],
-    counters: {
-      strongAgainst: ['reinhardt', 'junkrat', 'reaper', 'mei', 'vendetta', 'brigitte'],
-      weakAgainst: ['cassidy', 'ashe', 'widowmaker', 'soldier76', 'dva']
-    },
-    synergies: ['mercy', 'zenyatta', 'sigma', 'baptiste', 'hazard']
-  },
-  {
-    id: 'anran',
-    name: 'Anran',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 22,
-    country: 'China',
-    affiliation: 'Independiente',
-    releaseYear: 2025,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Pyromancer / Disruptor',
-    difficulty: 2,
-    icon: 'https://tonikiraw.com/assets/img/heroes/anran.webp',
-    description: 'Ágil piromante con Ignición abrasadora continua, Carga infernal con reducción de recarga, Llama danzante sanadora y escudos de calor temporales.',
-    perks: ['A fuego lento: daño de ignición prolongado', 'Mecha corta: reducción de cooldown en carga', 'Llama hambrienta con autosanación mejorada'],
-    counters: {
-      strongAgainst: ['reinhardt', 'winston', 'mei', 'lifeweaver', 'zenyatta'],
-      weakAgainst: ['cassidy', 'tracer', 'sojourn', 'dva', 'baptiste']
-    },
-    synergies: ['sombra', 'doctrine', 'winston', 'kiriko', 'lucio']
+    synergies: ["reinhardt","lucio","ana","brigitte","junker-queen"]
   },
   {
     id: 'emre',
@@ -785,16 +454,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2025,
     range: 'Medio',
     style: 'poke',
-    subrole: 'Tactical Soldier / Grenadier',
+    subrole: 'Hitscan / Tirador',
     difficulty: 1,
     icon: 'https://tonikiraw.com/assets/img/heroes/emre.webp',
     description: 'Veterano de la Operación Cúpula Blanca con Pistola sifonadora hitscan, Granada cibernética adhesiva con daño explosivo y Protocolo de anulación con proyectiles supresores.',
-    perks: ['Seguridad supresiva con ralentización del 30%', 'Disipador térmico para disparo continuo', 'Adhesión cibernética con detonación fijada'],
+    perks: [
+          "Seguridad supresiva con ralentización del 30%",
+          "Disipador térmico para disparo continuo",
+          "Adhesión cibernética con detonación fijada"
+    ],
     counters: {
-      strongAgainst: ['pharah', 'echo', 'freja', 'mercy', 'lucio'],
-      weakAgainst: ['genji', 'tracer', 'dva', 'sigma', 'hazard']
+      strongAgainst: ["pharah","echo","freja","mercy","lucio"],
+      weakAgainst: ["genji","tracer","dva","sigma","hazard"]
     },
-    synergies: ['ana', 'baptiste', 'reinhardt', 'sigma', 'junker-queen']
+    synergies: ["ana","baptiste","reinhardt","sigma","junker-queen"]
   },
   {
     id: 'sierra',
@@ -807,16 +480,72 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2025,
     range: 'Largo',
     style: 'poke',
-    subrole: 'Heavy Gunner / Drone Anchor',
+    subrole: 'Hitscan / Tirador',
     difficulty: 1,
     icon: 'https://tonikiraw.com/assets/img/heroes/sierra.webp',
     description: 'Especialista en supresión pesada con Rifle hélice de cadencia acelerada, Disparo rastreador que potencia velocidad de ataque y Drones de anclaje de apoyo médico.',
-    perks: ['Fijada: 20% velocidad de ataque tras marcar objetivo', 'Drones médicos con botiquín incorporado', 'Agarre firme con reducción de dispersión'],
+    perks: [
+          "Fijada: 20% velocidad de ataque tras marcar objetivo",
+          "Drones médicos con botiquín incorporado",
+          "Agarre firme con reducción de dispersión"
+    ],
     counters: {
-      strongAgainst: ['reinhardt', 'ramattra', 'mauga', 'roadhog', 'orisa'],
-      weakAgainst: ['widowmaker', 'hanzo', 'sombra', 'genji', 'tracer']
+      strongAgainst: ["reinhardt","ramattra","mauga","roadhog","orisa"],
+      weakAgainst: ["widowmaker","hanzo","sombra","genji","tracer"]
     },
-    synergies: ['sigma', 'baptiste', 'zenyatta', 'domina', 'mercy']
+    synergies: ["sigma","baptiste","zenyatta","domina","mercy"]
+  },
+  {
+    id: 'sojourn',
+    name: 'Sojourn',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 47,
+    country: 'Canadá',
+    affiliation: 'Overwatch',
+    releaseYear: 2022,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Hitscan / Tirador',
+    difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/82b8c1b8765dcb9a0ba16e343c3516bf324c771ac81e9878473280216e70a889.png',
+    description: 'Comandante cibernética con cañón de riel de precisión alimentado por energía, disparo disruptor y deslizamiento potente.',
+    perks: [
+          "Deslizamiento con super salto",
+          "Disparo disruptor con efecto ralentizante",
+          "Riel con carga pasiva"
+    ],
+    counters: {
+      strongAgainst: ["pharah","torbjorn","bastion","mercy","roadhog"],
+      weakAgainst: ["widowmaker","genji","tracer","dva","winston"]
+    },
+    synergies: ["mercy","sigma","winston","lucio","baptiste"]
+  },
+  {
+    id: 'soldier76',
+    name: 'Soldier: 76',
+    role: 'damage',
+    gender: 'Masculino',
+    age: 58,
+    country: 'Estados Unidos',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Hitscan / Tirador',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c93b5f0a528c40473188f77cc2a267aee7d5b6cf5c9e104105d634b4388674e2.png',
+    description: 'Super-soldado vigilante con rifle de pulsos, cohetes Helix de impacto, sprint táctico infinito y campo biótico curativo.',
+    perks: [
+          "Sprint con disparo continuo",
+          "Campo biótico de mayor radio",
+          "Cohetes Helix con doble carga"
+    ],
+    counters: {
+      strongAgainst: ["pharah","echo","mercy","torbjorn","reaper"],
+      weakAgainst: ["widowmaker","dva","sigma","genji","doomfist"]
+    },
+    synergies: ["mercy","baptiste","sigma","reinhardt","ana"]
   },
   {
     id: 'widowmaker',
@@ -829,19 +558,437 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Largo',
     style: 'poke',
-    subrole: 'Sniper / Pick Instantáneo',
+    subrole: 'Hitscan / Tirador',
     difficulty: 3,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/6e4702b45f196aaf51555cf57327322721f45458b17f5f0643ed008a88378259.png',
     description: 'Asesina letal armada con el rifle de francotirador Beso de la Viuda, gancho de agarre, mina venenosa y visión infrarroja.',
-    perks: ['Gancho con reseteo al acertar tiro a la cabeza', 'Mina venenosa con rastreo', 'Carga de mira acelerada'],
+    perks: [
+          "Gancho con reseteo al acertar tiro a la cabeza",
+          "Mina venenosa con rastreo",
+          "Carga de mira acelerada"
+    ],
     counters: {
-      strongAgainst: ['pharah', 'echo', 'torbjorn', 'bastion', 'soldier76', 'mercy', 'zenyatta'],
-      weakAgainst: ['winston', 'dva', 'genji', 'tracer', 'sombra', 'wrecking-ball']
+      strongAgainst: ["pharah","echo","torbjorn","bastion","soldier76","mercy","zenyatta"],
+      weakAgainst: ["winston","dva","genji","tracer","sombra","wrecking-ball"]
     },
-    synergies: ['mercy', 'sigma', 'zenyatta', 'baptiste']
+    synergies: ["mercy","sigma","zenyatta","baptiste"]
   },
-
-  // SUPPORT
+  {
+    id: 'anran',
+    name: 'Anran',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 22,
+    country: 'China',
+    affiliation: 'Independiente',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Flanker / Asesino',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/anran.webp',
+    description: 'Ágil piromante con Ignición abrasadora continua, Carga infernal con reducción de recarga, Llama danzante sanadora y escudos de calor temporales.',
+    perks: [
+          "A fuego lento: daño de ignición prolongado",
+          "Mecha corta: reducción de cooldown en carga",
+          "Llama hambrienta con autosanación mejorada"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","winston","mei","lifeweaver","zenyatta"],
+      weakAgainst: ["cassidy","tracer","sojourn","dva","baptiste"]
+    },
+    synergies: ["sombra","doctrine","winston","kiriko","lucio"]
+  },
+  {
+    id: 'genji',
+    name: 'Genji',
+    role: 'damage',
+    gender: 'Masculino',
+    age: 37,
+    country: 'Japón',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Flanker / Asesino',
+    difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/156b12c20b1aea872c1eeb5bb37a7de1047b2ab30ecefd0663a8925badde1ea8.png',
+    description: 'Ninja cibernético con shurikens, desvío de proyectiles, corte veloz reseteable con bajas y Hoja del Dragón.',
+    perks: [
+          "Desvío de proyectiles extendido",
+          "Corte con daño de sangrado",
+          "Shurikens adicionales"
+    ],
+    counters: {
+      strongAgainst: ["widowmaker","hanzo","bastion","zenyatta","ana","ashe"],
+      weakAgainst: ["winston","zarya","mei","symmetra","moira","brigitte"]
+    },
+    synergies: ["ana","winston","tracer","kiriko","lucio"]
+  },
+  {
+    id: 'reaper',
+    name: 'Reaper',
+    role: 'damage',
+    gender: 'Masculino',
+    age: 60,
+    country: 'Estados Unidos',
+    affiliation: 'Talon',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Flanker / Asesino',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/dc6ff07ac790c00dc95a40882449617bb6e0e38906b353a630cffe0c815270a9.png',
+    description: 'Espectro ejecutor con escopetas Hellfire gemelas, robo de vida pasivo, forma fantasmal invulnerable y teletransporte.',
+    perks: [
+          "Paso de las sombras instantáneo",
+          "Robo de vida aumentado",
+          "Forma fantasmal veloz"
+    ],
+    counters: {
+      strongAgainst: ["winston","reinhardt","roadhog","ramattra","mauga"],
+      weakAgainst: ["pharah","echo","widowmaker","ashe","dva","cassidy"]
+    },
+    synergies: ["lucio","reinhardt","junker-queen","kiriko","mei"]
+  },
+  {
+    id: 'shion',
+    name: 'Shion',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 23,
+    country: 'Japón',
+    affiliation: 'Neo-Tokyo Drifters',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Flanker / Asesino',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/shion.webp',
+    description: 'Piloto urbana con moto cibernética y cuchillas sopladoras, dotada de Evasión con exceso de salud, Ejecución demoledora y Vuelta salvaje con regeneración activa.',
+    perks: [
+          "Instinto de supervivencia con mayor duración de salud",
+          "Máquina X: 20% más daño en objetivos <50% vida",
+          "Vuelta salvaje con regeneración continua"
+    ],
+    counters: {
+      strongAgainst: ["widowmaker","zenyatta","ana","hanzo","ashe","lifeweaver"],
+      weakAgainst: ["tracer","cassidy","torbjorn","brigitte","winston"]
+    },
+    synergies: ["winston","sombra","kiriko","lucio","genji"]
+  },
+  {
+    id: 'tracer',
+    name: 'Tracer',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 28,
+    country: 'Reino Unido',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Flanker / Asesino',
+    difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4504f6f15cb3feaa92ecd38e01dcf751cb5abdac2e0bb52d0555727e53277502.png',
+    description: 'Piloto que desafía el tiempo con traslaciones hiperactivas, regresión temporal curativa, pistolas de pulsos y bomba de pulsos.',
+    perks: [
+          "Cuarta traslación temporal",
+          "Regresión con curación completa",
+          "Bomba de pulsos con mayor imán"
+    ],
+    counters: {
+      strongAgainst: ["zenyatta","ana","widowmaker","ashe","hanzo","reinhardt"],
+      weakAgainst: ["cassidy","torbjorn","brigitte","sombra","moira"]
+    },
+    synergies: ["winston","genji","sombra","kiriko","lucio"]
+  },
+  {
+    id: 'vendetta',
+    name: 'Vendetta',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 29,
+    country: 'Italia',
+    affiliation: 'Talon',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Flanker / Asesino',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/vendetta.webp',
+    description: 'Espadachina asesina de Talon con Corte proyectado, Espiral de tajos con daño en área, Arremetida veloz acumulable y Golpe drenante con robo de salud.',
+    perks: [
+          "Filo extra con reducción de coste energético",
+          "Golpe drenante con 40% de robo de salud",
+          "Implacable: acumula velocidad de ataque y movimiento"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","roadhog","orisa","sigma","zenyatta","ana"],
+      weakAgainst: ["pharah","echo","freja","cassidy","torbjorn","tracer"]
+    },
+    synergies: ["zarya","sombra","doctrine","lucio","kiriko"]
+  },
+  {
+    id: 'venture',
+    name: 'Venture',
+    role: 'damage',
+    gender: 'No binario',
+    age: 26,
+    country: 'Canadá',
+    affiliation: 'Sociedad Wayfinder',
+    releaseYear: 2024,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Flanker / Asesino',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/dcab9123f5f55df22e54d4e797de43c71b917e0149dd059a7fd6136f48464cd0.png',
+    description: 'Arqueólogue intrépide con excavador inteligente que dispara cargas sísmicas, se sumerge bajo tierra y embiste.',
+    perks: [
+          "Excavación subterránea veloz",
+          "Escudos pasivos aumentados al usar habilidades",
+          "Onda de choque mayor"
+    ],
+    counters: {
+      strongAgainst: ["zenyatta","ana","widowmaker","ashe","reinhardt"],
+      weakAgainst: ["pharah","echo","cassidy","dva","roadhog"]
+    },
+    synergies: ["winston","doomfist","tracer","kiriko","lucio"]
+  },
+  {
+    id: 'bastion',
+    name: 'Bastion',
+    role: 'damage',
+    gender: 'Ómnico',
+    age: 32,
+    country: 'Bosque Negro',
+    affiliation: 'Independiente',
+    releaseYear: 2016,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Proyectil & Control',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4ede795c2a681aaccfa72d0c901cba0cb8a2c292fd6a97b2ba9faed161c2d184.png',
+    description: 'Unidad de asedio ómnica capaz de transformarse en una torreta ametralladora móvil con granada táctica.',
+    perks: [
+          "Modo asalto con mayor velocidad",
+          "Granada de rebote aumentada",
+          "Blindaje reactivo"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","winston","mauga","roadhog","ramattra"],
+      weakAgainst: ["genji","tracer","hanzo","sigma","sombra","ana"]
+    },
+    synergies: ["baptiste","sigma","orisa","mercy","mei"]
+  },
+  {
+    id: 'hanzo',
+    name: 'Hanzo',
+    role: 'damage',
+    gender: 'Masculino',
+    age: 40,
+    country: 'Japón',
+    affiliation: 'Clan Shimada',
+    releaseYear: 2016,
+    range: 'Largo',
+    style: 'poke',
+    subrole: 'Proyectil & Control',
+    difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/78b61c3e806fb26b02b8980fba62189155074fc15bd865b0883268e546030be5.png',
+    description: 'Arquero maestro que dispara flechas sónicas rastreadoras, ráfagas tormentosas y convoca dragones espectrales.',
+    perks: [
+          "Flecha sónica con pulso ampliado",
+          "Flechas de tormenta con rebote",
+          "Salto acrobático doble"
+    ],
+    counters: {
+      strongAgainst: ["bastion","torbjorn","roadhog","cassidy","zenyatta"],
+      weakAgainst: ["genji","tracer","winston","dva","sombra","widowmaker"]
+    },
+    synergies: ["zarya","sigma","mercy","baptiste","zenyatta"]
+  },
+  {
+    id: 'junkrat',
+    name: 'Junkrat',
+    role: 'damage',
+    gender: 'Masculino',
+    age: 27,
+    country: 'Australia',
+    affiliation: 'Junkers',
+    releaseYear: 2016,
+    range: 'Medio',
+    style: 'brawl',
+    subrole: 'Proyectil & Control',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/7660b9fc6f25f30858fdd8797fe0d52b2306f1e78fef99843f58a274e69af046.png',
+    description: 'Anarquista demente obsesionado con explosivos de rebote, cepos inmovilizadores y minas de conmoción.',
+    perks: [
+          "Triple mina de choque",
+          "Cepo reforzado con daño aumentado",
+          "Neumático con turbo"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","orisa","bastion","brigitte","torbjorn"],
+      weakAgainst: ["pharah","echo","widowmaker","ashe","zarya","dva"]
+    },
+    synergies: ["reinhardt","roadhog","baptiste","mei"]
+  },
+  {
+    id: 'mei',
+    name: 'Mei',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 33,
+    country: 'China',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Proyectil & Control',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4a55ced3bd597fb08e0fde9dc007f8543ac616ba98ca3db9b0e4d871a8ae17f8.png',
+    description: 'Climatologist armada con un cañón endotérmico para aislar tanques con muros de hielo y congelar zonas.',
+    perks: [
+          "Muro de hielo con más pilares",
+          "Bloque de hielo con explosión térmica",
+          "Carámbano perforante"
+    ],
+    counters: {
+      strongAgainst: ["dva","genji","wrecking-ball","reinhardt","lucio"],
+      weakAgainst: ["pharah","echo","widowmaker","ashe","sombra"]
+    },
+    synergies: ["reinhardt","ramattra","lucio","baptiste","reaper"]
+  },
+  {
+    id: 'symmetra',
+    name: 'Symmetra',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 30,
+    country: 'India',
+    affiliation: 'Vishkar Corporation',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Proyectil & Control',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ebec57e8bd68b3d4383edfeb34f8f52dd0b94a6467d594c2fee722e8a97c32aa.png',
+    description: 'Arquitecta de luz sólida armada con proyector de fotones que se recarga con escudos, torretas centinela y teletransportador.',
+    perks: [
+          "Torretas con curación/ralentización",
+          "Rayo de fotones con alcance extendido",
+          "Teletransportador instantáneo"
+    ],
+    counters: {
+      strongAgainst: ["dva","sigma","genji","reinhardt","orisa"],
+      weakAgainst: ["pharah","echo","widowmaker","winston","ashe"]
+    },
+    synergies: ["reinhardt","ramattra","mei","baptiste","lucio"]
+  },
+  {
+    id: 'torbjorn',
+    name: 'Torbjörn',
+    role: 'damage',
+    gender: 'Masculino',
+    age: 59,
+    country: 'Suecia',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Medio',
+    style: 'brawl',
+    subrole: 'Proyectil & Control',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ce17118cedc29b0d2ac1e059666bed36b9531c85079b0b894bb402d12c917ba9.png',
+    description: 'Maestro armero con pistola de remaches, sobrecarga con armadura y velocidad, torreta automática defensiva y lava fundida.',
+    perks: [
+          "Torreta con misiles menores",
+          "Sobrecarga de doble duración",
+          "Remaches incendiarios"
+    ],
+    counters: {
+      strongAgainst: ["tracer","genji","sombra","winston","wrecking-ball"],
+      weakAgainst: ["widowmaker","hanzo","pharah","ana","sigma"]
+    },
+    synergies: ["orisa","sigma","reinhardt","baptiste","bastion"]
+  },
+  {
+    id: 'echo',
+    name: 'Echo',
+    role: 'damage',
+    gender: 'Ómnico',
+    age: 14,
+    country: 'Suiza',
+    affiliation: 'Overwatch',
+    releaseYear: 2020,
+    range: 'Medio',
+    style: 'dive',
+    subrole: 'Aéreo / Movilidad',
+    difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/d4f2d5b0c2b7e82d61353186c5f23152ccba9d3569b50839aa580dca3e9114ba.png',
+    description: 'Robot evolutiva con vuelo libre, bombas pegajosas, haz de enfoque ejecutor y capacidad de duplicar a cualquier enemigo.',
+    perks: [
+          "Haz de enfoque ejecutor anticipado",
+          "Planeo aerodinámico prolongado",
+          "Recarga veloz al duplicar"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","junkrat","reaper","roadhog","torbjorn"],
+      weakAgainst: ["cassidy","ashe","soldier76","widowmaker","dva"]
+    },
+    synergies: ["mercy","zenyatta","winston","tracer","pharah"]
+  },
+  {
+    id: 'freja',
+    name: 'Freja',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 26,
+    country: 'Noruega',
+    affiliation: 'Valkyrie Aerospace',
+    releaseYear: 2025,
+    range: 'Largo',
+    style: 'poke',
+    subrole: 'Aéreo / Movilidad',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/freja.webp',
+    description: 'Tiradora aérea armada con virote automático de precisión, Corriente ascendente con planeo sostenido, Desplazamiento veloz y sanación aérea pasiva.',
+    perks: [
+          "Andanada implacable: recarga virote al impactar",
+          "Recuperación aérea con sanación activa planeando",
+          "Vientos crecientes con carga adicional"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","junkrat","reaper","mei","vendetta","brigitte"],
+      weakAgainst: ["cassidy","ashe","widowmaker","soldier76","dva"]
+    },
+    synergies: ["mercy","zenyatta","sigma","baptiste","hazard"]
+  },
+  {
+    id: 'pharah',
+    name: 'Pharah',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 34,
+    country: 'Egipto',
+    affiliation: 'Helix Security',
+    releaseYear: 2016,
+    range: 'Largo',
+    style: 'poke',
+    subrole: 'Aéreo / Movilidad',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/60ac2d5de4a6d34644d8872233da402f1436c87f804bb11a21661bb30bf4a51f.png',
+    description: 'Oficial de seguridad con traje Raptor capaz de surcar los cielos lanzando cohetes devastadores y ráfagas concusivas.',
+    perks: [
+          "Propulsión lateral continua",
+          "Cohetes con daño concusivo de impacto",
+          "Bombardeo protegido"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","junkrat","reaper","mei","brigitte","symmetra"],
+      weakAgainst: ["widowmaker","ashe","cassidy","soldier76","dva","ana"]
+    },
+    synergies: ["mercy","zenyatta","winston","wrecking-ball"]
+  },
   {
     id: 'ana',
     name: 'Ana',
@@ -853,16 +1000,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Largo',
     style: 'poke',
-    subrole: 'Main Healer / Sniper',
+    subrole: 'Sanación Principal',
     difficulty: 3,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/985b06beae46b7ba3ca87d1512d0fc62ca7f206ceca58ef16fc44d43a1cc84ed.png',
     description: 'Francotiradora veterana armada con rifle biótico, granada anti-curación destructora de tanques, dardo sedante y Nanoestimulante.',
-    perks: ['Dardo sedante con recarga veloz', 'Granada biótica con curación extendida', 'Rifle con mira termográfica'],
+    perks: [
+          "Dardo sedante con recarga veloz",
+          "Granada biótica con curación extendida",
+          "Rifle con mira termográfica"
+    ],
     counters: {
-      strongAgainst: ['roadhog', 'mauga', 'junker-queen', 'zenyatta', 'bastion', 'reaper'],
-      weakAgainst: ['winston', 'dva', 'genji', 'tracer', 'sombra', 'wrecking-ball']
+      strongAgainst: ["roadhog","mauga","junker-queen","zenyatta","bastion","reaper"],
+      weakAgainst: ["winston","dva","genji","tracer","sombra","wrecking-ball"]
     },
-    synergies: ['genji', 'reinhardt', 'soldier76', 'winston', 'brigitte']
+    synergies: ["genji","reinhardt","soldier76","winston","brigitte"]
   },
   {
     id: 'baptiste',
@@ -875,104 +1026,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2019,
     range: 'Medio',
     style: 'poke',
-    subrole: 'Main Healer / Hitscan DPS',
+    subrole: 'Sanación Principal',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/d4e6f1ca45d9f88fa89260787397f141a6f007b14e5b26698883b6a17bab9680.png',
     description: 'Médico de combate con lanzagranadas biótico, botas exoesqueleto de gran salto, campo de inmortalidad y matriz de amplificación.',
-    perks: ['Botas exoesqueleto con carga instantánea', 'Campo de inmortalidad con mayor radio', 'Curación regenerativa potente'],
+    perks: [
+          "Botas exoesqueleto con carga instantánea",
+          "Campo de inmortalidad con mayor radio",
+          "Curación regenerativa potente"
+    ],
     counters: {
-      strongAgainst: ['pharah', 'echo', 'junkrat', 'torbjorn', 'reinhardt'],
-      weakAgainst: ['genji', 'tracer', 'sombra', 'doomfist', 'widowmaker']
+      strongAgainst: ["pharah","echo","junkrat","torbjorn","reinhardt"],
+      weakAgainst: ["genji","tracer","sombra","doomfist","widowmaker"]
     },
-    synergies: ['sigma', 'reinhardt', 'bastion', 'soldier76', 'ashe', 'zenyatta']
-  },
-  {
-    id: 'brigitte',
-    name: 'Brigitte',
-    role: 'support',
-    gender: 'Femenino',
-    age: 25,
-    country: 'Suecia',
-    affiliation: 'Overwatch',
-    releaseYear: 2018,
-    range: 'Melee',
-    style: 'brawl',
-    subrole: 'Anti-Dive / Guardaespaldas',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/795fba91376d87d441a7f359ae12a3175dfa95825ccc4414cc6b95b129fc4cb0.png',
-    description: 'Guerrera escudera que cura con Inspiración al golpear, protege con escudo y rechaza flankers con lanzamiento de mayal.',
-    perks: ['Escudo con 500 de vida', 'Lanzamiento de mayal con aturdimiento', 'Paquetes de reparación dobles'],
-    counters: {
-      strongAgainst: ['tracer', 'genji', 'winston', 'doomfist', 'wrecking-ball', 'sombra'],
-      weakAgainst: ['pharah', 'echo', 'junkrat', 'ramattra', 'widowmaker']
-    },
-    synergies: ['ana', 'zenyatta', 'reinhardt', 'junker-queen', 'cassidy']
-  },
-  {
-    id: 'doctrine',
-    name: 'Doctrine',
-    role: 'support',
-    gender: 'Masculino',
-    age: 77,
-    country: 'Islandia',
-    affiliation: 'Independiente',
-    releaseYear: 2025,
-    range: 'Medio',
-    style: 'poke',
-    subrole: 'Survivor / Drones',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/2492a15c575c12314907d0d77501ec337b4d56796bc7f03e5dfb50d415612bae.png',
-    description: 'Cibernético y supervillano que comanda drones drenadores de vida, cetro eterno bioeléctrico que cura o hiere, potenciador Infuse y vuelo etéreo.',
-    perks: ['Drones vigorizantes con sobrecuración', 'Infuse con doble carga de habilidad', 'Cetro eterno con ráfaga penetrante'],
-    counters: {
-      strongAgainst: ['reinhardt', 'roadhog', 'mauga', 'reaper', 'torbjorn', 'hazard'],
-      weakAgainst: ['widowmaker', 'tracer', 'genji', 'winston', 'sombra']
-    },
-    synergies: ['sigma', 'ashe', 'soldier76', 'hazard', 'baptiste']
-  },
-  {
-    id: 'illari',
-    name: 'Illari',
-    role: 'support',
-    gender: 'Femenino',
-    age: 18,
-    country: 'Perú',
-    affiliation: 'Guerreros Inti',
-    releaseYear: 2023,
-    range: 'Largo',
-    style: 'poke',
-    subrole: 'Poke / DPS Support',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ce42d1455e03e79f321345fea84b27a8918b5db8bd7ab9b2ca9e569606ede9e4.png',
-    description: 'Última guerrera solar con rifle de precisión solar, pilón de curación automático desplegable y ultimate Sol Cautivo.',
-    perks: ['Pilón curativo con escudos', 'Estallido solar con derribo', 'Rifle con recarga solar instantánea'],
-    counters: {
-      strongAgainst: ['pharah', 'echo', 'widowmaker', 'tracer', 'mercy'],
-      weakAgainst: ['winston', 'dva', 'genji', 'sombra', 'doomfist']
-    },
-    synergies: ['sigma', 'baptiste', 'soldier76', 'ashe', 'cassidy']
-  },
-  {
-    id: 'juno',
-    name: 'Juno',
-    role: 'support',
-    gender: 'Femenino',
-    age: 19,
-    country: 'Marte',
-    affiliation: 'Proyecto Lucerna',
-    releaseYear: 2024,
-    range: 'Medio',
-    style: 'dive',
-    subrole: 'Speed / Flanker Support',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c0167d251e57b0aa2b1e16c37d87f0e7c77263db9dd0503d77b5f2589bf3e4a0.png',
-    description: 'Exploradora espacial marciana con bláster médico de ráfagas, hiperanillo de aceleración masiva y torpedos teledirigidos.',
-    perks: ['Hiperanillo con bono de daño', 'Torpedos teledirigidos dobles', 'Vuelo gravitacional extendido'],
-    counters: {
-      strongAgainst: ['roadhog', 'reinhardt', 'reaper', 'junkrat'],
-      weakAgainst: ['widowmaker', 'ashe', 'cassidy', 'sombra', 'dva']
-    },
-    synergies: ['winston', 'tracer', 'genji', 'dva', 'reinhardt', 'ana']
+    synergies: ["sigma","reinhardt","bastion","soldier76","ashe","zenyatta"]
   },
   {
     id: 'kiriko',
@@ -985,16 +1052,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2022,
     range: 'Medio',
     style: 'dive',
-    subrole: 'Flex Support / Suzu & Crit',
+    subrole: 'Sanación Principal',
     difficulty: 3,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/408603fe037e8576078eaac5eab2fb251489ced4003b11f5f522776d43d0b83d.png',
     description: 'Ninja protectora con kunais de crítico letal, talismanes curativos teledirigidos, Suzu purificador y Paso Ligero a través de paredes.',
-    perks: ['Suzu con invulnerabilidad aumentada', 'Paso ligero con escudo al salir', 'Kunai con crítico triplicado'],
+    perks: [
+          "Suzu con invulnerabilidad aumentada",
+          "Paso ligero con escudo al salir",
+          "Kunai con crítico triplicado"
+    ],
     counters: {
-      strongAgainst: ['ana', 'junker-queen', 'roadhog', 'reinhardt', 'sombra', 'tracer'],
-      weakAgainst: ['winston', 'widowmaker', 'pharah', 'sojourn']
+      strongAgainst: ["ana","junker-queen","roadhog","reinhardt","sombra","tracer"],
+      weakAgainst: ["winston","widowmaker","pharah","sojourn"]
     },
-    synergies: ['winston', 'tracer', 'genji', 'doomfist', 'mauga', 'lucio']
+    synergies: ["winston","tracer","genji","doomfist","mauga","lucio"]
   },
   {
     id: 'lifeweaver',
@@ -1007,60 +1078,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2023,
     range: 'Largo',
     style: 'poke',
-    subrole: 'Utilidad / Rescate Vital',
+    subrole: 'Sanación Principal',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/3376515cebed0904012e67e956f6d1b9c12e03da642845eeaf787b7e4c7b339d.png',
     description: 'Bioluz innovadora que salva aliados en apuros con Agarre Vital, crea plataformas de pétalo elevadoras y planta el Árbol de la Vida.',
-    perks: ['Plataforma de pétalo con curación', 'Agarre vital con regeneración masiva', 'Ráfaga de espinas perforante'],
+    perks: [
+          "Plataforma de pétalo con curación",
+          "Agarre vital con regeneración masiva",
+          "Ráfaga de espinas perforante"
+    ],
     counters: {
-      strongAgainst: ['zarya', 'reinhardt', 'orisa', 'roadhog'],
-      weakAgainst: ['sombra', 'tracer', 'genji', 'widowmaker', 'winston']
+      strongAgainst: ["zarya","reinhardt","orisa","roadhog"],
+      weakAgainst: ["sombra","tracer","genji","widowmaker","winston"]
     },
-    synergies: ['ana', 'baptiste', 'cassidy', 'bastion', 'torbjorn']
-  },
-  {
-    id: 'lucio',
-    name: 'Lúcio',
-    role: 'support',
-    gender: 'Masculino',
-    age: 28,
-    country: 'Brasil',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'Speed / Disrupción',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/040bb13f5123ab93faad2f95627ba184608aef4b2469a4d3003859c7087df044.png',
-    description: 'DJ revolucionario que patrocina la velocidad del equipo con música y patinaje sobre muros; el corazón del juego Brawl y Rush.',
-    perks: ['Amp it up con velocidad del 80%', 'Empuje de onda sonora con aturdimiento', 'Patinaje continuo sin fricción'],
-    counters: {
-      strongAgainst: ['widowmaker', 'roadhog', 'reaper', 'reinhardt'],
-      weakAgainst: ['pharah', 'echo', 'torbjorn', 'sombra', 'cassidy', 'moira']
-    },
-    synergies: ['reinhardt', 'ramattra', 'junker-queen', 'reaper', 'mei', 'ana', 'kiriko']
-  },
-  {
-    id: 'mercy',
-    name: 'Mercy',
-    role: 'support',
-    gender: 'Femenino',
-    age: 39,
-    country: 'Suiza',
-    affiliation: 'Overwatch',
-    releaseYear: 2016,
-    range: 'Medio',
-    style: 'poke',
-    subrole: 'Main Pocket / Resurrección',
-    difficulty: 1,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/3bfb8bd8ec827e53d870f1238ab73d8aa1f5dbfbcfaaf7f96ffcd35b5c6102ab.png',
-    description: 'Médico ángel de la guardia que potencia el daño aliado, cura con rayo continuo, planea con agilidad y resucita compañeros caídos.',
-    perks: ['Resurrección con escudo protector', 'Potenciador de daño al 35%', 'Super salto libre'],
-    counters: {
-      strongAgainst: [],
-      weakAgainst: ['widowmaker', 'genji', 'tracer', 'sombra', 'winston', 'cassidy']
-    },
-    synergies: ['pharah', 'echo', 'ashe', 'sojourn', 'soldier76', 'widowmaker']
+    synergies: ["ana","baptiste","cassidy","bastion","torbjorn"]
   },
   {
     id: 'moira',
@@ -1073,16 +1104,98 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2017,
     range: 'Corto',
     style: 'brawl',
-    subrole: 'Brawl / Burst Healer',
+    subrole: 'Sanación Principal',
     difficulty: 1,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/f48f8485056d5d00dad195859188d23e50f7126b8b08b5646f46ef1b42f5e1de.png',
     description: 'Genetista brillante que equilibra curación masiva con drenaje biótico, orbes teledirigidos y Desvanecimiento para escapar de todo peligro.',
-    perks: ['Desvanecimiento con purga aliada', 'Orbes de doble duración', 'Drenaje con mayor alcance'],
+    perks: [
+          "Desvanecimiento con purga aliada",
+          "Orbes de doble duración",
+          "Drenaje con mayor alcance"
+    ],
     counters: {
-      strongAgainst: ['genji', 'tracer', 'sombra', 'lucio', 'symmetra'],
-      weakAgainst: ['dva', 'ana', 'widowmaker', 'ashe', 'bastion']
+      strongAgainst: ["genji","tracer","sombra","lucio","symmetra"],
+      weakAgainst: ["dva","ana","widowmaker","ashe","bastion"]
     },
-    synergies: ['reinhardt', 'lucio', 'reaper', 'ramattra', 'junker-queen']
+    synergies: ["reinhardt","lucio","reaper","ramattra","junker-queen"]
+  },
+  {
+    id: 'doctrine',
+    name: 'Doctrine',
+    role: 'support',
+    gender: 'Masculino',
+    age: 77,
+    country: 'Islandia',
+    affiliation: 'Independiente',
+    releaseYear: 2025,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Táctico & Utilidad',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/2492a15c575c12314907d0d77501ec337b4d56796bc7f03e5dfb50d415612bae.png',
+    description: 'Cibernético y supervillano que comanda drones drenadores de vida, cetro eterno bioeléctrico que cura o hiere, potenciador Infuse y vuelo etéreo.',
+    perks: [
+          "Drones vigorizantes con sobrecuración",
+          "Infuse con doble carga de habilidad",
+          "Cetro eterno con ráfaga penetrante"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","roadhog","mauga","reaper","torbjorn","hazard"],
+      weakAgainst: ["widowmaker","tracer","genji","winston","sombra"]
+    },
+    synergies: ["sigma","ashe","soldier76","hazard","baptiste"]
+  },
+  {
+    id: 'illari',
+    name: 'Illari',
+    role: 'support',
+    gender: 'Femenino',
+    age: 18,
+    country: 'Perú',
+    affiliation: 'Guerreros Inti',
+    releaseYear: 2023,
+    range: 'Largo',
+    style: 'poke',
+    subrole: 'Táctico & Utilidad',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ce42d1455e03e79f321345fea84b27a8918b5db8bd7ab9b2ca9e569606ede9e4.png',
+    description: 'Última guerrera solar con rifle de precisión solar, pilón de curación automático desplegable y ultimate Sol Cautivo.',
+    perks: [
+          "Pilón curativo con escudos",
+          "Estallido solar con derribo",
+          "Rifle con recarga solar instantánea"
+    ],
+    counters: {
+      strongAgainst: ["pharah","echo","widowmaker","tracer","mercy"],
+      weakAgainst: ["winston","dva","genji","sombra","doomfist"]
+    },
+    synergies: ["sigma","baptiste","soldier76","ashe","cassidy"]
+  },
+  {
+    id: 'lucio',
+    name: 'Lúcio',
+    role: 'support',
+    gender: 'Masculino',
+    age: 28,
+    country: 'Brasil',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Táctico & Utilidad',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/040bb13f5123ab93faad2f95627ba184608aef4b2469a4d3003859c7087df044.png',
+    description: 'DJ revolucionario que patrocina la velocidad del equipo con música y patinaje sobre muros; el corazón del juego Brawl y Rush.',
+    perks: [
+          "Amp it up con velocidad del 80%",
+          "Empuje de onda sonora con aturdimiento",
+          "Patinaje continuo sin fricción"
+    ],
+    counters: {
+      strongAgainst: ["widowmaker","roadhog","reaper","reinhardt"],
+      weakAgainst: ["pharah","echo","torbjorn","sombra","cassidy","moira"]
+    },
+    synergies: ["reinhardt","ramattra","junker-queen","reaper","mei","ana","kiriko"]
   },
   {
     id: 'sombra',
@@ -1095,16 +1208,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Corto',
     style: 'dive',
-    subrole: 'Tactician / Support Hacker',
+    subrole: 'Táctico & Utilidad',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/47727b02a16e3bd7b2447d86ae1edf11587bc320b2aecb4f2f16a7ca4ad4e8a0.png',
     description: 'Hacker de apoyo táctico con Hotfix para regenerar aliados y hackear recursos, Cyberspace para debilitar y curar en zona, Translocalizador y EMP masivo.',
-    perks: ['Hotfix con mayor regeneración', 'Cyberspace de radio extendido', 'EMP con daño a barreras aumentado'],
+    perks: [
+          "Hotfix con mayor regeneración",
+          "Cyberspace de radio extendido",
+          "EMP con daño a barreras aumentado"
+    ],
     counters: {
-      strongAgainst: ['doomfist', 'wrecking-ball', 'widowmaker', 'zenyatta', 'reinhardt', 'bastion', 'doctrine'],
-      weakAgainst: ['winston', 'dva', 'cassidy', 'torbjorn', 'brigitte', 'mei', 'hazard']
+      strongAgainst: ["doomfist","wrecking-ball","widowmaker","zenyatta","reinhardt","bastion","doctrine"],
+      weakAgainst: ["winston","dva","cassidy","torbjorn","brigitte","mei","hazard"]
     },
-    synergies: ['tracer', 'winston', 'doomfist', 'kiriko', 'genji', 'hazard']
+    synergies: ["tracer","winston","doomfist","kiriko","genji","hazard"]
   },
   {
     id: 'wuyang',
@@ -1117,60 +1234,20 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2025,
     range: 'Medio',
     style: 'poke',
-    subrole: 'Hydrokinetic / Wave Healer',
+    subrole: 'Táctico & Utilidad',
     difficulty: 2,
     icon: 'https://tonikiraw.com/assets/img/heroes/wuyang.webp',
     description: 'Maestro de la hidroquinesis con Torrente impetuoso, Ola guardiana retornable con empuje, Flujo restaurativo en área y Orbes acuáticos de impacto múltiple.',
-    perks: ['Flujo y reflujo: Ola guardiana retorna a origen', 'Lluvia arreciante con 3 orbes simultáneos', 'Desborde con 50% extra de recursos de sanación'],
+    perks: [
+          "Flujo y reflujo: Ola guardiana retorna a origen",
+          "Lluvia arreciante con 3 orbes simultáneos",
+          "Desborde con 50% extra de recursos de sanación"
+    ],
     counters: {
-      strongAgainst: ['reaper', 'reinhardt', 'junker-queen', 'mei', 'roadhog'],
-      weakAgainst: ['widowmaker', 'ashe', 'sombra', 'tracer', 'genji']
+      strongAgainst: ["reaper","reinhardt","junker-queen","mei","roadhog"],
+      weakAgainst: ["widowmaker","ashe","sombra","tracer","genji"]
     },
-    synergies: ['jetpack-cat', 'sigma', 'ramattra', 'soldier76', 'cassidy']
-  },
-  {
-    id: 'jetpack-cat',
-    name: 'Jetpack Cat',
-    role: 'support',
-    gender: 'Animal',
-    age: 4,
-    country: 'Suecia',
-    affiliation: 'Ironclad Guild',
-    releaseYear: 2025,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Aerial Support / Transport',
-    difficulty: 2,
-    icon: 'https://tonikiraw.com/assets/img/heroes/jetpack-cat.webp',
-    description: 'Gatita equipada con jetpack de la familia Lindholm armada con Patiproyectiles bióticos teledirigidos, Transporte aéreo de aliados protegidos con escudo, Ronroneo curativo y Garras ralentizantes.',
-    perks: ['Transporte protegido con 50 de escudo adicional', 'Ronroneo perfecto de triple pulso restaurador', 'Garras fuera con 40 de daño y ralentización'],
-    counters: {
-      strongAgainst: ['reinhardt', 'roadhog', 'junkrat', 'reaper', 'venture'],
-      weakAgainst: ['cassidy', 'soldier76', 'ashe', 'dva', 'torbjorn']
-    },
-    synergies: ['sombra', 'wuyang', 'winston', 'tracer', 'genji', 'hazard']
-  },
-  {
-    id: 'mizuki',
-    name: 'Mizuki',
-    role: 'support',
-    gender: 'Masculino',
-    age: 35,
-    country: 'Japón',
-    affiliation: 'Kanezaka',
-    releaseYear: 2025,
-    range: 'Corto',
-    style: 'brawl',
-    subrole: 'Anti-Dive / Tether Controller',
-    difficulty: 2,
-    icon: 'https://tonikiraw.com/assets/img/heroes/mizuki.webp',
-    description: 'Custodio espiritual de Kanezaka con Aura reparadora perimetral, Cadena vinculante que frena el dive y amplifica el daño recibido, Sanación Kasa con rebote amplificado y Paso rápido Katashiro.',
-    perks: ['Alma expuesta: 30% más de daño tras Cadena vinculante', 'Regreso resonante con rebote adicional de Kasa', 'Paso rápido con aumento de velocidad en Aura'],
-    counters: {
-      strongAgainst: ['genji', 'tracer', 'winston', 'doomfist', 'shion', 'vendetta'],
-      weakAgainst: ['widowmaker', 'ashe', 'pharah', 'freja', 'sigma']
-    },
-    synergies: ['reinhardt', 'junker-queen', 'brigitte', 'cassidy', 'reaper']
+    synergies: ["jetpack-cat","sigma","ramattra","soldier76","cassidy"]
   },
   {
     id: 'zenyatta',
@@ -1183,15 +1260,149 @@ export const OVERWATCH_HEROES: Hero[] = [
     releaseYear: 2016,
     range: 'Largo',
     style: 'poke',
-    subrole: 'Discord / Glass Cannon',
+    subrole: 'Táctico & Utilidad',
     difficulty: 2,
     icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/7d1546b1541a8afc39353f9337a408d6275a141b0432b7e560ef61579996b0fc.png',
     description: 'Monje ómnico que debilita enemigos con el Orbe de la Discordia aumentando el daño recibido, cura con armonía y trasciende el plano.',
-    perks: ['Discordia con efecto acumulativo', 'Patada de empuje gravitatorio', 'Orbe de armonía amplificado'],
+    perks: [
+          "Discordia con efecto acumulativo",
+          "Patada de empuje gravitatorio",
+          "Orbe de armonía amplificado"
+    ],
     counters: {
-      strongAgainst: ['roadhog', 'mauga', 'reinhardt', 'orisa', 'bastion', 'hazard'],
-      weakAgainst: ['sombra', 'tracer', 'genji', 'winston', 'widowmaker', 'doomfist']
+      strongAgainst: ["roadhog","mauga","reinhardt","orisa","bastion","hazard"],
+      weakAgainst: ["sombra","tracer","genji","winston","widowmaker","doomfist"]
     },
-    synergies: ['sigma', 'baptiste', 'brigitte', 'ashe', 'soldier76', 'widowmaker', 'doctrine']
+    synergies: ["sigma","baptiste","brigitte","ashe","soldier76","widowmaker","doctrine"]
+  },
+  {
+    id: 'brigitte',
+    name: 'Brigitte',
+    role: 'support',
+    gender: 'Femenino',
+    age: 25,
+    country: 'Suecia',
+    affiliation: 'Overwatch',
+    releaseYear: 2018,
+    range: 'Melee',
+    style: 'brawl',
+    subrole: 'Anti-Dive / Escolta',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/795fba91376d87d441a7f359ae12a3175dfa95825ccc4414cc6b95b129fc4cb0.png',
+    description: 'Guerrera escudera que cura con Inspiración al golpear, protege con escudo y rechaza flankers con lanzamiento de mayal.',
+    perks: [
+          "Escudo con 500 de vida",
+          "Lanzamiento de mayal con aturdimiento",
+          "Paquetes de reparación dobles"
+    ],
+    counters: {
+      strongAgainst: ["tracer","genji","winston","doomfist","wrecking-ball","sombra"],
+      weakAgainst: ["pharah","echo","junkrat","ramattra","widowmaker"]
+    },
+    synergies: ["ana","zenyatta","reinhardt","junker-queen","cassidy"]
+  },
+  {
+    id: 'mizuki',
+    name: 'Mizuki',
+    role: 'support',
+    gender: 'Masculino',
+    age: 35,
+    country: 'Japón',
+    affiliation: 'Kanezaka',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Anti-Dive / Escolta',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/mizuki.webp',
+    description: 'Custodio espiritual de Kanezaka con Aura reparadora perimetral, Cadena vinculante que frena el dive y amplifica el daño recibido, Sanación Kasa con rebote amplificado y Paso rápido Katashiro.',
+    perks: [
+          "Alma expuesta: 30% más de daño tras Cadena vinculante",
+          "Regreso resonante con rebote adicional de Kasa",
+          "Paso rápido con aumento de velocidad en Aura"
+    ],
+    counters: {
+      strongAgainst: ["genji","tracer","winston","doomfist","shion","vendetta"],
+      weakAgainst: ["widowmaker","ashe","pharah","freja","sigma"]
+    },
+    synergies: ["reinhardt","junker-queen","brigitte","cassidy","reaper"]
+  },
+  {
+    id: 'jetpack-cat',
+    name: 'Jetpack Cat',
+    role: 'support',
+    gender: 'Animal',
+    age: 4,
+    country: 'Suecia',
+    affiliation: 'Ironclad Guild',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Móvil & Aéreo',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/jetpack-cat.webp',
+    description: 'Gatita equipada con jetpack de la familia Lindholm armada con Patiproyectiles bióticos teledirigidos, Transporte aéreo de aliados protegidos con escudo, Ronroneo curativo y Garras ralentizantes.',
+    perks: [
+          "Transporte protegido con 50 de escudo adicional",
+          "Ronroneo perfecto de triple pulso restaurador",
+          "Garras fuera con 40 de daño y ralentización"
+    ],
+    counters: {
+      strongAgainst: ["reinhardt","roadhog","junkrat","reaper","venture"],
+      weakAgainst: ["cassidy","soldier76","ashe","dva","torbjorn"]
+    },
+    synergies: ["sombra","wuyang","winston","tracer","genji","hazard"]
+  },
+  {
+    id: 'juno',
+    name: 'Juno',
+    role: 'support',
+    gender: 'Femenino',
+    age: 19,
+    country: 'Marte',
+    affiliation: 'Proyecto Lucerna',
+    releaseYear: 2024,
+    range: 'Medio',
+    style: 'dive',
+    subrole: 'Móvil & Aéreo',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c0167d251e57b0aa2b1e16c37d87f0e7c77263db9dd0503d77b5f2589bf3e4a0.png',
+    description: 'Exploradora espacial marciana con bláster médico de ráfagas, hiperanillo de aceleración masiva y torpedos teledirigidos.',
+    perks: [
+          "Hiperanillo con bono de daño",
+          "Torpedos teledirigidos dobles",
+          "Vuelo gravitacional extendido"
+    ],
+    counters: {
+      strongAgainst: ["roadhog","reinhardt","reaper","junkrat"],
+      weakAgainst: ["widowmaker","ashe","cassidy","sombra","dva"]
+    },
+    synergies: ["winston","tracer","genji","dva","reinhardt","ana"]
+  },
+  {
+    id: 'mercy',
+    name: 'Mercy',
+    role: 'support',
+    gender: 'Femenino',
+    age: 39,
+    country: 'Suiza',
+    affiliation: 'Overwatch',
+    releaseYear: 2016,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Móvil & Aéreo',
+    difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/3bfb8bd8ec827e53d870f1238ab73d8aa1f5dbfbcfaaf7f96ffcd35b5c6102ab.png',
+    description: 'Médico ángel de la guardia que potencia el daño aliado, cura con rayo continuo, planea con agilidad y resucita compañeros caídos.',
+    perks: [
+          "Resurrección con escudo protector",
+          "Potenciador de daño al 35%",
+          "Super salto libre"
+    ],
+    counters: {
+      strongAgainst: [],
+      weakAgainst: ["widowmaker","genji","tracer","sombra","winston","cassidy"]
+    },
+    synergies: ["pharah","echo","ashe","sojourn","soldier76","widowmaker"]
   }
 ];
