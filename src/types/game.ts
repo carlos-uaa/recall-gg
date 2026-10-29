@@ -17,6 +17,7 @@ export interface Hero {
   releaseYear: number;
   range: 'Corto' | 'Medio' | 'Largo' | 'Melee';
   style: CompStyle;
+  subrole: string;
   icon?: string;
   difficulty: 1 | 2 | 3; // 1: Fácil/Baja, 2: Media, 3: Alta (Widow, Tracer, Genji)
   description: string;
