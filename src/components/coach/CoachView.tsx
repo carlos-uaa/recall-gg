@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_MAPS } from '../../games/overwatch/maps';
-import type { GameMap, RankTier, Role, Hero } from '../../types/game';
+import type { GameMap, RankTier, Role } from '../../types/game';
 import { calculateRecommendations, analyzePlayerPick } from '../../core/coachEngine';
 import { HeroAvatar } from '../common/HeroAvatar';
 import { HeroSelectScreen } from './HeroSelectScreen';
@@ -85,7 +85,6 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
       // First, remove this hero if it was in another slot to prevent duplicate
       const cleaned = slots.map(s => (s.heroId === heroId && !s.isMyPick ? { ...s, heroId: null } : s));
       
-      // Find slot of matching role
       let assigned = false;
       return cleaned.map(s => {
         if (!assigned && s.role === hero.role) {
@@ -164,20 +163,17 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
     if (!activeSlotTarget) return;
 
     if (activeSlotTarget.team === 'ally') {
-      // Validate no duplicate in ally team
       setAllySlots(slots =>
         slots.map(s => {
           if (s.id === activeSlotTarget.slotId) {
             if (s.isMyPick) setPlayerHeroId(heroId);
             return { ...s, heroId };
           }
-          // If this hero was in another slot on the same team, clear it to avoid duplicate
           if (s.heroId === heroId) return { ...s, heroId: null };
           return s;
         })
       );
     } else {
-      // Validate no duplicate in enemy team
       setEnemySlots(slots =>
         slots.map(s => {
           if (s.id === activeSlotTarget.slotId) return { ...s, heroId };
@@ -353,7 +349,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         </div>
       </div>
 
-      {/* 2. OVERWATCH HERO SELECT SCREEN (AT THE TOP!) */}
+      {/* 2. OVERWATCH HERO SELECT SCREEN (DIRECTAMENTE ARRIBA, ESTILO ORIGINAL CON IMAGEN, BADGE SUPERPUESTO Y NOMBRE FOOTER) */}
       <HeroSelectScreen
         selectedHeroId={playerHeroId}
         onSelectHero={handleSelectMyHero}
@@ -362,139 +358,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         playerRole={playerHero.role}
       />
 
-      {/* 3. PLAYER HERO PICK DIAGNOSIS & SMART COUNTER-SWITCH */}
-      {playerPickDiagnosis && (
-        <div className={`border-2 rounded-3xl p-6 shadow-2xl relative overflow-hidden transition ${
-          playerPickDiagnosis.score >= 70
-            ? 'border-emerald-500/50 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900'
-            : playerPickDiagnosis.score >= 50
-            ? 'border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900'
-            : 'border-rose-500/60 bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900'
-        }`}>
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-5 border-b border-slate-800">
-            <div className="flex items-center space-x-4">
-              <HeroAvatar hero={playerPickDiagnosis.hero} size="xl" showRoleBadge />
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 flex items-center">
-                    <UserCheck className="w-3 h-3 mr-1" /> TU ELECCIÓN ACTUAL
-                  </span>
-                  <span className="text-xs text-slate-400 capitalize">
-                    {playerPickDiagnosis.hero.role === 'damage' ? 'DPS' : playerPickDiagnosis.hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
-                  </span>
-                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                    {playerPickDiagnosis.hero.subrole}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-black text-white mt-1">
-                  {playerPickDiagnosis.hero.name}
-                </h2>
-                <p className="text-xs text-slate-300 mt-1 max-w-xl">
-                  {playerPickDiagnosis.verdict}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <div className="text-right">
-                <div className="text-[10px] uppercase font-bold text-slate-400">Viabilidad Calculada</div>
-                <div className={`text-3xl font-black font-mono ${
-                  playerPickDiagnosis.score >= 70 ? 'text-emerald-400' : playerPickDiagnosis.score >= 50 ? 'text-amber-400' : 'text-rose-400'
-                }`}>
-                  {playerPickDiagnosis.score}/100
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Threats & Targets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 border-b border-slate-800">
-            {/* Threats */}
-            <div className="bg-slate-900/60 rounded-2xl p-3.5 border border-rose-500/20">
-              <div className="flex items-center space-x-2 text-rose-400 font-bold text-xs mb-2">
-                <AlertOctagon className="w-4 h-4" />
-                <span>Counters rivales que te anulan directamente ({playerPickDiagnosis.directThreats.length})</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {playerPickDiagnosis.directThreats.length > 0 ? (
-                  playerPickDiagnosis.directThreats.map(threat => (
-                    <div key={threat.id} className="flex items-center space-x-2 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-rose-500/30">
-                      <HeroAvatar hero={threat} size="xs" />
-                      <span className="text-xs font-semibold text-rose-300">{threat.name}</span>
-                    </div>
-                  ))
-                ) : (
-                  <span className="text-xs text-emerald-400 font-medium italic">
-                    ¡Ningún héroe rival te hace hard-counter directo en este momento!
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Favorable Targets */}
-            <div className="bg-slate-900/60 rounded-2xl p-3.5 border border-emerald-500/20">
-              <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs mb-2">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Tus objetivos favoritos en el equipo rival ({playerPickDiagnosis.favorableTargets.length})</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {playerPickDiagnosis.favorableTargets.length > 0 ? (
-                  playerPickDiagnosis.favorableTargets.map(target => (
-                    <div key={target.id} className="flex items-center space-x-2 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-emerald-500/30">
-                      <HeroAvatar hero={target} size="xs" />
-                      <span className="text-xs font-semibold text-emerald-300">{target.name}</span>
-                    </div>
-                  ))
-                ) : (
-                  <span className="text-xs text-slate-400 italic">
-                    Enfócate en desgastar escudos o coordinar con tus tanques.
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* COUNTER-SWITCH SUGGESTIONS (WITHIN SAME ROLE) */}
-          <div className="pt-4">
-            <div className="flex items-center space-x-2 text-sm font-black text-white mb-3">
-              <RefreshCw className="w-4 h-4 text-orange-400" />
-              <span>{t.switchRecommendations}</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {playerPickDiagnosis.recommendedSwitches.map(alt => (
-                <div
-                  key={alt.hero.id}
-                  onClick={() => handleSelectMyHero(alt.hero.id)}
-                  className="bg-slate-800/90 border border-orange-500/30 hover:border-orange-500 rounded-2xl p-3 flex items-center justify-between cursor-pointer transition shadow-lg group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <HeroAvatar hero={alt.hero} size="md" />
-                    <div>
-                      <div className="flex items-center space-x-1.5">
-                        <span className="font-bold text-white text-sm group-hover:text-orange-400 transition">
-                          {alt.hero.name}
-                        </span>
-                        <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                          {alt.score} pts
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-300 leading-tight mt-0.5">
-                        {alt.reason}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] text-orange-400 font-bold uppercase opacity-0 group-hover:opacity-100 transition">
-                    Cambiar
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 4. TEAM COMPOSITIONS (ALLY & ENEMY SLOTS WITH ROLE CONSTRAINTS) */}
+      {/* 3. TEAM COMPOSITIONS (ALLY & ENEMY SLOTS WITH ROLE CONSTRAINTS) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Ally Team */}
         <div className={`border rounded-3xl p-5 shadow-lg relative ${
@@ -510,7 +374,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               </h3>
             </div>
             <span className="text-[11px] text-slate-400">
-              Sin héroes repetidos en tu alineación
+              Sin héroes repetidos en tu equipo
             </span>
           </div>
 
@@ -676,6 +540,138 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         </div>
       </div>
 
+      {/* 4. PLAYER HERO PICK DIAGNOSIS & SMART COUNTER-SWITCH (AHORA SITUADO DEBAJO DE LA SELECCIÓN DE EQUIPO) */}
+      {playerPickDiagnosis && (
+        <div className={`border-2 rounded-3xl p-6 shadow-2xl relative overflow-hidden transition ${
+          playerPickDiagnosis.score >= 70
+            ? 'border-emerald-500/50 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900'
+            : playerPickDiagnosis.score >= 50
+            ? 'border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900'
+            : 'border-rose-500/60 bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900'
+        }`}>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-5 border-b border-slate-800">
+            <div className="flex items-center space-x-4">
+              <HeroAvatar hero={playerPickDiagnosis.hero} size="xl" showRoleBadge />
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 flex items-center">
+                    <UserCheck className="w-3 h-3 mr-1" /> TU ELECCIÓN ACTUAL
+                  </span>
+                  <span className="text-xs text-slate-400 capitalize">
+                    {playerPickDiagnosis.hero.role === 'damage' ? 'DPS' : playerPickDiagnosis.hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
+                  </span>
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                    {playerPickDiagnosis.hero.subrole}
+                  </span>
+                </div>
+                <h2 className="text-2xl font-black text-white mt-1">
+                  {playerPickDiagnosis.hero.name}
+                </h2>
+                <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                  {playerPickDiagnosis.verdict}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <div className="text-right">
+                <div className="text-[10px] uppercase font-bold text-slate-400">Viabilidad Calculada</div>
+                <div className={`text-3xl font-black font-mono ${
+                  playerPickDiagnosis.score >= 70 ? 'text-emerald-400' : playerPickDiagnosis.score >= 50 ? 'text-amber-400' : 'text-rose-400'
+                }`}>
+                  {playerPickDiagnosis.score}/100
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Threats & Targets */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 border-b border-slate-800">
+            {/* Threats */}
+            <div className="bg-slate-900/60 rounded-2xl p-3.5 border border-rose-500/20">
+              <div className="flex items-center space-x-2 text-rose-400 font-bold text-xs mb-2">
+                <AlertOctagon className="w-4 h-4" />
+                <span>Counters rivales que te anulan directamente ({playerPickDiagnosis.directThreats.length})</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {playerPickDiagnosis.directThreats.length > 0 ? (
+                  playerPickDiagnosis.directThreats.map(threat => (
+                    <div key={threat.id} className="flex items-center space-x-2 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-rose-500/30">
+                      <HeroAvatar hero={threat} size="xs" />
+                      <span className="text-xs font-semibold text-rose-300">{threat.name}</span>
+                    </div>
+                  ))
+                ) : (
+                  <span className="text-xs text-emerald-400 font-medium italic">
+                    ¡Ningún héroe rival te hace hard-counter directo en este momento!
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Favorable Targets */}
+            <div className="bg-slate-900/60 rounded-2xl p-3.5 border border-emerald-500/20">
+              <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs mb-2">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Tus objetivos favoritos en el equipo rival ({playerPickDiagnosis.favorableTargets.length})</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {playerPickDiagnosis.favorableTargets.length > 0 ? (
+                  playerPickDiagnosis.favorableTargets.map(target => (
+                    <div key={target.id} className="flex items-center space-x-2 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-emerald-500/30">
+                      <HeroAvatar hero={target} size="xs" />
+                      <span className="text-xs font-semibold text-emerald-300">{target.name}</span>
+                    </div>
+                  ))
+                ) : (
+                  <span className="text-xs text-slate-400 italic">
+                    Enfócate en desgastar escudos o coordinar con tus tanques.
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* COUNTER-SWITCH SUGGESTIONS (WITHIN SAME ROLE) */}
+          <div className="pt-4">
+            <div className="flex items-center space-x-2 text-sm font-black text-white mb-3">
+              <RefreshCw className="w-4 h-4 text-orange-400" />
+              <span>{t.switchRecommendations}</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {playerPickDiagnosis.recommendedSwitches.map(alt => (
+                <div
+                  key={alt.hero.id}
+                  onClick={() => handleSelectMyHero(alt.hero.id)}
+                  className="bg-slate-800/90 border border-orange-500/30 hover:border-orange-500 rounded-2xl p-3 flex items-center justify-between cursor-pointer transition shadow-lg group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <HeroAvatar hero={alt.hero} size="md" />
+                    <div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="font-bold text-white text-sm group-hover:text-orange-400 transition">
+                          {alt.hero.name}
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                          {alt.score} pts
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-tight mt-0.5">
+                        {alt.reason}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-orange-400 font-bold uppercase opacity-0 group-hover:opacity-100 transition">
+                    Cambiar
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 5. MODAL CON VALIDACIÓN DE NO-REPETICIÓN */}
       {activeSlotTarget && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -719,7 +715,6 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 {OVERWATCH_HEROES.filter(
                   h => h.role === activeSlotTarget.role && h.name.toLowerCase().includes(searchFilter.toLowerCase())
                 ).map(hero => {
-                  // Check if already taken in this specific team
                   const isTaken = activeSlotTarget.team === 'ally'
                     ? allyHeroIds.includes(hero.id)
                     : enemyHeroIds.includes(hero.id);
