@@ -19,9 +19,9 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
 
   const metaTiers: Record<string, string[]> = {
     S: ['tracer', 'winston', 'kiriko', 'lucio', 'dva', 'sojourn', 'baptiste', 'juno'],
-    A: ['ashe', 'cassidy', 'ana', 'sigma', 'genji', 'reinhardt', 'illari', 'doomfist', 'venture'],
+    A: ['ashe', 'cassidy', 'ana', 'sigma', 'genji', 'reinhardt', 'illari', 'doomfist', 'venture', 'hazard', 'doctrine', 'sombra'],
     B: ['ramattra', 'junker-queen', 'widowmaker', 'soldier76', 'brigitte', 'moira', 'echo', 'mei', 'zarya'],
-    C: ['roadhog', 'mauga', 'orisa', 'bastion', 'torbjorn', 'junkrat', 'zenyatta', 'sombra', 'symmetra'],
+    C: ['roadhog', 'mauga', 'orisa', 'bastion', 'torbjorn', 'junkrat', 'zenyatta', 'symmetra'],
     D: ['hanzo', 'reaper', 'pharah', 'lifeweaver', 'mercy', 'wrecking-ball'],
   };
 

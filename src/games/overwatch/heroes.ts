@@ -47,6 +47,28 @@ export const OVERWATCH_HEROES: Hero[] = [
     synergies: ['tracer', 'genji', 'kiriko', 'lucio', 'venture']
   },
   {
+    id: 'hazard',
+    name: 'Hazard',
+    role: 'tank',
+    gender: 'Masculino',
+    age: 24,
+    country: 'Escocia',
+    affiliation: 'The Phreaks',
+    releaseYear: 2024,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Initiator / Spikes',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ca48b96dbae6ea7f58ce8a5e73513c8c62b1685bdbf258020fb78bb21a008b5f.png',
+    description: 'Líder de The Phreaks armado con púas de vanadio, guardia de espinas que absorbe daño frontal, salto violento y muro dentado.',
+    perks: ['Muro de púas con derribo y empuje', 'Guardia de espinas con recarga de munición', 'Salto violento con doble tajo'],
+    counters: {
+      strongAgainst: ['reinhardt', 'winston', 'doomfist', 'tracer', 'genji', 'roadhog'],
+      weakAgainst: ['ana', 'zenyatta', 'pharah', 'echo', 'sigma']
+    },
+    synergies: ['lucio', 'kiriko', 'reaper', 'sombra', 'baptiste', 'doctrine']
+  },
+  {
     id: 'junker-queen',
     name: 'Junker Queen',
     role: 'tank',
@@ -533,28 +555,6 @@ export const OVERWATCH_HEROES: Hero[] = [
     synergies: ['mercy', 'baptiste', 'sigma', 'reinhardt', 'ana']
   },
   {
-    id: 'sombra',
-    name: 'Sombra',
-    role: 'damage',
-    gender: 'Femenino',
-    age: 32,
-    country: 'México',
-    affiliation: 'Talon',
-    releaseYear: 2016,
-    range: 'Corto',
-    style: 'dive',
-    subrole: 'Flanker / Hacker',
-    difficulty: 2,
-    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/47727b02a16e3bd7b2447d86ae1edf11587bc320b2aecb4f2f16a7ca4ad4e8a0.png',
-    description: 'Hacker maestra invisible con subfusil, virus letal con daño por segundo, translocalizador táctico y hackeo disruptivo.',
-    perks: ['Virus con infección rápida', 'Hackeo con mayor supresión', 'Translocalizador con señuelo'],
-    counters: {
-      strongAgainst: ['doomfist', 'wrecking-ball', 'widowmaker', 'zenyatta', 'reinhardt', 'bastion'],
-      weakAgainst: ['winston', 'dva', 'cassidy', 'torbjorn', 'brigitte', 'mei']
-    },
-    synergies: ['tracer', 'winston', 'doomfist', 'kiriko', 'genji']
-  },
-  {
     id: 'symmetra',
     name: 'Symmetra',
     role: 'damage',
@@ -733,6 +733,28 @@ export const OVERWATCH_HEROES: Hero[] = [
     synergies: ['ana', 'zenyatta', 'reinhardt', 'junker-queen', 'cassidy']
   },
   {
+    id: 'doctrine',
+    name: 'Doctrine',
+    role: 'support',
+    gender: 'Masculino',
+    age: 77,
+    country: 'Islandia',
+    affiliation: 'Independiente',
+    releaseYear: 2025,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Survivor / Drones',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/2492a15c575c12314907d0d77501ec337b4d56796bc7f03e5dfb50d415612bae.png',
+    description: 'Cibernético y supervillano que comanda drones drenadores de vida, cetro eterno bioeléctrico que cura o hiere, potenciador Infuse y vuelo etéreo.',
+    perks: ['Drones vigorizantes con sobrecuración', 'Infuse con doble carga de habilidad', 'Cetro eterno con ráfaga penetrante'],
+    counters: {
+      strongAgainst: ['reinhardt', 'roadhog', 'mauga', 'reaper', 'torbjorn', 'hazard'],
+      weakAgainst: ['widowmaker', 'tracer', 'genji', 'winston', 'sombra']
+    },
+    synergies: ['sigma', 'ashe', 'soldier76', 'hazard', 'baptiste']
+  },
+  {
     id: 'illari',
     name: 'Illari',
     role: 'support',
@@ -887,6 +909,28 @@ export const OVERWATCH_HEROES: Hero[] = [
     synergies: ['reinhardt', 'lucio', 'reaper', 'ramattra', 'junker-queen']
   },
   {
+    id: 'sombra',
+    name: 'Sombra',
+    role: 'support',
+    gender: 'Femenino',
+    age: 32,
+    country: 'México',
+    affiliation: 'Talon',
+    releaseYear: 2016,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Tactician / Support Hacker',
+    difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/47727b02a16e3bd7b2447d86ae1edf11587bc320b2aecb4f2f16a7ca4ad4e8a0.png',
+    description: 'Hacker de apoyo táctico con Hotfix para regenerar aliados y hackear recursos, Cyberspace para debilitar y curar en zona, Translocalizador y EMP masivo.',
+    perks: ['Hotfix con mayor regeneración', 'Cyberspace de radio extendido', 'EMP con daño a barreras aumentado'],
+    counters: {
+      strongAgainst: ['doomfist', 'wrecking-ball', 'widowmaker', 'zenyatta', 'reinhardt', 'bastion', 'doctrine'],
+      weakAgainst: ['winston', 'dva', 'cassidy', 'torbjorn', 'brigitte', 'mei', 'hazard']
+    },
+    synergies: ['tracer', 'winston', 'doomfist', 'kiriko', 'genji', 'hazard']
+  },
+  {
     id: 'zenyatta',
     name: 'Zenyatta',
     role: 'support',
@@ -903,9 +947,9 @@ export const OVERWATCH_HEROES: Hero[] = [
     description: 'Monje ómnico que debilita enemigos con el Orbe de la Discordia aumentando el daño recibido, cura con armonía y trasciende el plano.',
     perks: ['Discordia con efecto acumulativo', 'Patada de empuje gravitatorio', 'Orbe de armonía amplificado'],
     counters: {
-      strongAgainst: ['roadhog', 'mauga', 'reinhardt', 'orisa', 'bastion'],
+      strongAgainst: ['roadhog', 'mauga', 'reinhardt', 'orisa', 'bastion', 'hazard'],
       weakAgainst: ['sombra', 'tracer', 'genji', 'winston', 'widowmaker', 'doomfist']
     },
-    synergies: ['sigma', 'baptiste', 'brigitte', 'ashe', 'soldier76', 'widowmaker']
+    synergies: ['sigma', 'baptiste', 'brigitte', 'ashe', 'soldier76', 'widowmaker', 'doctrine']
   }
 ];
