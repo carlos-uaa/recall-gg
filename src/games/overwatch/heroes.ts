@@ -47,6 +47,50 @@ export const OVERWATCH_HEROES: Hero[] = [
     synergies: ['tracer', 'genji', 'kiriko', 'lucio', 'venture']
   },
   {
+    id: 'dmon',
+    name: 'D.Mon',
+    role: 'tank',
+    gender: 'Femenino',
+    age: 21,
+    country: 'Corea del Sur',
+    affiliation: 'MEKA',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'MEKA Melee / Brawler',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/dmon.webp',
+    description: 'Miembro de MEKA armada con mecha acorazado con Sable de plasma, Barrera de energía, Golpe arrollador con robo de salud y Fusión concentrada.',
+    perks: ['Bestia interior: Golpes de sable sanan 40 a Barrera', 'Golpetazo con 150% de robo de salud', 'Fusión concentrada de alta potencia'],
+    counters: {
+      strongAgainst: ['reinhardt', 'roadhog', 'mauga', 'doomfist', 'junker-queen'],
+      weakAgainst: ['ana', 'zenyatta', 'sombra', 'symmetra', 'echo']
+    },
+    synergies: ['lucio', 'kiriko', 'genji', 'reaper', 'doctrine']
+  },
+  {
+    id: 'domina',
+    name: 'Domina',
+    role: 'tank',
+    gender: 'Femenino',
+    age: 36,
+    country: 'Italia',
+    affiliation: 'Vishkar',
+    releaseYear: 2025,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Hard-light Shield / Controller',
+    difficulty: 1,
+    icon: 'https://tonikiraw.com/assets/img/heroes/domina.webp',
+    description: 'Comandante de tecnología de luz sólida con Matriz de barrera reposicionable, Cañón de fotones de largo alcance y Cargas de cristal con detonación disruptiva.',
+    perks: ['Diseño eficiente con restauración de escudo', 'Detonación disruptiva con ralentización del 30%', 'Retiro corporativo para reposicionar la barrera'],
+    counters: {
+      strongAgainst: ['soldier76', 'ashe', 'cassidy', 'widowmaker', 'ana'],
+      weakAgainst: ['sombra', 'bastion', 'sojourn', 'ramattra', 'tracer', 'hazard']
+    },
+    synergies: ['baptiste', 'zenyatta', 'sigma', 'ashe', 'soldier76']
+  },
+  {
     id: 'hazard',
     name: 'Hazard',
     role: 'tank',
@@ -643,6 +687,138 @@ export const OVERWATCH_HEROES: Hero[] = [
     synergies: ['winston', 'doomfist', 'tracer', 'kiriko', 'lucio']
   },
   {
+    id: 'shion',
+    name: 'Shion',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 23,
+    country: 'Japón',
+    affiliation: 'Neo-Tokyo Drifters',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Flanker / Motorcyclist',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/shion.webp',
+    description: 'Piloto urbana con moto cibernética y cuchillas sopladoras, dotada de Evasión con exceso de salud, Ejecución demoledora y Vuelta salvaje con regeneración activa.',
+    perks: ['Instinto de supervivencia con mayor duración de salud', 'Máquina X: 20% más daño en objetivos <50% vida', 'Vuelta salvaje con regeneración continua'],
+    counters: {
+      strongAgainst: ['widowmaker', 'zenyatta', 'ana', 'hanzo', 'ashe', 'lifeweaver'],
+      weakAgainst: ['tracer', 'cassidy', 'torbjorn', 'brigitte', 'winston']
+    },
+    synergies: ['winston', 'sombra', 'kiriko', 'lucio', 'genji']
+  },
+  {
+    id: 'vendetta',
+    name: 'Vendetta',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 29,
+    country: 'Italia',
+    affiliation: 'Talon',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Duelist / Melee Flanker',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/vendetta.webp',
+    description: 'Espadachina asesina de Talon con Corte proyectado, Espiral de tajos con daño en área, Arremetida veloz acumulable y Golpe drenante con robo de salud.',
+    perks: ['Filo extra con reducción de coste energético', 'Golpe drenante con 40% de robo de salud', 'Implacable: acumula velocidad de ataque y movimiento'],
+    counters: {
+      strongAgainst: ['reinhardt', 'roadhog', 'orisa', 'sigma', 'zenyatta', 'ana'],
+      weakAgainst: ['pharah', 'echo', 'freja', 'cassidy', 'torbjorn', 'tracer']
+    },
+    synergies: ['zarya', 'sombra', 'doctrine', 'lucio', 'kiriko']
+  },
+  {
+    id: 'freja',
+    name: 'Freja',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 26,
+    country: 'Noruega',
+    affiliation: 'Valkyrie Aerospace',
+    releaseYear: 2025,
+    range: 'Largo',
+    style: 'poke',
+    subrole: 'Aerial Marksman / Crossbow',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/freja.webp',
+    description: 'Tiradora aérea armada con virote automático de precisión, Corriente ascendente con planeo sostenido, Desplazamiento veloz y sanación aérea pasiva.',
+    perks: ['Andanada implacable: recarga virote al impactar', 'Recuperación aérea con sanación activa planeando', 'Vientos crecientes con carga adicional'],
+    counters: {
+      strongAgainst: ['reinhardt', 'junkrat', 'reaper', 'mei', 'vendetta', 'brigitte'],
+      weakAgainst: ['cassidy', 'ashe', 'widowmaker', 'soldier76', 'dva']
+    },
+    synergies: ['mercy', 'zenyatta', 'sigma', 'baptiste', 'hazard']
+  },
+  {
+    id: 'anran',
+    name: 'Anran',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 22,
+    country: 'China',
+    affiliation: 'Independiente',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Pyromancer / Disruptor',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/anran.webp',
+    description: 'Ágil piromante con Ignición abrasadora continua, Carga infernal con reducción de recarga, Llama danzante sanadora y escudos de calor temporales.',
+    perks: ['A fuego lento: daño de ignición prolongado', 'Mecha corta: reducción de cooldown en carga', 'Llama hambrienta con autosanación mejorada'],
+    counters: {
+      strongAgainst: ['reinhardt', 'winston', 'mei', 'lifeweaver', 'zenyatta'],
+      weakAgainst: ['cassidy', 'tracer', 'sojourn', 'dva', 'baptiste']
+    },
+    synergies: ['sombra', 'doctrine', 'winston', 'kiriko', 'lucio']
+  },
+  {
+    id: 'emre',
+    name: 'Emre',
+    role: 'damage',
+    gender: 'Masculino',
+    age: 44,
+    country: 'Turquía',
+    affiliation: 'Overwatch',
+    releaseYear: 2025,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Tactical Soldier / Grenadier',
+    difficulty: 1,
+    icon: 'https://tonikiraw.com/assets/img/heroes/emre.webp',
+    description: 'Veterano de la Operación Cúpula Blanca con Pistola sifonadora hitscan, Granada cibernética adhesiva con daño explosivo y Protocolo de anulación con proyectiles supresores.',
+    perks: ['Seguridad supresiva con ralentización del 30%', 'Disipador térmico para disparo continuo', 'Adhesión cibernética con detonación fijada'],
+    counters: {
+      strongAgainst: ['pharah', 'echo', 'freja', 'mercy', 'lucio'],
+      weakAgainst: ['genji', 'tracer', 'dva', 'sigma', 'hazard']
+    },
+    synergies: ['ana', 'baptiste', 'reinhardt', 'sigma', 'junker-queen']
+  },
+  {
+    id: 'sierra',
+    name: 'Sierra',
+    role: 'damage',
+    gender: 'Femenino',
+    age: 27,
+    country: 'España',
+    affiliation: 'Talon',
+    releaseYear: 2025,
+    range: 'Largo',
+    style: 'poke',
+    subrole: 'Heavy Gunner / Drone Anchor',
+    difficulty: 1,
+    icon: 'https://tonikiraw.com/assets/img/heroes/sierra.webp',
+    description: 'Especialista en supresión pesada con Rifle hélice de cadencia acelerada, Disparo rastreador que potencia velocidad de ataque y Drones de anclaje de apoyo médico.',
+    perks: ['Fijada: 20% velocidad de ataque tras marcar objetivo', 'Drones médicos con botiquín incorporado', 'Agarre firme con reducción de dispersión'],
+    counters: {
+      strongAgainst: ['reinhardt', 'ramattra', 'mauga', 'roadhog', 'orisa'],
+      weakAgainst: ['widowmaker', 'hanzo', 'sombra', 'genji', 'tracer']
+    },
+    synergies: ['sigma', 'baptiste', 'zenyatta', 'domina', 'mercy']
+  },
+  {
     id: 'widowmaker',
     name: 'Widowmaker',
     role: 'damage',
@@ -929,6 +1105,72 @@ export const OVERWATCH_HEROES: Hero[] = [
       weakAgainst: ['winston', 'dva', 'cassidy', 'torbjorn', 'brigitte', 'mei', 'hazard']
     },
     synergies: ['tracer', 'winston', 'doomfist', 'kiriko', 'genji', 'hazard']
+  },
+  {
+    id: 'wuyang',
+    name: 'Wuyang',
+    role: 'support',
+    gender: 'Masculino',
+    age: 30,
+    country: 'China',
+    affiliation: 'Monasterio de las Mareas',
+    releaseYear: 2025,
+    range: 'Medio',
+    style: 'poke',
+    subrole: 'Hydrokinetic / Wave Healer',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/wuyang.webp',
+    description: 'Maestro de la hidroquinesis con Torrente impetuoso, Ola guardiana retornable con empuje, Flujo restaurativo en área y Orbes acuáticos de impacto múltiple.',
+    perks: ['Flujo y reflujo: Ola guardiana retorna a origen', 'Lluvia arreciante con 3 orbes simultáneos', 'Desborde con 50% extra de recursos de sanación'],
+    counters: {
+      strongAgainst: ['reaper', 'reinhardt', 'junker-queen', 'mei', 'roadhog'],
+      weakAgainst: ['widowmaker', 'ashe', 'sombra', 'tracer', 'genji']
+    },
+    synergies: ['jetpack-cat', 'sigma', 'ramattra', 'soldier76', 'cassidy']
+  },
+  {
+    id: 'jetpack-cat',
+    name: 'Jetpack Cat',
+    role: 'support',
+    gender: 'Animal',
+    age: 4,
+    country: 'Suecia',
+    affiliation: 'Ironclad Guild',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'dive',
+    subrole: 'Aerial Support / Transport',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/jetpack-cat.webp',
+    description: 'Gatita equipada con jetpack de la familia Lindholm armada con Patiproyectiles bióticos teledirigidos, Transporte aéreo de aliados protegidos con escudo, Ronroneo curativo y Garras ralentizantes.',
+    perks: ['Transporte protegido con 50 de escudo adicional', 'Ronroneo perfecto de triple pulso restaurador', 'Garras fuera con 40 de daño y ralentización'],
+    counters: {
+      strongAgainst: ['reinhardt', 'roadhog', 'junkrat', 'reaper', 'venture'],
+      weakAgainst: ['cassidy', 'soldier76', 'ashe', 'dva', 'torbjorn']
+    },
+    synergies: ['sombra', 'wuyang', 'winston', 'tracer', 'genji', 'hazard']
+  },
+  {
+    id: 'mizuki',
+    name: 'Mizuki',
+    role: 'support',
+    gender: 'Masculino',
+    age: 35,
+    country: 'Japón',
+    affiliation: 'Kanezaka',
+    releaseYear: 2025,
+    range: 'Corto',
+    style: 'brawl',
+    subrole: 'Anti-Dive / Tether Controller',
+    difficulty: 2,
+    icon: 'https://tonikiraw.com/assets/img/heroes/mizuki.webp',
+    description: 'Custodio espiritual de Kanezaka con Aura reparadora perimetral, Cadena vinculante que frena el dive y amplifica el daño recibido, Sanación Kasa con rebote amplificado y Paso rápido Katashiro.',
+    perks: ['Alma expuesta: 30% más de daño tras Cadena vinculante', 'Regreso resonante con rebote adicional de Kasa', 'Paso rápido con aumento de velocidad en Aura'],
+    counters: {
+      strongAgainst: ['genji', 'tracer', 'winston', 'doomfist', 'shion', 'vendetta'],
+      weakAgainst: ['widowmaker', 'ashe', 'pharah', 'freja', 'sigma']
+    },
+    synergies: ['reinhardt', 'junker-queen', 'brigitte', 'cassidy', 'reaper']
   },
   {
     id: 'zenyatta',

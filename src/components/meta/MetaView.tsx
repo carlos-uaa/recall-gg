@@ -18,11 +18,11 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
   const [search] = useState('');
 
   const metaTiers: Record<string, string[]> = {
-    S: ['tracer', 'winston', 'kiriko', 'lucio', 'dva', 'sojourn', 'baptiste', 'juno'],
-    A: ['ashe', 'cassidy', 'ana', 'sigma', 'genji', 'reinhardt', 'illari', 'doomfist', 'venture', 'hazard', 'doctrine', 'sombra'],
-    B: ['ramattra', 'junker-queen', 'widowmaker', 'soldier76', 'brigitte', 'moira', 'echo', 'mei', 'zarya'],
-    C: ['roadhog', 'mauga', 'orisa', 'bastion', 'torbjorn', 'junkrat', 'zenyatta', 'symmetra'],
-    D: ['hanzo', 'reaper', 'pharah', 'lifeweaver', 'mercy', 'wrecking-ball'],
+    S: ['winston', 'tracer', 'sombra', 'doctrine'],
+    A: ['dva', 'hazard', 'dmon', 'shion', 'cassidy', 'sojourn', 'genji', 'torbjorn', 'vendetta', 'ana', 'kiriko'],
+    B: ['zarya', 'orisa', 'sigma', 'ramattra', 'doomfist', 'wrecking-ball', 'bastion', 'hanzo', 'reaper', 'freja', 'soldier76', 'symmetra', 'widowmaker', 'lucio', 'baptiste', 'juno', 'wuyang', 'jetpack-cat'],
+    C: ['mauga', 'domina', 'reinhardt', 'junker-queen', 'roadhog', 'anran', 'ashe', 'venture', 'junkrat', 'mei', 'pharah', 'echo', 'emre', 'sierra', 'brigitte', 'mizuki', 'moira', 'zenyatta', 'lifeweaver', 'illari', 'mercy'],
+    D: [],
   };
 
   const getTierForHero = (heroId: string): string => {
