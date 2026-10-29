@@ -14,6 +14,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'dive',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/df5a5532862d9292634fb3dc0e51a4705aa601de65e5e815513ccc663d84de56.png',
     description: 'Tanque móvil con propulsores, micro misiles y Matriz de Defensa para anular proyectiles y ultimates.',
     perks: ['Matriz extendida', 'Propulsores con microaturdimiento', 'Recarga veloz de misiles'],
     counters: {
@@ -34,6 +35,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Melee',
     style: 'dive',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ff5c54f43ad253c7faeda9c4ed31d42582ea6b19205d197866f3dd0c0aa14c16.png',
     description: 'Tanque brawler de alta movilidad y control de masas que genera sobreescudos al golpear con sus habilidades.',
     perks: ['Bloqueo reforzado', 'Salto sísmico de largo alcance', 'Puño cohete cargado rápido'],
     counters: {
@@ -54,6 +56,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/06eeecb359f311f43a8f5121d4f9f3a93c565d70b30e94ef543c05596c9a39dc.png',
     description: 'Luchadora agresiva que inflige sangrado y se cura a través de las heridas de sus enemigos.',
     perks: ['Grito de mando con más velocidad', 'Cuchillo magnético con sangrado extra', 'Golpe de carnicero amplio'],
     counters: {
@@ -74,6 +77,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/33d39bb439c08975197fc52eff4874716839711b5356c4fdc174f9c24bac1d0e.png',
     description: 'Tanque colosal con ametralladoras gemelas que incendian y asestan golpes críticos, con robo de vida en área.',
     perks: ['Embestida con aturdimiento largo', 'Aura de sobremarcha con resistencia ampliada', 'Encendido rápido'],
     counters: {
@@ -94,11 +98,12 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a73958a28551f5254f3ab3f97c5f5f8d698a95c0b6a515d1a2b1caac169205a6.png',
     description: 'Ancla inamovible con Fortificación inmune a CC, lanza de jabalina y giro de lanza defensivo.',
     perks: ['Jabalina con daño de empuje', 'Fortificación de mayor duración', 'Enfriamiento reducido'],
     counters: {
       strongAgainst: ['reinhardt', 'doomfist', 'roadhog', 'wrecking-ball', 'junker-queen'],
-      weakAgainst: ['zarya', 'sigma', 'zenyatta', 'symmeta', 'sojourn']
+      weakAgainst: ['zarya', 'sigma', 'zenyatta', 'symmetra', 'sojourn']
     },
     synergies: ['baptiste', 'torbjorn', 'bastion', 'ana', 'cassidy']
   },
@@ -114,6 +119,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ddef7c9fb8ce4256e8508196b486f81950efe7aaa6cf27fec4668beb4cd15774.png',
     description: 'Líder de Null Sector con modo Ómnico táctico a distancia y forma Némesis para golpear a través de escudos.',
     perks: ['Vórtice voraz ralentizante', 'Forma Némesis con armadura extra', 'Bloqueo con reducción del 80%'],
     counters: {
@@ -134,6 +140,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Melee',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/551fbe070c16fdfcc17f7f1de63af22c53e7d2f1340fc2f3172441504527bc4e.png',
     description: 'Caballero con escudo de barrera masivo y martillo propulsado; el pilar clásico del juego de avance cuerpo a cuerpo.',
     perks: ['Doble onda de fuego', 'Cancelación de carga precisa', 'Escudo con regeneración acelerada'],
     counters: {
@@ -154,6 +161,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/89ddf07e4b619ed96169042e296a1b8856d102746f35add88284b44a9a5a6a03.png',
     description: 'Superviviente despiadado con un gancho mortal, trampa de cerdos y autocuración con inhalador recargable.',
     perks: ['Inhalador con resistencia al daño', 'Gancho con mayor alcance', 'Trampa electrificada'],
     counters: {
@@ -174,11 +182,12 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/a4c032fa466c9a6d9c6974747635d7ef910027f91cd58892af0c899db565f92d.png',
     description: 'Astrofísico brillante con control de la gravedad, barrera móvil reposicionable y absorción de proyectiles.',
     perks: ['Acreción con daño de choque', 'Absorción con sobreescudos ampliados', 'Barrera con recarga instantánea'],
     counters: {
       strongAgainst: ['bastion', 'torbjorn', 'soldier76', 'ashe', 'widowmaker', 'mauga'],
-      weakAgainst: ['winston', 'zarya', 'symmeta', 'reinhardt', 'moira', 'doomfist']
+      weakAgainst: ['winston', 'zarya', 'symmetra', 'reinhardt', 'moira', 'doomfist']
     },
     synergies: ['baptiste', 'zenyatta', 'ashe', 'widowmaker', 'hanzo', 'soldier76']
   },
@@ -194,6 +203,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'dive',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/46a10db3aa908c590ddc4e7606376a88143d1f1306ecfbea043263040f9529a5.png',
     description: 'Científico gorila genéticamente modificado, maestro del salto propulsado y cañón tesla para desarticular francotiradores y apoyos.',
     perks: ['Disparo secundario cargado a distancia', 'Escudo burbuja con más durabilidad', 'Salto con daño sísmico'],
     counters: {
@@ -214,6 +224,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'dive',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/9ef1d58867136e0b26f928d896000b9dab216118f6e2f59e53f2e975e1e27afa.png',
     description: 'Hámster hiperinteligente (Hammond) que pilota un meca esférico veloz con gancho, martinete y escudos adaptativos.',
     perks: ['Escudos adaptativos compartidos', 'Gancho retráctil continuo', 'Martinete de amplio radio'],
     counters: {
@@ -234,6 +245,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/9b6f63cc66ddf9d5e0862173c733cc0d2e574c5c89357798d91b93b2f95a7080.png',
     description: 'Una de las mujeres más fuertes del mundo; absorbe daño con sus burbujas de partículas para potenciar su rayo letal.',
     perks: ['Burbuja con enfriamiento reducido', 'Retención de energía al morir', 'Doble carga gravitatoria'],
     counters: {
@@ -256,6 +268,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4076bbaa2eb52a0bfe612434071e56e7702d5454473dbbea2f9e392a9d997a94.png',
     description: 'Líder de la banda Deadlock armada con rifle de palanca Viper, dinamita detonable y su fiel secuaz B.O.B.',
     perks: ['Dinamita con propagación mayor', 'Disparo de escopeta con retroceso seguro', 'Carga veloz de B.O.B.'],
     counters: {
@@ -276,6 +289,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'poke',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4ede795c2a681aaccfa72d0c901cba0cb8a2c292fd6a97b2ba9faed161c2d184.png',
     description: 'Unidad de asedio ómnica capaz de transformarse en una torreta ametralladora móvil con granada táctica.',
     perks: ['Modo asalto con mayor velocidad', 'Granada de rebote aumentada', 'Blindaje reactivo'],
     counters: {
@@ -296,6 +310,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/9240cd64cc8ef58df9acbf55204ab1b5d8578f743fda5931f0dbccbd75ab841b.png',
     description: 'Pistolero justiciero con revólver Pacifista, granada magnética que anula habilidades de movimiento y tiro certero.',
     perks: ['Voltereta con recarga doble', 'Granada con efecto de anclaje pesado', 'Tiro certero veloz'],
     counters: {
@@ -316,11 +331,12 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'dive',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/d4f2d5b0c2b7e82d61353186c5f23152ccba9d3569b50839aa580dca3e9114ba.png',
     description: 'Robot evolutiva con vuelo libre, bombas pegajosas, haz de enfoque ejecutor y capacidad de duplicar a cualquier enemigo.',
     perks: ['Haz de enfoque ejecutor anticipado', 'Planeo aerodinámico prolongado', 'Recarga veloz al duplicar'],
     counters: {
       strongAgainst: ['reinhardt', 'junkrat', 'reaper', 'roadhog', 'torbjorn'],
-      weakAgainst: ['hitscan', 'cassidy', 'ashe', 'soldier76', 'widowmaker', 'dva']
+      weakAgainst: ['cassidy', 'ashe', 'soldier76', 'widowmaker', 'dva']
     },
     synergies: ['mercy', 'zenyatta', 'winston', 'tracer', 'pharah']
   },
@@ -336,11 +352,12 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'dive',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/156b12c20b1aea872c1eeb5bb37a7de1047b2ab30ecefd0663a8925badde1ea8.png',
     description: 'Ninja cibernético con shurikens, desvío de proyectiles, corte veloz reseteable con bajas y Hoja del Dragón.',
     perks: ['Desvío de proyectiles extendido', 'Corte con daño de sangrado', 'Shurikens adicionales'],
     counters: {
       strongAgainst: ['widowmaker', 'hanzo', 'bastion', 'zenyatta', 'ana', 'ashe'],
-      weakAgainst: ['winston', 'zarya', 'mei', 'symmeta', 'moira', 'brigitte']
+      weakAgainst: ['winston', 'zarya', 'mei', 'symmetra', 'moira', 'brigitte']
     },
     synergies: ['ana', 'winston', 'tracer', 'kiriko', 'lucio']
   },
@@ -356,6 +373,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/78b61c3e806fb26b02b8980fba62189155074fc15bd865b0883268e546030be5.png',
     description: 'Arquero maestro que dispara flechas sónicas rastreadoras, ráfagas tormentosas y convoca dragones espectrales.',
     perks: ['Flecha sónica con pulso ampliado', 'Flechas de tormenta con rebote', 'Salto acrobático doble'],
     counters: {
@@ -376,6 +394,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/7660b9fc6f25f30858fdd8797fe0d52b2306f1e78fef99843f58a274e69af046.png',
     description: 'Anarquista demente obsesionado con explosivos de rebote, cepos inmovilizadores y minas de conmoción.',
     perks: ['Triple mina de choque', 'Cepo reforzado con daño aumentado', 'Neumático con turbo'],
     counters: {
@@ -396,6 +415,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4a55ced3bd597fb08e0fde9dc007f8543ac616ba98ca3db9b0e4d871a8ae17f8.png',
     description: 'Climatologist armada con un cañón endotérmico para aislar tanques con muros de hielo y congelar zonas.',
     perks: ['Muro de hielo con más pilares', 'Bloque de hielo con explosión térmica', 'Carámbano perforante'],
     counters: {
@@ -416,10 +436,11 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/60ac2d5de4a6d34644d8872233da402f1436c87f804bb11a21661bb30bf4a51f.png',
     description: 'Oficial de seguridad con traje Raptor capaz de surcar los cielos lanzando cohetes devastadores y ráfagas concusivas.',
     perks: ['Propulsión lateral continua', 'Cohetes con daño concusivo de impacto', 'Bombardeo protegido'],
     counters: {
-      strongAgainst: ['reinhardt', 'junkrat', 'reaper', 'mei', 'brigitte', 'symmeta'],
+      strongAgainst: ['reinhardt', 'junkrat', 'reaper', 'mei', 'brigitte', 'symmetra'],
       weakAgainst: ['widowmaker', 'ashe', 'cassidy', 'soldier76', 'dva', 'ana']
     },
     synergies: ['mercy', 'zenyatta', 'winston', 'wrecking-ball']
@@ -436,6 +457,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/dc6ff07ac790c00dc95a40882449617bb6e0e38906b353a630cffe0c815270a9.png',
     description: 'Espectro ejecutor con escopetas Hellfire gemelas, robo de vida pasivo, forma fantasmal invulnerable y teletransporte.',
     perks: ['Paso de las sombras instantáneo', 'Robo de vida aumentado', 'Forma fantasmal veloz'],
     counters: {
@@ -456,6 +478,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'poke',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/82b8c1b8765dcb9a0ba16e343c3516bf324c771ac81e9878473280216e70a889.png',
     description: 'Comandante cibernética con cañón de riel de precisión alimentado por energía, disparo disruptor y deslizamiento potente.',
     perks: ['Deslizamiento con super salto', 'Disparo disruptor con efecto ralentizante', 'Riel con carga pasiva'],
     counters: {
@@ -476,6 +499,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'poke',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c93b5f0a528c40473188f77cc2a267aee7d5b6cf5c9e104105d634b4388674e2.png',
     description: 'Super-soldado vigilante con rifle de pulsos, cohetes Helix de impacto, sprint táctico infinito y campo biótico curativo.',
     perks: ['Sprint con disparo continuo', 'Campo biótico de mayor radio', 'Cohetes Helix con doble carga'],
     counters: {
@@ -496,6 +520,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'dive',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/47727b02a16e3bd7b2447d86ae1edf11587bc320b2aecb4f2f16a7ca4ad4e8a0.png',
     description: 'Hacker maestra invisible con subfusil, virus letal con daño por segundo, translocalizador táctico y hackeo disruptivo.',
     perks: ['Virus con infección rápida', 'Hackeo con mayor supresión', 'Translocalizador con señuelo'],
     counters: {
@@ -516,6 +541,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ebec57e8bd68b3d4383edfeb34f8f52dd0b94a6467d594c2fee722e8a97c32aa.png',
     description: 'Arquitecta de luz sólida armada con proyector de fotones que se recarga con escudos, torretas centinela y teletransportador.',
     perks: ['Torretas con curación/ralentización', 'Rayo de fotones con alcance extendido', 'Teletransportador instantáneo'],
     counters: {
@@ -536,6 +562,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ce17118cedc29b0d2ac1e059666bed36b9531c85079b0b894bb402d12c917ba9.png',
     description: 'Maestro armero con pistola de remaches, sobrecarga con armadura y velocidad, torreta automática defensiva y lava fundida.',
     perks: ['Torreta con misiles menores', 'Sobrecarga de doble duración', 'Remaches incendiarios'],
     counters: {
@@ -556,6 +583,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'dive',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/4504f6f15cb3feaa92ecd38e01dcf751cb5abdac2e0bb52d0555727e53277502.png',
     description: 'Piloto que desafía el tiempo con traslaciones hiperactivas, regresión temporal curativa, pistolas de pulsos y bomba de pulsos.',
     perks: ['Cuarta traslación temporal', 'Regresión con curación completa', 'Bomba de pulsos con mayor imán'],
     counters: {
@@ -576,6 +604,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'dive',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/dcab9123f5f55df22e54d4e797de43c71b917e0149dd059a7fd6136f48464cd0.png',
     description: 'Arqueólogue intrépide con excavador inteligente que dispara cargas sísmicas, se sumerge bajo tierra y embiste.',
     perks: ['Excavación subterránea veloz', 'Escudos pasivos aumentados al usar habilidades', 'Onda de choque mayor'],
     counters: {
@@ -596,6 +625,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/6e4702b45f196aaf51555cf57327322721f45458b17f5f0643ed008a88378259.png',
     description: 'Asesina letal armada con el rifle de francotirador Beso de la Viuda, gancho de agarre, mina venenosa y visión infrarroja.',
     perks: ['Gancho con reseteo al acertar tiro a la cabeza', 'Mina venenosa con rastreo', 'Carga de mira acelerada'],
     counters: {
@@ -618,6 +648,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/985b06beae46b7ba3ca87d1512d0fc62ca7f206ceca58ef16fc44d43a1cc84ed.png',
     description: 'Francotiradora veterana armada con rifle biótico, granada anti-curación destructora de tanques, dardo sedante y Nanoestimulante.',
     perks: ['Dardo sedante con recarga veloz', 'Granada biótica con curación extendida', 'Rifle con mira termográfica'],
     counters: {
@@ -638,6 +669,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'poke',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/d4e6f1ca45d9f88fa89260787397f141a6f007b14e5b26698883b6a17bab9680.png',
     description: 'Médico de combate con lanzagranadas biótico, botas exoesqueleto de gran salto, campo de inmortalidad y matriz de amplificación.',
     perks: ['Botas exoesqueleto con carga instantánea', 'Campo de inmortalidad con mayor radio', 'Curación regenerativa potente'],
     counters: {
@@ -658,6 +690,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Melee',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/795fba91376d87d441a7f359ae12a3175dfa95825ccc4414cc6b95b129fc4cb0.png',
     description: 'Guerrera escudera que cura con Inspiración al golpear, protege con escudo y rechaza flankers con lanzamiento de mayal.',
     perks: ['Escudo con 500 de vida', 'Lanzamiento de mayal con aturdimiento', 'Paquetes de reparación dobles'],
     counters: {
@@ -678,6 +711,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/ce42d1455e03e79f321345fea84b27a8918b5db8bd7ab9b2ca9e569606ede9e4.png',
     description: 'Última guerrera solar con rifle de precisión solar, pilón de curación automático desplegable y ultimate Sol Cautivo.',
     perks: ['Pilón curativo con escudos', 'Estallido solar con derribo', 'Rifle con recarga solar instantánea'],
     counters: {
@@ -698,6 +732,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'dive',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/c0167d251e57b0aa2b1e16c37d87f0e7c77263db9dd0503d77b5f2589bf3e4a0.png',
     description: 'Exploradora espacial marciana con bláster médico de ráfagas, hiperanillo de aceleración masiva y torpedos teledirigidos.',
     perks: ['Hiperanillo con bono de daño', 'Torpedos teledirigidos dobles', 'Vuelo gravitacional extendido'],
     counters: {
@@ -718,6 +753,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'dive',
     difficulty: 3,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/408603fe037e8576078eaac5eab2fb251489ced4003b11f5f522776d43d0b83d.png',
     description: 'Ninja protectora con kunais de crítico letal, talismanes curativos teledirigidos, Suzu purificador y Paso Ligero a través de paredes.',
     perks: ['Suzu con invulnerabilidad aumentada', 'Paso ligero con escudo al salir', 'Kunai con crítico triplicado'],
     counters: {
@@ -738,6 +774,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/3376515cebed0904012e67e956f6d1b9c12e03da642845eeaf787b7e4c7b339d.png',
     description: 'Bioluz innovadora que salva aliados en apuros con Agarre Vital, crea plataformas de pétalo elevadoras y planta el Árbol de la Vida.',
     perks: ['Plataforma de pétalo con curación', 'Agarre vital con regeneración masiva', 'Ráfaga de espinas perforante'],
     counters: {
@@ -758,6 +795,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/040bb13f5123ab93faad2f95627ba184608aef4b2469a4d3003859c7087df044.png',
     description: 'DJ revolucionario que patrocina la velocidad del equipo con música y patinaje sobre muros; el corazón del juego Brawl y Rush.',
     perks: ['Amp it up con velocidad del 80%', 'Empuje de onda sonora con aturdimiento', 'Patinaje continuo sin fricción'],
     counters: {
@@ -778,6 +816,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Medio',
     style: 'poke',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/3bfb8bd8ec827e53d870f1238ab73d8aa1f5dbfbcfaaf7f96ffcd35b5c6102ab.png',
     description: 'Médico ángel de la guardia que potencia el daño aliado, cura con rayo continuo, planea con agilidad y resucita compañeros caídos.',
     perks: ['Resurrección con escudo protector', 'Potenciador de daño al 35%', 'Super salto libre'],
     counters: {
@@ -798,10 +837,11 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Corto',
     style: 'brawl',
     difficulty: 1,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/f48f8485056d5d00dad195859188d23e50f7126b8b08b5646f46ef1b42f5e1de.png',
     description: 'Genetista brillante que equilibra curación masiva con drenaje biótico, orbes teledirigidos y Desvanecimiento para escapar de todo peligro.',
     perks: ['Desvanecimiento con purga aliada', 'Orbes de doble duración', 'Drenaje con mayor alcance'],
     counters: {
-      strongAgainst: ['genji', 'tracer', 'sombra', 'lucio', 'symmeta'],
+      strongAgainst: ['genji', 'tracer', 'sombra', 'lucio', 'symmetra'],
       weakAgainst: ['dva', 'ana', 'widowmaker', 'ashe', 'bastion']
     },
     synergies: ['reinhardt', 'lucio', 'reaper', 'ramattra', 'junker-queen']
@@ -818,6 +858,7 @@ export const OVERWATCH_HEROES: Hero[] = [
     range: 'Largo',
     style: 'poke',
     difficulty: 2,
+    icon: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/7d1546b1541a8afc39353f9337a408d6275a141b0432b7e560ef61579996b0fc.png',
     description: 'Monje ómnico que debilita enemigos con el Orbe de la Discordia aumentando el daño recibido, cura con armonía y trasciende el plano.',
     perks: ['Discordia con efecto acumulativo', 'Patada de empuje gravitatorio', 'Orbe de armonía amplificado'],
     counters: {

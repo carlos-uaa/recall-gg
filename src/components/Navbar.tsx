@@ -1,13 +1,27 @@
 import React, { useState } from 'react';
 import type { GameId } from '../types/game';
 import { SUPPORTED_GAMES } from '../games/registry';
-import { Crosshair, Gamepad2, BarChart3, Swords, ChevronDown } from 'lucide-react';
+import { TRANSLATIONS, type Language } from '../utils/i18n';
+import { 
+  Crosshair, 
+  Gamepad2, 
+  BarChart3, 
+  Swords, 
+  ChevronDown, 
+  Sun, 
+  Moon, 
+  Globe 
+} from 'lucide-react';
 
 interface NavbarProps {
   currentGame: GameId;
   onSelectGame: (game: GameId) => void;
   activeTab: 'coach' | 'guesser' | 'meta' | 'counters';
   onSelectTab: (tab: 'coach' | 'guesser' | 'meta' | 'counters') => void;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
+  language: Language;
+  onToggleLanguage: (lang: Language) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -15,31 +29,44 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectGame,
   activeTab,
   onSelectTab,
+  theme,
+  onToggleTheme,
+  language,
+  onToggleLanguage,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const t = TRANSLATIONS[language];
   const activeGameMeta = SUPPORTED_GAMES.find(g => g.id === currentGame) || SUPPORTED_GAMES[0];
 
+  const isDark = theme === 'dark';
+
   return (
-    <header className="sticky top-0 z-50 bg-[#090d16]/90 backdrop-blur-md border-b border-slate-800">
+    <header className={`sticky top-0 z-50 backdrop-blur-md border-b transition-colors duration-200 ${
+      isDark ? 'bg-[#090d16]/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-sm'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Branding */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onSelectTab('coach')}>
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20 text-white font-black text-xl tracking-wider">
                 R
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xl font-extrabold tracking-tight text-white font-mono">
+                  <span className={`text-xl font-extrabold tracking-tight font-mono ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
                     RECALL<span className="text-orange-500">.GG</span>
                   </span>
-                  <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    100% Libre
+                  <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                    {t.freeBadge}
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 font-medium tracking-wide">
-                  TACTICAL COMPANION & MINIGAMES
+                <p className={`text-[10px] font-medium tracking-wide ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>
+                  {t.tagline}
                 </p>
               </div>
             </div>
@@ -48,7 +75,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-sm font-semibold text-slate-200 border border-slate-700/60 transition"
+                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-semibold border transition ${
+                  isDark
+                    ? 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border-slate-700/60'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                }`}
               >
                 <span className="w-2 h-2 rounded-full bg-orange-500 inline-block animate-pulse"></span>
                 <span>{activeGameMeta.name}</span>
@@ -56,9 +87,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {dropdownOpen && (
-                <div className="absolute left-0 mt-2 w-64 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl py-2 z-50">
-                  <div className="px-3 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    Seleccionar Juego
+                <div className={`absolute left-0 mt-2 w-64 rounded-xl border shadow-2xl py-2 z-50 ${
+                  isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
+                }`}>
+                  <div className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    {t.selectGame}
                   </div>
                   {SUPPORTED_GAMES.map(game => (
                     <button
@@ -72,10 +107,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                       disabled={!game.active}
                       className={`w-full text-left px-3 py-2.5 flex items-center justify-between text-sm transition ${
                         game.id === currentGame
-                          ? 'bg-orange-500/10 text-orange-400 font-semibold'
+                          ? 'bg-orange-500/10 text-orange-500 font-semibold'
                           : game.active
-                          ? 'text-slate-300 hover:bg-slate-800'
-                          : 'text-slate-500 cursor-not-allowed opacity-60'
+                          ? isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-700 hover:bg-slate-100'
+                          : 'text-slate-400 cursor-not-allowed opacity-50'
                       }`}
                     >
                       <div>
@@ -83,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         <div className="text-xs text-slate-400">{game.tagline}</div>
                       </div>
                       <span className={`text-[10px] px-2 py-0.5 rounded font-mono ${
-                        game.active ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-800 text-slate-500'
+                        game.active ? 'bg-orange-500/20 text-orange-500' : 'bg-slate-800 text-slate-400'
                       }`}>
                         {game.badge}
                       </span>
@@ -101,11 +136,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
                 activeTab === 'coach'
                   ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                  : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               <Crosshair className="w-4 h-4" />
-              <span>Coach Táctico</span>
+              <span className="hidden sm:inline">{t.coachTab}</span>
+              <span className="sm:hidden">Coach</span>
             </button>
 
             <button
@@ -113,14 +151,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
                 activeTab === 'guesser'
                   ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
-                  : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               <Gamepad2 className="w-4 h-4" />
-              <span>Recalldle</span>
-              <span className="hidden md:inline-flex px-1.5 py-0.2 bg-purple-400/20 text-purple-300 text-[10px] rounded uppercase font-bold tracking-wider">
-                Juego
-              </span>
+              <span>{t.guesserTab}</span>
             </button>
 
             <button
@@ -128,11 +165,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
                 activeTab === 'meta'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                  : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Meta & Tier List</span>
+              <span className="hidden sm:inline">{t.metaTab}</span>
               <span className="sm:hidden">Meta</span>
             </button>
 
@@ -141,13 +180,45 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
                 activeTab === 'counters'
                   ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
-                  : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               <Swords className="w-4 h-4" />
-              <span className="hidden sm:inline">Counters</span>
+              <span>{t.countersTab}</span>
             </button>
           </nav>
+
+          {/* Theme & Language Controls */}
+          <div className="flex items-center space-x-2 pl-2 border-l border-slate-700/50">
+            {/* Language Switch */}
+            <button
+              onClick={() => onToggleLanguage(language === 'es' ? 'en' : 'es')}
+              className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${
+                isDark
+                  ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
+              }`}
+              title="Cambiar Idioma / Switch Language"
+            >
+              <Globe className="w-3.5 h-3.5 text-orange-500" />
+              <span className="uppercase">{language}</span>
+            </button>
+
+            {/* Theme Switch */}
+            <button
+              onClick={onToggleTheme}
+              className={`p-2 rounded-lg border transition ${
+                isDark
+                  ? 'bg-slate-800 text-amber-400 border-slate-700 hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
+              }`}
+              title={isDark ? t.lightMode : t.darkMode}
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       </div>
     </header>

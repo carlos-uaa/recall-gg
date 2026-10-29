@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import type { Role } from '../../types/game';
+import { HeroAvatar } from '../common/HeroAvatar';
+import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import { BarChart3, Star } from 'lucide-react';
 
-export const MetaView: React.FC = () => {
+interface MetaViewProps {
+  language?: Language;
+  theme?: 'dark' | 'light';
+}
+
+export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'dark' }) => {
+  const t = TRANSLATIONS[language];
+  const isDark = theme === 'dark';
+
   const [selectedRole, setSelectedRole] = useState<Role | 'all'>('all');
   const [search] = useState('');
 
-  // Defined tiers based on current OW2 competitive meta
   const metaTiers: Record<string, string[]> = {
     S: ['tracer', 'winston', 'kiriko', 'lucio', 'dva', 'sojourn', 'baptiste', 'juno'],
     A: ['ashe', 'cassidy', 'ana', 'sigma', 'genji', 'reinhardt', 'illari', 'doomfist', 'venture'],
@@ -34,23 +43,27 @@ export const MetaView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Meta Header */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 backdrop-blur shadow-xl">
+      <div className={`border rounded-3xl p-6 shadow-xl transition ${
+        isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
+      }`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold mb-2">
               <BarChart3 className="w-4 h-4" />
               <span>TIER LIST COMPETITIVA & META ACTUAL</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Ranking de Héroes Overwatch 2
+            <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              {t.metaTitle}
             </h1>
-            <p className="text-sm text-slate-400">
-              Clasificación actualizada según torneos, partidas competitivas de alto rango y efectividad global.
+            <p className="text-sm text-slate-400 mt-1">
+              {t.metaSubtitle}
             </p>
           </div>
 
           {/* Role Filters */}
-          <div className="flex items-center space-x-1.5 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
+          <div className={`flex items-center space-x-1.5 p-1.5 rounded-xl border ${
+            isDark ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-300'
+          }`}>
             {(['all', 'tank', 'damage', 'support'] as const).map(r => (
               <button
                 key={r}
@@ -59,10 +72,24 @@ export const MetaView: React.FC = () => {
                   selectedRole === r ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {r === 'all' ? 'Todos' : r === 'damage' ? 'DPS' : r === 'tank' ? 'Tanque' : 'Apoyo'}
+                {r === 'all' ? t.allRoles : r === 'damage' ? t.damage : r === 'tank' ? t.tank : t.support}
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Legend for Stars Difficulty */}
+        <div className="mt-4 pt-4 border-t border-slate-800 flex items-center space-x-4 text-xs text-slate-400">
+          <span className="font-semibold text-slate-300">Dificultad de Uso:</span>
+          <span className="flex items-center text-amber-400 text-[11px]">
+            ★☆☆ <span className="ml-1 text-slate-400">Baja / Fácil</span>
+          </span>
+          <span className="flex items-center text-amber-400 text-[11px]">
+            ★★☆ <span className="ml-1 text-slate-400">Media</span>
+          </span>
+          <span className="flex items-center text-amber-400 text-[11px]">
+            ★★★ <span className="ml-1 text-slate-400">Alta / Exigente mecánicamente</span>
+          </span>
         </div>
       </div>
 
@@ -82,37 +109,51 @@ export const MetaView: React.FC = () => {
           return (
             <div
               key={tier}
-              className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row md:items-center gap-4 shadow-lg"
+              className={`border rounded-3xl p-4 flex flex-col md:flex-row md:items-center gap-4 shadow-lg transition ${
+                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'
+              }`}
             >
-              {/* Tier Badge Box */}
-              <div className={`w-16 h-16 rounded-xl flex items-center justify-center font-black text-2xl border flex-shrink-0 ${badgeColor}`}>
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl border flex-shrink-0 ${badgeColor}`}>
                 {tier}
               </div>
 
-              {/* Heroes in this Tier */}
               <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {tierHeroes.map(hero => (
                   <div
                     key={hero.id}
-                    className="bg-slate-800/80 border border-slate-700 rounded-xl p-3 hover:border-blue-500/50 hover:bg-slate-800 transition group flex flex-col justify-between"
+                    className={`border rounded-2xl p-3 transition group flex flex-col justify-between ${
+                      isDark
+                        ? 'bg-slate-800/80 border-slate-700 hover:border-blue-500/50'
+                        : 'bg-slate-50 border-slate-200 hover:border-blue-400'
+                    }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-900 text-slate-400">
                           {hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
                         </span>
-                        <div className="flex items-center text-amber-400" title={`Dificultad: ${hero.difficulty}/3`}>
-                          {Array.from({ length: hero.difficulty }).map((_, i) => (
-                            <Star key={i} className="w-2.5 h-2.5 fill-current" />
+                        <div className="flex items-center text-amber-400" title={`Dificultad de uso: ${hero.difficulty}/3`}>
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-2.5 h-2.5 ${i < hero.difficulty ? 'fill-current text-amber-400' : 'text-slate-600'}`}
+                            />
                           ))}
                         </div>
                       </div>
 
-                      <div className="font-bold text-white text-sm group-hover:text-blue-400 transition truncate">
-                        {hero.name}
-                      </div>
-                      <div className="text-[11px] text-slate-400 uppercase font-mono mt-0.5">
-                        {hero.style} • {hero.range}
+                      <div className="flex items-center space-x-2.5">
+                        <HeroAvatar hero={hero} size="sm" />
+                        <div className="truncate">
+                          <div className={`font-bold text-sm truncate group-hover:text-blue-400 transition ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}>
+                            {hero.name}
+                          </div>
+                          <div className="text-[10px] text-slate-400 uppercase font-mono">
+                            {hero.style}
+                          </div>
+                        </div>
                       </div>
                     </div>
 

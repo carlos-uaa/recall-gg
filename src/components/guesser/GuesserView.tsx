@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { Hero, GuessFeedback } from '../../types/game';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { compareGuess, getDailyHero, getRandomHero } from '../../core/guesserEngine';
+import { HeroAvatar } from '../common/HeroAvatar';
+import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import confetti from 'canvas-confetti';
 import { 
   Gamepad2, 
@@ -15,7 +17,15 @@ import {
   Flame 
 } from 'lucide-react';
 
-export const GuesserView: React.FC = () => {
+interface GuesserViewProps {
+  language?: Language;
+  theme?: 'dark' | 'light';
+}
+
+export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme = 'dark' }) => {
+  const t = TRANSLATIONS[language];
+  const isDark = theme === 'dark';
+
   const [gameMode, setGameMode] = useState<'daily' | 'infinite'>('daily');
   const [targetHero, setTargetHero] = useState<Hero>(getDailyHero());
   const [guesses, setGuesses] = useState<GuessFeedback[]>([]);
@@ -25,7 +35,6 @@ export const GuesserView: React.FC = () => {
   const [copiedShare, setCopiedShare] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize or change mode
   useEffect(() => {
     resetGame(gameMode);
   }, [gameMode]);
@@ -42,7 +51,7 @@ export const GuesserView: React.FC = () => {
 
   const handleSelectHero = (hero: Hero) => {
     if (isGameOver) return;
-    if (guesses.some(g => g.hero.id === hero.id)) return; // Already guessed
+    if (guesses.some(g => g.hero.id === hero.id)) return;
 
     const feedback = compareGuess(hero, targetHero);
     const newGuesses = [feedback, ...guesses];
@@ -53,8 +62,8 @@ export const GuesserView: React.FC = () => {
     if (feedback.isCorrect) {
       setIsGameOver(true);
       confetti({
-        particleCount: 120,
-        spread: 80,
+        particleCount: 130,
+        spread: 90,
         origin: { y: 0.6 }
       });
     }
@@ -73,16 +82,16 @@ export const GuesserView: React.FC = () => {
     direction?: 'higher' | 'lower',
     partial?: boolean
   ) => {
-    let bg = 'bg-slate-800/90 border-slate-700 text-slate-300';
+    let bg = isDark ? 'bg-slate-800/90 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700';
     if (matched) {
-      bg = 'bg-emerald-600/90 border-emerald-500 text-white font-bold shadow-lg shadow-emerald-500/20';
+      bg = 'bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/20 border-emerald-500';
     } else if (partial) {
-      bg = 'bg-amber-600/90 border-amber-500 text-white font-bold shadow-lg shadow-amber-500/20';
+      bg = 'bg-amber-600 text-white font-bold shadow-lg shadow-amber-500/20 border-amber-500';
     }
 
     return (
       <div className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center transition-all duration-300 ${bg}`}>
-        <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium mb-0.5">
+        <span className="text-[10px] uppercase tracking-wider opacity-75 font-medium mb-0.5">
           {title}
         </span>
         <div className="flex items-center space-x-1 text-xs font-semibold">
@@ -108,18 +117,20 @@ export const GuesserView: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      {/* Guesser Header */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 backdrop-blur shadow-xl text-center relative overflow-hidden">
+      {/* Header */}
+      <div className={`border rounded-3xl p-6 shadow-xl text-center relative overflow-hidden transition ${
+        isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
+      }`}>
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold mb-3">
           <Gamepad2 className="w-4 h-4" />
           <span>MINIJUEGO ADICTIVO: RECALLDLE</span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-          ¿Puedes adivinar al Héroe de Hoy?
+        <h1 className={`text-3xl sm:text-4xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          {t.guesserTitle}
         </h1>
         <p className="text-sm text-slate-400 max-w-xl mx-auto mt-2">
-          Escribe el nombre de un personaje. Te mostraremos pistas con colores según coincidan el rol, género, edad, país y afiliación.
+          {t.guesserSubtitle}
         </p>
 
         {/* Mode Selector */}
@@ -129,11 +140,11 @@ export const GuesserView: React.FC = () => {
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
               gameMode === 'daily'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                : isDark ? 'bg-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
             }`}
           >
             <Calendar className="w-4 h-4" />
-            <span>Desafío Diario</span>
+            <span>{t.dailyChallenge}</span>
           </button>
 
           <button
@@ -141,18 +152,20 @@ export const GuesserView: React.FC = () => {
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
               gameMode === 'infinite'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                : isDark ? 'bg-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
             }`}
           >
             <Flame className="w-4 h-4" />
-            <span>Modo Práctica Libre</span>
+            <span>{t.freePractice}</span>
           </button>
 
           {gameMode === 'infinite' && (
             <button
               onClick={() => resetGame('infinite')}
-              className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition"
-              title="Nuevo Héroe Aleatorio"
+              className={`p-2 rounded-xl border transition ${
+                isDark ? 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900'
+              }`}
+              title={t.newHeroRandom}
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -168,32 +181,40 @@ export const GuesserView: React.FC = () => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Escribe el nombre del héroe (ej. Tracer, Reinhardt, Mercy)..."
+              placeholder={t.typeHeroPlaceholder}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setDropdownOpen(true);
               }}
               onFocus={() => setDropdownOpen(true)}
-              className="w-full bg-slate-900 border-2 border-slate-700 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder-slate-500 font-semibold text-sm focus:outline-none focus:border-purple-500 shadow-xl"
+              className={`w-full border-2 rounded-2xl pl-12 pr-4 py-3.5 font-semibold text-sm focus:outline-none focus:border-purple-500 shadow-xl transition ${
+                isDark
+                  ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500'
+                  : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+              }`}
             />
           </div>
 
           {dropdownOpen && searchQuery.length > 0 && (
-            <div className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-2xl max-h-64 overflow-y-auto z-40 shadow-2xl p-2 divide-y divide-slate-800">
+            <div className={`absolute left-0 right-0 mt-2 border rounded-2xl max-h-64 overflow-y-auto z-40 shadow-2xl p-2 divide-y ${
+              isDark ? 'bg-slate-900 border-slate-700 divide-slate-800' : 'bg-white border-slate-200 divide-slate-100'
+            }`}>
               {availableHeroes.length > 0 ? (
                 availableHeroes.map(hero => (
                   <button
                     key={hero.id}
                     onClick={() => handleSelectHero(hero)}
-                    className="w-full text-left p-2.5 rounded-xl flex items-center justify-between hover:bg-slate-800 transition"
+                    className={`w-full text-left p-2.5 rounded-xl flex items-center justify-between transition ${
+                      isDark ? 'hover:bg-slate-800' : 'hover:bg-slate-50'
+                    }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center font-bold text-xs text-white">
-                        {hero.name.substring(0, 2)}
-                      </div>
+                      <HeroAvatar hero={hero} size="sm" />
                       <div>
-                        <div className="font-bold text-white text-sm">{hero.name}</div>
+                        <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {hero.name}
+                        </div>
                         <div className="text-[11px] text-slate-400 capitalize">
                           {hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'} • {hero.country}
                         </div>
@@ -215,15 +236,15 @@ export const GuesserView: React.FC = () => {
       ) : (
         /* Victory Modal Card */
         <div className="bg-gradient-to-b from-purple-900/40 to-slate-900 border-2 border-purple-500/50 rounded-3xl p-8 max-w-xl mx-auto text-center shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-amber-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/40">
-            <Trophy className="w-8 h-8 text-white" />
+          <div className="flex justify-center mb-4">
+            <HeroAvatar hero={targetHero} size="xl" showRoleBadge />
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-white">
-            ¡VICTORIA! Era <span className="text-purple-400">{targetHero.name}</span>
+            {t.victoryTitle} <span className="text-purple-400">{targetHero.name}</span>!
           </h2>
           <p className="text-sm text-slate-300 mt-2">
-            Lograste descifrar al héroe en <span className="font-bold text-white font-mono">{guesses.length}</span> {guesses.length === 1 ? 'intento' : 'intentos'}.
+            Lograste descifrar al héroe en <span className="font-bold text-white font-mono">{guesses.length}</span> {guesses.length === 1 ? t.attempt : t.attempts}.
           </p>
 
           <div className="flex items-center justify-center space-x-3 mt-6">
@@ -232,7 +253,7 @@ export const GuesserView: React.FC = () => {
               className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg shadow-purple-600/30 transition"
             >
               <Share2 className="w-4 h-4" />
-              <span>{copiedShare ? '¡Copiado al Portapapeles!' : 'Compartir Resultado'}</span>
+              <span>{copiedShare ? t.copiedClipboard : t.shareResults}</span>
             </button>
 
             {gameMode === 'infinite' && (
@@ -241,7 +262,7 @@ export const GuesserView: React.FC = () => {
                 className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition"
               >
                 <RotateCcw className="w-4 h-4" />
-                <span>Jugar Otra Vez</span>
+                <span>{t.playAgain}</span>
               </button>
             )}
           </div>
@@ -252,7 +273,7 @@ export const GuesserView: React.FC = () => {
       {guesses.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-400 px-2">
-            <span>HISTORIAL DE INTENTOS ({guesses.length})</span>
+            <span>{t.historyAttempts} ({guesses.length})</span>
             <div className="flex items-center space-x-3">
               <span className="flex items-center space-x-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
@@ -263,7 +284,7 @@ export const GuesserView: React.FC = () => {
                 <span>Parcial</span>
               </span>
               <span className="flex items-center space-x-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-600 inline-block"></span>
                 <span>No coincide</span>
               </span>
             </div>
@@ -273,15 +294,20 @@ export const GuesserView: React.FC = () => {
             {guesses.map((guess, index) => (
               <div
                 key={index}
-                className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 shadow-lg backdrop-blur"
+                className={`border rounded-2xl p-4 shadow-lg backdrop-blur transition ${
+                  isDark ? 'bg-slate-900/70 border-slate-800' : 'bg-white border-slate-200'
+                }`}
               >
-                <div className="flex items-center space-x-2 mb-3">
-                  <span className="text-xs font-mono font-bold text-purple-400">
-                    #{guesses.length - index}
-                  </span>
-                  <span className="text-sm font-bold text-white">
-                    {guess.hero.name}
-                  </span>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <HeroAvatar hero={guess.hero} size="sm" />
+                    <span className="text-xs font-mono font-bold text-purple-400">
+                      #{guesses.length - index}
+                    </span>
+                    <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {guess.hero.name}
+                    </span>
+                  </div>
                   {guess.isCorrect && (
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
                       ¡ACERTASTE!
@@ -290,13 +316,13 @@ export const GuesserView: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                  {renderFeedbackCell('Rol', guess.role.value, guess.role.matched)}
-                  {renderFeedbackCell('Género', guess.gender.value, guess.gender.matched)}
-                  {renderFeedbackCell('Afiliación', guess.affiliation.value, guess.affiliation.matched, undefined, guess.affiliation.partial)}
-                  {renderFeedbackCell('País', guess.country.value, guess.country.matched)}
-                  {renderFeedbackCell('Edad', guess.age.value, guess.age.matched, guess.age.direction)}
-                  {renderFeedbackCell('Año Debut', guess.releaseYear.value, guess.releaseYear.matched, guess.releaseYear.direction)}
-                  {renderFeedbackCell('Alcance', guess.range.value, guess.range.matched)}
+                  {renderFeedbackCell(t.colRole, guess.role.value, guess.role.matched)}
+                  {renderFeedbackCell(t.colGender, guess.gender.value, guess.gender.matched)}
+                  {renderFeedbackCell(t.colAffiliation, guess.affiliation.value, guess.affiliation.matched, undefined, guess.affiliation.partial)}
+                  {renderFeedbackCell(t.colCountry, guess.country.value, guess.country.matched)}
+                  {renderFeedbackCell(t.colAge, guess.age.value, guess.age.matched, guess.age.direction)}
+                  {renderFeedbackCell(t.colYear, guess.releaseYear.value, guess.releaseYear.matched, guess.releaseYear.direction)}
+                  {renderFeedbackCell(t.colRange, guess.range.value, guess.range.matched)}
                 </div>
               </div>
             ))}
