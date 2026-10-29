@@ -37,7 +37,6 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
 
   const renderHeroPortrait = (hero: Hero) => {
     const isSelected = selectedHeroId === hero.id;
-    // Cannot pick heroes already chosen by other allies in team
     const isTakenByAlly = allyHeroIds.includes(hero.id) && !isSelected;
     const isLockedOut = roleQueueLocked && playerRole && playerRole !== hero.role;
     const isDisabled = isTakenByAlly || isLockedOut;
@@ -55,9 +54,9 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
         title={`${hero.name} • ${hero.subrole} • ${hero.style.toUpperCase()}`}
         className={`group relative flex-shrink-0 w-20 sm:w-24 h-28 sm:h-32 rounded-xl overflow-hidden border-2 transition-all duration-200 select-none ${
           isSelected
-            ? 'border-orange-500 ring-2 ring-orange-500 shadow-lg shadow-orange-500/50 scale-105 z-20'
+            ? 'border-orange-500 ring-4 ring-orange-500/50 shadow-xl shadow-orange-500/50 scale-105 z-20'
             : isDisabled
-            ? 'opacity-35 grayscale border-slate-800 bg-slate-900 cursor-not-allowed'
+            ? 'opacity-35 grayscale border-slate-700 bg-slate-900 cursor-not-allowed'
             : isDark
             ? 'border-slate-700/80 bg-slate-800 hover:border-orange-400 hover:scale-105 hover:z-10 shadow-md'
             : 'border-slate-300 bg-slate-100 hover:border-orange-400 hover:scale-105 hover:z-10 shadow-sm'
@@ -122,7 +121,9 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
         : 'bg-white border-slate-200'
     }`}>
       {/* Top Controls Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-800">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b ${
+        isDark ? 'border-slate-800' : 'border-slate-200'
+      }`}>
         <div className="flex items-center space-x-2.5">
           <div className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></div>
           <div>
@@ -132,7 +133,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
               SELECCIÓN DE TU HÉROE
             </h2>
             <p className="text-xs text-slate-400">
-              Haz clic en el personaje que vas a jugar para calcular su viabilidad y opciones de counter-switch.
+              Haz clic en el personaje que vas a jugar. Centrado como en Overwatch original.
             </p>
           </div>
         </div>
@@ -174,32 +175,36 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
             onClick={() => setRoleQueueLocked(!roleQueueLocked)}
             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
               roleQueueLocked
-                ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 shadow'
+                ? 'bg-amber-500/20 text-amber-500 border-amber-500/40 shadow'
                 : isDark
                 ? 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
-                : 'bg-slate-100 text-slate-600 border-slate-300'
+                : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'
             }`}
             title="Simula la cola de roles competitiva bloqueando los demás roles"
           >
-            <Lock className={`w-3 h-3 ${roleQueueLocked ? 'text-amber-400' : 'text-slate-400'}`} />
+            <Lock className={`w-3 h-3 ${roleQueueLocked ? 'text-amber-500' : 'text-slate-400'}`} />
             <span>Role Queue {roleQueueLocked ? 'Bloqueado' : 'Libre'}</span>
           </button>
         </div>
       </div>
 
-      {/* Role Segments Gallery */}
-      <div className="space-y-5">
+      {/* Role Segments Gallery (CENTERED LIKE OVERWATCH!) */}
+      <div className="space-y-6">
         {roleCategories
           .filter(cat => activeTab === 'all' || activeTab === cat.role)
           .map(cat => (
-            <div key={cat.role} className="space-y-2.5">
-              <div className="flex items-center space-x-2 text-xs font-mono font-bold tracking-wider uppercase text-slate-400">
-                {cat.icon}
-                <span>{cat.label} ({cat.heroes.length})</span>
+            <div key={cat.role} className="space-y-3">
+              <div className="flex items-center justify-center space-x-3 text-xs font-mono font-bold tracking-wider uppercase text-slate-400">
+                <span className={`h-[1px] w-12 hidden sm:block ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></span>
+                <span className="flex items-center space-x-1.5">
+                  {cat.icon}
+                  <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>{cat.label} ({cat.heroes.length})</span>
+                </span>
+                <span className={`h-[1px] w-12 hidden sm:block ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></span>
               </div>
 
-              {/* Horizontal Scroll / Wrap Grid of Portraits */}
-              <div className="flex flex-wrap gap-2 sm:gap-2.5">
+              {/* Centered Wrap Grid: If a hero overflows, it centers naturally */}
+              <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-2.5 max-w-5xl mx-auto">
                 {cat.heroes.map(hero => renderHeroPortrait(hero))}
               </div>
             </div>

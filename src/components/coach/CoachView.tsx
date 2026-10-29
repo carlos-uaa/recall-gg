@@ -16,13 +16,15 @@ import {
   AlertTriangle, 
   Plus, 
   X, 
-  ChevronRight,
-  Sparkles,
-  Star,
-  RefreshCw,
-  UserCheck,
-  AlertOctagon,
-  Lock
+  ChevronRight, 
+  Sparkles, 
+  Star, 
+  RefreshCw, 
+  UserCheck, 
+  AlertOctagon, 
+  Lock,
+  Flame,
+  Award
 } from 'lucide-react';
 
 interface CoachViewProps {
@@ -82,7 +84,6 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
     // Update allySlots: Find the first slot matching this hero's role to be "isMyPick"
     setAllySlots(slots => {
-      // First, remove this hero if it was in another slot to prevent duplicate
       const cleaned = slots.map(s => (s.heroId === heroId && !s.isMyPick ? { ...s, heroId: null } : s));
       
       let assigned = false;
@@ -217,13 +218,28 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
     }
   };
 
+  // Helper colors for the diagnosis card depending on theme
+  const getDiagnosisCardStyles = (score: number) => {
+    if (isDark) {
+      if (score >= 70) return 'border-emerald-500/60 bg-gradient-to-b from-emerald-950/40 via-slate-900 to-slate-900 text-white';
+      if (score >= 50) return 'border-amber-500/60 bg-gradient-to-b from-amber-950/40 via-slate-900 to-slate-900 text-white';
+      return 'border-rose-500/60 bg-gradient-to-b from-rose-950/40 via-slate-900 to-slate-900 text-white';
+    } else {
+      if (score >= 70) return 'border-emerald-300 bg-gradient-to-b from-emerald-50 via-white to-white text-slate-800 shadow-xl';
+      if (score >= 50) return 'border-amber-300 bg-gradient-to-b from-amber-50 via-white to-white text-slate-800 shadow-xl';
+      return 'border-rose-300 bg-gradient-to-b from-rose-50 via-white to-white text-slate-800 shadow-xl';
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 1. TOP GLOBAL SETTINGS BAR */}
       <div className={`border rounded-3xl p-5 sm:p-6 shadow-xl backdrop-blur transition ${
         isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
       }`}>
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-6 border-b border-slate-800/60">
+        <div className={`flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-6 border-b ${
+          isDark ? 'border-slate-800/60' : 'border-slate-200'
+        }`}>
           <div>
             <div className="flex items-center space-x-2">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-500/20 text-orange-500 border border-orange-500/30">
@@ -349,7 +365,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         </div>
       </div>
 
-      {/* 2. OVERWATCH HERO SELECT SCREEN (DIRECTAMENTE ARRIBA, ESTILO ORIGINAL CON IMAGEN, BADGE SUPERPUESTO Y NOMBRE FOOTER) */}
+      {/* 2. OVERWATCH HERO SELECT SCREEN (ARRIBA DE TODO, CENTRADO EXACTO COMO EN OVERWATCH) */}
       <HeroSelectScreen
         selectedHeroId={playerHeroId}
         onSelectHero={handleSelectMyHero}
@@ -358,7 +374,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         playerRole={playerHero.role}
       />
 
-      {/* 3. TEAM COMPOSITIONS (ALLY & ENEMY SLOTS WITH ROLE CONSTRAINTS) */}
+      {/* 3. TEAM COMPOSITIONS (CASILLAS DE EQUIPO ALIADO Y RIVAL) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Ally Team */}
         <div className={`border rounded-3xl p-5 shadow-lg relative ${
@@ -398,7 +414,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       {slot.label}
                     </span>
                     {slot.isMyPick && (
-                      <span className="text-[9px] font-bold text-amber-400 bg-amber-400/20 px-1.5 py-0.2 rounded">
+                      <span className="text-[9px] font-bold text-amber-500 bg-amber-500/20 px-1.5 py-0.2 rounded border border-amber-500/30">
                         TÚ
                       </span>
                     )}
@@ -410,7 +426,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       className="cursor-pointer flex flex-col items-center w-full"
                     >
                       <HeroAvatar hero={hero} size="lg" />
-                      <span className="text-xs font-bold text-slate-200 truncate w-full text-center mt-1.5">
+                      <span className={`text-xs font-bold truncate w-full text-center mt-1.5 ${
+                        isDark ? 'text-slate-200' : 'text-slate-800'
+                      }`}>
                         {hero.name}
                       </span>
                       <span className="text-[10px] text-slate-400 uppercase font-mono">
@@ -505,7 +523,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       className="cursor-pointer flex flex-col items-center w-full"
                     >
                       <HeroAvatar hero={hero} size="lg" />
-                      <span className="text-xs font-bold text-slate-200 truncate w-full text-center mt-1.5">
+                      <span className={`text-xs font-bold truncate w-full text-center mt-1.5 ${
+                        isDark ? 'text-slate-200' : 'text-slate-800'
+                      }`}>
                         {hero.name}
                       </span>
                       <span className="text-[10px] text-slate-400 uppercase font-mono">
@@ -540,87 +560,126 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         </div>
       </div>
 
-      {/* 4. PLAYER HERO PICK DIAGNOSIS & SMART COUNTER-SWITCH (AHORA SITUADO DEBAJO DE LA SELECCIÓN DE EQUIPO) */}
+      {/* 4. CARD CENTRAL DE TU PERSONAJE SELECCIONADO (CON CALIFICACIÓN FINAL Y MEJORES RECOMENDACIONES) */}
       {playerPickDiagnosis && (
-        <div className={`border-2 rounded-3xl p-6 shadow-2xl relative overflow-hidden transition ${
-          playerPickDiagnosis.score >= 70
-            ? 'border-emerald-500/50 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900'
-            : playerPickDiagnosis.score >= 50
-            ? 'border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900'
-            : 'border-rose-500/60 bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900'
-        }`}>
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-5 border-b border-slate-800">
-            <div className="flex items-center space-x-4">
-              <HeroAvatar hero={playerPickDiagnosis.hero} size="xl" showRoleBadge />
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 flex items-center">
-                    <UserCheck className="w-3 h-3 mr-1" /> TU ELECCIÓN ACTUAL
-                  </span>
-                  <span className="text-xs text-slate-400 capitalize">
-                    {playerPickDiagnosis.hero.role === 'damage' ? 'DPS' : playerPickDiagnosis.hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
-                  </span>
-                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                    {playerPickDiagnosis.hero.subrole}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-black text-white mt-1">
-                  {playerPickDiagnosis.hero.name}
-                </h2>
-                <p className="text-xs text-slate-300 mt-1 max-w-xl">
-                  {playerPickDiagnosis.verdict}
-                </p>
+        <div className={`border-2 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden transition ${getDiagnosisCardStyles(playerPickDiagnosis.score)}`}>
+          {/* Central Hero Showcase Header */}
+          <div className="flex flex-col items-center text-center max-w-3xl mx-auto pb-6 border-b border-slate-700/30">
+            {/* Hero Large Avatar with Glowing Accent */}
+            <div className="relative mb-3">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-4 border-orange-500 shadow-2xl shadow-orange-500/40 ring-4 ring-orange-500/20">
+                <img
+                  src={playerPickDiagnosis.hero.icon}
+                  alt={playerPickDiagnosis.hero.name}
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+              <div className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-orange-600 text-white text-[10px] font-black uppercase tracking-wider shadow">
+                TU ELECCIÓN
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <div className="text-right">
-                <div className="text-[10px] uppercase font-bold text-slate-400">Viabilidad Calculada</div>
-                <div className={`text-3xl font-black font-mono ${
+            {/* Hero Name & Identity Badges */}
+            <h2 className={`text-3xl sm:text-4xl font-black uppercase tracking-tight ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              {playerPickDiagnosis.hero.name}
+            </h2>
+
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+              <span className="px-2.5 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-orange-500 border border-orange-500/30">
+                {playerPickDiagnosis.hero.role === 'damage' ? 'DPS' : playerPickDiagnosis.hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
+              </span>
+              <span className={`px-2.5 py-1 rounded-xl text-xs font-mono font-semibold border ${
+                isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-300'
+              }`}>
+                {playerPickDiagnosis.hero.subrole}
+              </span>
+              <span className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold uppercase border ${
+                playerPickDiagnosis.hero.style === 'dive'
+                  ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                  : playerPickDiagnosis.hero.style === 'brawl'
+                  ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
+              }`}>
+                {playerPickDiagnosis.hero.style}
+              </span>
+            </div>
+
+            {/* Prominent Score Metric */}
+            <div className="my-5 p-4 rounded-2xl border flex items-center justify-center space-x-6 w-full max-w-md mx-auto bg-slate-900/40 backdrop-blur border-slate-700/40">
+              <div className="text-center">
+                <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  Calificación Final
+                </span>
+                <span className={`text-4xl sm:text-5xl font-black font-mono leading-none ${
                   playerPickDiagnosis.score >= 70 ? 'text-emerald-400' : playerPickDiagnosis.score >= 50 ? 'text-amber-400' : 'text-rose-400'
                 }`}>
-                  {playerPickDiagnosis.score}/100
-                </div>
+                  {playerPickDiagnosis.score}<span className="text-xl text-slate-500">/100</span>
+                </span>
+              </div>
+              <div className="h-10 w-[1px] bg-slate-700/50"></div>
+              <div className="text-left">
+                <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  Estado del Pick
+                </span>
+                <span className={`text-base sm:text-lg font-black uppercase ${
+                  playerPickDiagnosis.score >= 70 ? 'text-emerald-400' : playerPickDiagnosis.score >= 50 ? 'text-amber-400' : 'text-rose-400'
+                }`}>
+                  {playerPickDiagnosis.score >= 78 ? 'Dominante' : playerPickDiagnosis.score >= 60 ? 'Viable' : 'En Riesgo'}
+                </span>
               </div>
             </div>
+
+            <p className={`text-sm max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+              {playerPickDiagnosis.verdict}
+            </p>
           </div>
 
-          {/* Threats & Targets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 border-b border-slate-800">
-            {/* Threats */}
-            <div className="bg-slate-900/60 rounded-2xl p-3.5 border border-rose-500/20">
-              <div className="flex items-center space-x-2 text-rose-400 font-bold text-xs mb-2">
+          {/* Threats & Favorable Targets Matrix */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-5 border-b border-slate-700/30">
+            {/* Direct Threats */}
+            <div className={`rounded-2xl p-4 border transition ${
+              isDark ? 'bg-slate-900/60 border-rose-500/30' : 'bg-rose-50/70 border-rose-200'
+            }`}>
+              <div className="flex items-center space-x-2 text-rose-500 font-bold text-xs mb-2.5">
                 <AlertOctagon className="w-4 h-4" />
-                <span>Counters rivales que te anulan directamente ({playerPickDiagnosis.directThreats.length})</span>
+                <span>Counters rivales que te amenazan ({playerPickDiagnosis.directThreats.length})</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {playerPickDiagnosis.directThreats.length > 0 ? (
                   playerPickDiagnosis.directThreats.map(threat => (
-                    <div key={threat.id} className="flex items-center space-x-2 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-rose-500/30">
+                    <div key={threat.id} className={`flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border ${
+                      isDark ? 'bg-slate-800 border-rose-500/30 text-rose-300' : 'bg-white border-rose-300 text-rose-900 shadow-sm'
+                    }`}>
                       <HeroAvatar hero={threat} size="xs" />
-                      <span className="text-xs font-semibold text-rose-300">{threat.name}</span>
+                      <span className="text-xs font-semibold">{threat.name}</span>
                     </div>
                   ))
                 ) : (
-                  <span className="text-xs text-emerald-400 font-medium italic">
-                    ¡Ningún héroe rival te hace hard-counter directo en este momento!
+                  <span className="text-xs text-emerald-500 font-medium italic">
+                    ¡Ningún héroe rival te hace counter directo en este momento!
                   </span>
                 )}
               </div>
             </div>
 
             {/* Favorable Targets */}
-            <div className="bg-slate-900/60 rounded-2xl p-3.5 border border-emerald-500/20">
-              <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs mb-2">
+            <div className={`rounded-2xl p-4 border transition ${
+              isDark ? 'bg-slate-900/60 border-emerald-500/30' : 'bg-emerald-50/70 border-emerald-200'
+            }`}>
+              <div className="flex items-center space-x-2 text-emerald-500 font-bold text-xs mb-2.5">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Tus objetivos favoritos en el equipo rival ({playerPickDiagnosis.favorableTargets.length})</span>
+                <span>Objetivos a los que dominas ({playerPickDiagnosis.favorableTargets.length})</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {playerPickDiagnosis.favorableTargets.length > 0 ? (
                   playerPickDiagnosis.favorableTargets.map(target => (
-                    <div key={target.id} className="flex items-center space-x-2 bg-slate-800 px-2.5 py-1.5 rounded-xl border border-emerald-500/30">
+                    <div key={target.id} className={`flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border ${
+                      isDark ? 'bg-slate-800 border-emerald-500/30 text-emerald-300' : 'bg-white border-emerald-300 text-emerald-900 shadow-sm'
+                    }`}>
                       <HeroAvatar hero={target} size="xs" />
-                      <span className="text-xs font-semibold text-emerald-300">{target.name}</span>
+                      <span className="text-xs font-semibold">{target.name}</span>
                     </div>
                   ))
                 ) : (
@@ -632,11 +691,20 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             </div>
           </div>
 
-          {/* COUNTER-SWITCH SUGGESTIONS (WITHIN SAME ROLE) */}
-          <div className="pt-4">
-            <div className="flex items-center space-x-2 text-sm font-black text-white mb-3">
-              <RefreshCw className="w-4 h-4 text-orange-400" />
-              <span>{t.switchRecommendations}</span>
+          {/* BEST RECOMMENDATIONS & COUNTER-SWITCHES */}
+          <div className="pt-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-orange-500" />
+                <span className={`text-sm font-black uppercase tracking-tight ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
+                  {t.switchRecommendations}
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-400">
+                Opciones dentro de tu rol ({playerHero.role.toUpperCase()})
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -644,25 +712,31 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 <div
                   key={alt.hero.id}
                   onClick={() => handleSelectMyHero(alt.hero.id)}
-                  className="bg-slate-800/90 border border-orange-500/30 hover:border-orange-500 rounded-2xl p-3 flex items-center justify-between cursor-pointer transition shadow-lg group"
+                  className={`border rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition shadow-lg group ${
+                    isDark
+                      ? 'bg-slate-800/90 border-orange-500/30 hover:border-orange-500'
+                      : 'bg-white border-orange-200 hover:border-orange-500'
+                  }`}
                 >
                   <div className="flex items-center space-x-3">
                     <HeroAvatar hero={alt.hero} size="md" />
                     <div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="font-bold text-white text-sm group-hover:text-orange-400 transition">
+                        <span className={`font-black text-sm group-hover:text-orange-500 transition ${
+                          isDark ? 'text-white' : 'text-slate-900'
+                        }`}>
                           {alt.hero.name}
                         </span>
-                        <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                        <span className="text-[10px] font-mono text-emerald-500 font-black">
                           {alt.score} pts
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-300 leading-tight mt-0.5">
+                      <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
                         {alt.reason}
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] text-orange-400 font-bold uppercase opacity-0 group-hover:opacity-100 transition">
+                  <span className="text-[10px] text-orange-500 font-bold uppercase opacity-0 group-hover:opacity-100 transition">
                     Cambiar
                   </span>
                 </div>
