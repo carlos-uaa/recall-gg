@@ -194,11 +194,12 @@ export const OVERWATCH_MAPS: GameMap[] = [
     "mode": "Control",
     "image": "https://tonikiraw.com/assets/img/mapas/busan.webp",
     "favoredStyles": [
-      "dive"
+      "dive",
+      "poke"
     ],
     "hasHighGround": true,
-    "isCloseQuarters": true,
-    "longSightlines": false
+    "isCloseQuarters": false,
+    "longSightlines": true
   },
   {
     "id": "ilios",
@@ -378,6 +379,32 @@ export const OVERWATCH_MAPS: GameMap[] = [
     "mode": "Invasión / Clash",
     "image": "https://tonikiraw.com/assets/img/mapas/neon-junction.webp",
     "favoredStyles": [
+      "dive"
+    ],
+    "hasHighGround": true,
+    "isCloseQuarters": true,
+    "longSightlines": false
+  },
+  {
+    "id": "hanaoka",
+    "name": "Hanaoka",
+    "mode": "Invasión / Clash",
+    "image": "https://overfast-api.tekrop.fr/static/maps/hanaoka.jpg",
+    "favoredStyles": [
+      "brawl",
+      "dive"
+    ],
+    "hasHighGround": true,
+    "isCloseQuarters": true,
+    "longSightlines": false
+  },
+  {
+    "id": "throne-of-anubis",
+    "name": "Trono de Anubis",
+    "mode": "Invasión / Clash",
+    "image": "https://overfast-api.tekrop.fr/static/maps/throne-of-anubis.jpg",
+    "favoredStyles": [
+      "brawl",
       "dive"
     ],
     "hasHighGround": true,

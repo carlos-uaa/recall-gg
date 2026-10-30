@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_MAPS } from '../../games/overwatch/maps';
+import { OVERWATCH_RANKS, getRankInfo } from '../../games/overwatch/ranks';
+import { evaluateHeroMapSynergy } from '../../games/overwatch/mapSynergies';
 import type { GameMap, RankTier, Role } from '../../types/game';
 import { calculateRecommendations, analyzePlayerPick } from '../../core/coachEngine';
 import { HeroAvatar } from '../common/HeroAvatar';
@@ -45,7 +47,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
   const isDark = theme === 'dark';
 
   const [selectedMapId, setSelectedMapId] = useState<string>('kings-row');
-  const [rankTier, setRankTier] = useState<RankTier>('plat_diamond');
+  const [rankTier, setRankTier] = useState<RankTier>('diamond');
+  const selectedRank = useMemo(() => getRankInfo(rankTier), [rankTier]);
   const [gameFormat, setGameFormat] = useState<'5v5' | '6v6'>('5v5');
   const [viewMode, setViewMode] = useState<'quick' | 'detailed'>('detailed');
 
@@ -376,61 +379,60 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <div className="flex items-center justify-between mb-1.5">
               <label className={`text-xs font-bold flex items-center space-x-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                <span>RANGO COMPETITIVO</span>
+                <span>RANGO COMPETITIVO INDIVIDUAL</span>
               </label>
               <button
                 type="button"
                 onClick={() => setRankPickerOpen(true)}
                 className="text-xs font-bold text-amber-500 hover:text-amber-400 transition"
               >
-                Cambiar Rango →
+                Elegir Rango →
               </button>
             </div>
 
-            {/* Clickable Rank Banner */}
+            {/* Clickable Rank Banner with Official Rank Emblem */}
             <div
               onClick={() => setRankPickerOpen(true)}
-              className={`group relative h-28 sm:h-32 rounded-2xl border p-4 flex items-center justify-between cursor-pointer shadow-lg transition hover:border-amber-400 hover:scale-[1.01] ${
-                isDark
-                  ? rankTier === 'master_top500'
-                    ? 'border-purple-500/50 bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-900'
-                    : rankTier === 'plat_diamond'
-                    ? 'border-cyan-500/50 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900'
-                    : 'border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900'
-                  : rankTier === 'master_top500'
-                  ? 'border-purple-300 bg-gradient-to-r from-purple-50 via-white to-white'
-                  : rankTier === 'plat_diamond'
-                  ? 'border-cyan-300 bg-gradient-to-r from-cyan-50 via-white to-white'
-                  : 'border-amber-300 bg-gradient-to-r from-amber-50 via-white to-white'
-              }`}
+              style={{
+                borderColor: `color-mix(in oklab, ${selectedRank.accentColor} ${isDark ? '55%' : '65%'}, ${isDark ? '#1e293b' : '#cbd5e1'})`,
+                backgroundImage: isDark
+                  ? `linear-gradient(95deg, color-mix(in oklab, ${selectedRank.accentColor} 20%, #0f172a) 0%, #0f172a 65%)`
+                  : `linear-gradient(95deg, color-mix(in oklab, ${selectedRank.accentColor} 18%, white) 0%, #ffffff 70%)`,
+              }}
+              className="group relative h-28 sm:h-32 rounded-2xl border p-4 flex items-center justify-between cursor-pointer shadow-lg transition hover:scale-[1.01]"
             >
-              <div className="flex items-center space-x-4">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl border shadow-lg ${
-                  rankTier === 'master_top500'
-                    ? isDark ? 'bg-purple-900/60 border-purple-400 text-purple-300 shadow-purple-500/30' : 'bg-purple-100 border-purple-400 text-purple-700'
-                    : rankTier === 'plat_diamond'
-                    ? isDark ? 'bg-cyan-900/60 border-cyan-400 text-cyan-300 shadow-cyan-500/30' : 'bg-cyan-100 border-cyan-400 text-cyan-700'
-                    : isDark ? 'bg-amber-900/60 border-amber-400 text-amber-300 shadow-amber-500/30' : 'bg-amber-100 border-amber-400 text-amber-700'
-                }`}>
-                  {rankTier === 'master_top500' ? 'GM' : rankTier === 'plat_diamond' ? 'DIA' : 'ORO'}
+              <div className="flex items-center space-x-4 min-w-0">
+                <div
+                  style={{
+                    borderColor: `color-mix(in oklab, ${selectedRank.accentColor} 65%, white)`,
+                    boxShadow: `0 8px 22px color-mix(in oklab, ${selectedRank.accentColor} 32%, transparent)`,
+                  }}
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-2 flex items-center justify-center border flex-shrink-0 transition group-hover:scale-105 ${
+                    isDark ? 'bg-slate-950/80' : 'bg-slate-900/90'
+                  }`}
+                >
+                  <img
+                    src={selectedRank.icon}
+                    alt={selectedRank.name}
+                    className="w-full h-full object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.65)]"
+                  />
                 </div>
-                <div>
-                  <span className={`text-[10px] font-mono uppercase font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Modificador de Habilidad
+                <div className="min-w-0">
+                  <span
+                    style={{
+                      color: isDark
+                        ? `color-mix(in oklab, ${selectedRank.accentColor} 80%, white)`
+                        : `color-mix(in oklab, ${selectedRank.accentColor} 78%, #0f172a)`,
+                    }}
+                    className="text-[10px] font-mono uppercase font-black tracking-wider"
+                  >
+                    RANGO {selectedRank.englishName.toUpperCase()}
                   </span>
-                  <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {rankTier === 'bronze_gold'
-                      ? 'Bronce — Oro'
-                      : rankTier === 'plat_diamond'
-                      ? 'Platino — Diamante'
-                      : 'Master — Top 500'}
+                  <h3 className={`text-lg sm:text-xl font-black leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {selectedRank.name}
                   </h3>
-                  <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    {rankTier === 'bronze_gold'
-                      ? 'Premia consistencia y castiga exigencia mecánica'
-                      : rankTier === 'plat_diamond'
-                      ? 'Ponderación equilibrada entre meta y utilidad'
-                      : 'Prioriza techo mecánico y sinergias coordinadas'}
+                  <p className={`text-xs mt-0.5 line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    {selectedRank.summary}
                   </p>
                 </div>
               </div>
@@ -682,30 +684,99 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               </span>
             </div>
 
-            {/* Prominent Score Metric */}
-            <div className="my-5 p-4 rounded-2xl border flex items-center justify-center space-x-6 w-full max-w-md mx-auto bg-slate-900/40 backdrop-blur border-slate-700/40">
-              <div className="text-center">
-                <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                  Calificación Final
-                </span>
-                <span className={`text-4xl sm:text-5xl font-black font-mono leading-none ${
-                  playerPickDiagnosis.score >= 70 ? 'text-emerald-400' : playerPickDiagnosis.score >= 50 ? 'text-amber-400' : 'text-rose-400'
-                }`}>
-                  {playerPickDiagnosis.score}<span className="text-xl text-slate-500">/100</span>
-                </span>
+            {/* Prominent Score Metric + Map & Rank Breakdown */}
+            <div className={`my-5 p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full max-w-2xl mx-auto backdrop-blur ${
+              isDark ? 'bg-slate-900/55 border-slate-700/50' : 'bg-slate-900/5 border-slate-300/80'
+            }`}>
+              <div className="flex items-center space-x-6">
+                <div className="text-center">
+                  <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                    Calificación Final
+                  </span>
+                  <span className={`text-4xl sm:text-5xl font-black font-mono leading-none ${
+                    playerPickDiagnosis.score >= 70 ? 'text-emerald-500' : playerPickDiagnosis.score >= 50 ? 'text-amber-500' : 'text-rose-500'
+                  }`}>
+                    {playerPickDiagnosis.score}<span className="text-xl text-slate-400">/100</span>
+                  </span>
+                </div>
+                <div className="h-10 w-[1px] bg-slate-500/30"></div>
+                <div className="text-left">
+                  <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                    Estado del Pick
+                  </span>
+                  <span className={`text-base sm:text-lg font-black uppercase ${
+                    playerPickDiagnosis.score >= 70 ? 'text-emerald-500' : playerPickDiagnosis.score >= 50 ? 'text-amber-500' : 'text-rose-500'
+                  }`}>
+                    {playerPickDiagnosis.score >= 78 ? 'Dominante' : playerPickDiagnosis.score >= 60 ? 'Viable' : 'En Riesgo'}
+                  </span>
+                </div>
               </div>
-              <div className="h-10 w-[1px] bg-slate-700/50"></div>
-              <div className="text-left">
-                <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                  Estado del Pick
-                </span>
-                <span className={`text-base sm:text-lg font-black uppercase ${
-                  playerPickDiagnosis.score >= 70 ? 'text-emerald-400' : playerPickDiagnosis.score >= 50 ? 'text-amber-400' : 'text-rose-400'
-                }`}>
-                  {playerPickDiagnosis.score >= 78 ? 'Dominante' : playerPickDiagnosis.score >= 60 ? 'Viable' : 'En Riesgo'}
-                </span>
-              </div>
+
+              {playerPickDiagnosis.mapEvaluation && (
+                <>
+                  <div className="hidden sm:block h-10 w-[1px] bg-slate-500/30"></div>
+                  <div className="text-center sm:text-left">
+                    <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                      Sinergia en {selectedMap.name}
+                    </span>
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-0.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-lg text-xs font-mono font-black border ${
+                          playerPickDiagnosis.mapEvaluation.score >= 5
+                            ? 'bg-emerald-500/20 text-emerald-500 border-emerald-500/40'
+                            : playerPickDiagnosis.mapEvaluation.score <= -5
+                            ? 'bg-rose-500/20 text-rose-500 border-rose-500/40'
+                            : isDark
+                            ? 'bg-slate-800 text-slate-300 border-slate-700'
+                            : 'bg-slate-200 text-slate-700 border-slate-300'
+                        }`}
+                      >
+                        {playerPickDiagnosis.mapEvaluation.score > 0
+                          ? `+${playerPickDiagnosis.mapEvaluation.score}`
+                          : playerPickDiagnosis.mapEvaluation.score}{' '}
+                        pts
+                      </span>
+                      <span className={`text-xs font-bold uppercase ${
+                        playerPickDiagnosis.mapEvaluation.rating === 'ideal'
+                          ? 'text-emerald-500'
+                          : playerPickDiagnosis.mapEvaluation.rating === 'favorable'
+                          ? 'text-emerald-400'
+                          : playerPickDiagnosis.mapEvaluation.rating === 'poor'
+                          ? 'text-rose-500'
+                          : playerPickDiagnosis.mapEvaluation.rating === 'unfavorable'
+                          ? 'text-amber-500'
+                          : 'text-slate-400'
+                      }`}>
+                        {playerPickDiagnosis.mapEvaluation.rating === 'ideal'
+                          ? 'Mapa Ideal'
+                          : playerPickDiagnosis.mapEvaluation.rating === 'favorable'
+                          ? 'Favorable'
+                          : playerPickDiagnosis.mapEvaluation.rating === 'poor'
+                          ? 'Muy Cerrado / Adverso'
+                          : playerPickDiagnosis.mapEvaluation.rating === 'unfavorable'
+                          ? 'Incómodo'
+                          : 'Neutral'}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
+
+            {playerPickDiagnosis.mapEvaluation && (
+              <div className={`mb-3 px-3.5 py-2 rounded-xl border text-xs max-w-xl mx-auto flex items-center gap-2 text-left ${
+                playerPickDiagnosis.mapEvaluation.score >= 5
+                  ? isDark ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-200' : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                  : playerPickDiagnosis.mapEvaluation.score <= -5
+                  ? isDark ? 'bg-rose-950/40 border-rose-500/30 text-rose-200' : 'bg-rose-50 border-rose-200 text-rose-900'
+                  : isDark ? 'bg-slate-800/60 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+              }`}>
+                <MapPin className="w-4 h-4 flex-shrink-0 text-orange-400" />
+                <span>
+                  <strong>{selectedMap.name}:</strong> {playerPickDiagnosis.mapEvaluation.reason}.
+                </span>
+              </div>
+            )}
 
             <p className={`text-sm max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               {playerPickDiagnosis.verdict}
@@ -1101,19 +1172,25 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         </div>
       </div>
 
-      {/* 5. MODAL SELECTOR VISUAL DE MAPAS */}
+      {/* 5. MODAL SELECTOR VISUAL DE MAPAS (CON SINERGIA DE TU HÉROE EN TIEMPO REAL) */}
       {mapPickerOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className={`w-full max-w-4xl max-h-[85vh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
             isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
           }`}>
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-5 h-5 text-orange-400" />
-                <h3 className="text-lg font-black text-white">SELECCIONA EL MAPA</h3>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
-                  {OVERWATCH_MAPS.length} MAPAS
+            <div className={`p-4 sm:p-5 border-b flex items-center justify-between ${
+              isDark ? 'border-slate-800' : 'border-slate-200'
+            }`}>
+              <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                <MapPin className="w-5 h-5 text-orange-500" />
+                <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  SELECCIONA EL MAPA
+                </h3>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
+                  isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'
+                }`}>
+                  {OVERWATCH_MAPS.length} MAPAS · Sinergia para {playerHero.name}
                 </span>
               </div>
               <button
@@ -1125,7 +1202,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             </div>
 
             {/* Mode Filters */}
-            <div className="p-3 border-b border-slate-800 flex flex-wrap gap-1.5 bg-slate-950/40">
+            <div className={`p-3 border-b flex flex-wrap gap-1.5 ${
+              isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'
+            }`}>
               {['all', 'Híbrido', 'Escolta', 'Control', 'Avance', 'Punto Caliente', 'Invasión / Clash'].map(m => (
                 <button
                   key={m}
@@ -1133,7 +1212,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
                     mapFilterMode === m
                       ? 'bg-orange-500 text-white shadow'
-                      : 'text-slate-400 hover:text-white bg-slate-800/60'
+                      : isDark
+                      ? 'text-slate-400 hover:text-white bg-slate-800/60'
+                      : 'text-slate-600 hover:text-slate-900 bg-slate-200/70'
                   }`}
                 >
                   {m === 'all' ? 'Todos los modos' : m}
@@ -1141,128 +1222,170 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               ))}
             </div>
 
-            {/* Maps Grid with Large Images */}
+            {/* Maps Grid with Large Images + Per-Hero Map Synergy Score */}
             <div className="p-4 overflow-y-auto flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {OVERWATCH_MAPS
                 .filter(m => mapFilterMode === 'all' || m.mode === mapFilterMode)
-                .map(m => (
-                  <button
-                    key={m.id}
-                    onClick={() => {
-                      setSelectedMapId(m.id);
-                      setMapPickerOpen(false);
-                    }}
-                    className={`group relative h-28 rounded-2xl overflow-hidden border-2 text-left transition ${
-                      m.id === selectedMapId
-                        ? 'border-orange-500 ring-2 ring-orange-500 scale-[1.02]'
-                        : 'border-slate-800 hover:border-slate-600'
-                    }`}
-                  >
-                    <img
-                      src={m.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
-                      alt={m.name}
-                      className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-2.5">
-                      <span className="text-[9px] font-mono text-orange-400 font-bold uppercase leading-none">
-                        {m.mode}
+                .map(m => {
+                  const heroMapSyn = evaluateHeroMapSynergy(playerHero, m);
+                  return (
+                    <button
+                      key={m.id}
+                      title={`${m.name}: ${heroMapSyn.reason}`}
+                      onClick={() => {
+                        setSelectedMapId(m.id);
+                        setMapPickerOpen(false);
+                      }}
+                      className={`group relative h-28 rounded-2xl overflow-hidden border-2 text-left transition ${
+                        m.id === selectedMapId
+                          ? 'border-orange-500 ring-2 ring-orange-500 scale-[1.02]'
+                          : isDark
+                          ? 'border-slate-800 hover:border-slate-600'
+                          : 'border-slate-300 hover:border-orange-400'
+                      }`}
+                    >
+                      <img
+                        src={m.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
+                        alt={m.name}
+                        className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+
+                      {/* Top-right Hero Synergy Score Pill */}
+                      <span
+                        className={`absolute top-1.5 right-1.5 z-10 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-black shadow backdrop-blur-sm border ${
+                          heroMapSyn.score >= 5
+                            ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/60'
+                            : heroMapSyn.score <= -5
+                            ? 'bg-rose-950/90 text-rose-300 border-rose-500/60'
+                            : 'bg-slate-900/85 text-slate-300 border-slate-600/60'
+                        }`}
+                      >
+                        {heroMapSyn.score > 0 ? `+${heroMapSyn.score}` : heroMapSyn.score} pts
                       </span>
-                      <span className="text-xs font-black text-white truncate mt-0.5">
-                        {m.name}
-                      </span>
-                      <div className="flex items-center space-x-1 mt-1">
-                        {m.favoredStyles.map(st => (
-                          <span key={st} className="text-[8px] uppercase font-mono px-1 py-0.2 rounded bg-black/60 text-slate-300">
-                            {st}
-                          </span>
-                        ))}
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-2.5">
+                        <span className="text-[9px] font-mono text-orange-400 font-bold uppercase leading-none">
+                          {m.mode}
+                        </span>
+                        <span className="text-xs font-black text-white truncate mt-0.5">
+                          {m.name}
+                        </span>
+                        <div className="flex items-center space-x-1 mt-1">
+                          {m.favoredStyles.map(st => (
+                            <span key={st} className="text-[8px] uppercase font-mono px-1 py-0.2 rounded bg-black/60 text-slate-300">
+                              {st}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
             </div>
           </div>
         </div>
       )}
 
-      {/* 6. MODAL SELECTOR VISUAL DE RANGO */}
+      {/* 6. MODAL SELECTOR INDIVIDUAL DE RANGOS (CON ÍCONOS OFICIALES DE OVERWATCH 2) */}
       {rankPickerOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className={`w-full max-w-xl rounded-3xl border shadow-2xl overflow-hidden transition ${
+          <div className={`w-full max-w-3xl max-h-[88vh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
             isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
           }`}>
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Trophy className="w-5 h-5 text-amber-400" />
-                <h3 className="text-lg font-black text-white">SELECCIONA TU RANGO COMPETITIVO</h3>
+            <div className={`p-4 sm:p-5 border-b flex items-center justify-between ${
+              isDark ? 'border-slate-800' : 'border-slate-200'
+            }`}>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <Trophy className="w-5 h-5 text-amber-500" />
+                  <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    ELIGE TU RANGO COMPETITIVO INDIVIDUAL
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Cada división ajusta individualmente el peso del techo mecánico y la coordinación táctica.
+                </p>
               </div>
               <button
                 onClick={() => setRankPickerOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Ranks Cards */}
-            <div className="p-4 space-y-3">
-              {[
-                {
-                  id: 'bronze_gold' as RankTier,
-                  title: 'Bronce — Oro',
-                  tag: 'BRONZE / SILVER / GOLD',
-                  badge: 'ORO',
-                  desc: 'Pondera héroes con alta consistencia de impacto y castiga selecciones muy exigentes mecánicamente.',
-                  color: 'border-amber-500/40 bg-amber-950/20 text-amber-300 hover:border-amber-400'
-                },
-                {
-                  id: 'plat_diamond' as RankTier,
-                  title: 'Platino — Diamante',
-                  tag: 'PLATINUM / DIAMOND',
-                  badge: 'DIA',
-                  desc: 'Ponderación estándar competitiva. Buen equilibrio entre mecánicas, counters directos y posicionamiento.',
-                  color: 'border-cyan-500/40 bg-cyan-950/20 text-cyan-300 hover:border-cyan-400'
-                },
-                {
-                  id: 'master_top500' as RankTier,
-                  title: 'Master — Top 500',
-                  tag: 'MASTER / GRANDMASTER / CHAMPION',
-                  badge: 'GM',
-                  desc: 'Premia héroes con alto techo de habilidad (Genji, Tracer, Doomfist) y sinergias altamente coordinadas.',
-                  color: 'border-purple-500/40 bg-purple-950/20 text-purple-300 hover:border-purple-400'
-                }
-              ].map(r => (
-                <div
-                  key={r.id}
-                  onClick={() => {
-                    setRankTier(r.id);
-                    setRankPickerOpen(false);
-                  }}
-                  className={`border-2 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-md ${
-                    rankTier === r.id ? 'ring-2 ring-orange-500 border-orange-500' : r.color
-                  }`}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-14 h-14 rounded-2xl bg-black/40 border border-current flex items-center justify-center font-black text-xl shadow">
-                      {r.badge}
+            {/* Individual 9-Rank Visual Grid */}
+            <div className="p-4 sm:p-5 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {OVERWATCH_RANKS.map(r => {
+                const isSelected = rankTier === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => {
+                      setRankTier(r.id);
+                      setRankPickerOpen(false);
+                    }}
+                    style={{
+                      borderColor: isSelected
+                        ? r.accentColor
+                        : `color-mix(in oklab, ${r.accentColor} ${isDark ? '35%' : '45%'}, ${isDark ? '#1e293b' : '#cbd5e1'})`,
+                      backgroundImage: isDark
+                        ? `linear-gradient(145deg, color-mix(in oklab, ${r.accentColor} ${isSelected ? '24%' : '12%'}, #0f172a), #0f172a)`
+                        : `linear-gradient(145deg, color-mix(in oklab, ${r.accentColor} ${isSelected ? '22%' : '10%'}, white), #ffffff)`,
+                      boxShadow: isSelected
+                        ? `0 0 0 2px ${r.accentColor}, 0 12px 26px color-mix(in oklab, ${r.accentColor} 28%, transparent)`
+                        : undefined,
+                    }}
+                    className="relative rounded-2xl border-2 p-3.5 text-left flex flex-col justify-between gap-2.5 cursor-pointer transition hover:scale-[1.02]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        style={{
+                          borderColor: `color-mix(in oklab, ${r.accentColor} 60%, white)`,
+                        }}
+                        className="w-14 h-14 rounded-xl bg-slate-950/90 border p-1.5 flex items-center justify-center flex-shrink-0 shadow-md"
+                      >
+                        <img
+                          src={r.icon}
+                          alt={r.name}
+                          className="w-full h-full object-contain drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)]"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <span
+                          style={{
+                            color: isDark
+                              ? `color-mix(in oklab, ${r.accentColor} 80%, white)`
+                              : `color-mix(in oklab, ${r.accentColor} 78%, #0f172a)`,
+                          }}
+                          className="block text-[9px] font-mono uppercase font-black tracking-wider"
+                        >
+                          {r.englishName}
+                        </span>
+                        <h4 className={`text-base font-black leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {r.name}
+                        </h4>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[10px] font-mono uppercase font-bold text-slate-400">
-                        {r.tag}
+
+                    <p className={`text-[11px] leading-snug ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                      {r.coachingNote}
+                    </p>
+
+                    {isSelected && (
+                      <span
+                        style={{ backgroundColor: r.accentColor }}
+                        className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-slate-950 text-[9px] font-black uppercase shadow"
+                      >
+                        Activo
                       </span>
-                      <h4 className="text-base font-black text-white">{r.title}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5 max-w-sm">{r.desc}</p>
-                    </div>
-                  </div>
-                  {rankTier === r.id && (
-                    <span className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase shadow">
-                      Activo
-                    </span>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

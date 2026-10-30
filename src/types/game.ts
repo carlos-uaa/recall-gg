@@ -6,7 +6,35 @@ export type GameId = 'overwatch' | 'valorant' | 'marvel-rivals';
 
 export type AppTab = 'coach' | 'heroes' | 'counters' | 'meta' | 'guesser';
 
-export type RankTier = 'bronze_gold' | 'plat_diamond' | 'master_top500';
+export type RankTier =
+  | 'bronze'
+  | 'silver'
+  | 'gold'
+  | 'platinum'
+  | 'diamond'
+  | 'master'
+  | 'grandmaster'
+  | 'champion'
+  | 'top500';
+
+export interface RankInfo {
+  id: RankTier;
+  name: string;
+  englishName: string;
+  icon: string;
+  accentColor: string;
+  summary: string;
+  coachingNote: string;
+}
+
+export type MapSynergyRating = 'ideal' | 'favorable' | 'neutral' | 'unfavorable' | 'poor';
+
+export interface HeroMapEvaluation {
+  mapId: string;
+  score: number; // -16 to +16
+  rating: MapSynergyRating;
+  reason: string;
+}
 
 export interface CounterDetail {
   hard: boolean;

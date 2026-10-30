@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
+import { getHeroMapBreakdown } from '../../games/overwatch/mapSynergies';
 import type { Hero, HeroAbilityItem, HeroPerkItem } from '../../types/game';
 import { HeroSelectScreen } from '../coach/HeroSelectScreen';
 import type { Language } from '../../utils/i18n';
@@ -162,6 +163,8 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
       return bH - aH || a.name.localeCompare(b.name, 'es');
     })
     .slice(0, 6);
+
+  const mapBreakdown = getHeroMapBreakdown(selectedHero);
 
   // Readable dynamic heading color using color-mix in oklab (maintains strong contrast in both Light and Dark mode)
   const sectionTitleColor = isDark
@@ -640,7 +643,133 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           </div>
         </div>
 
-        {/* 3. BOTTOM QUICK MATCHUPS STRIP */}
+        {/* 3. MAP SYNERGY BREAKDOWN (MEJORES Y PEORES MAPAS DEL PERSONAJE) */}
+        <section
+          className={`relative z-10 border-t px-5 sm:px-8 py-5 space-y-4 ${
+            isDark ? 'bg-[#141925]/90 border-slate-800' : 'bg-slate-50/90 border-slate-200'
+          }`}
+        >
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <MapPin style={{ color: sectionTitleColor }} className="w-4 h-4 flex-shrink-0" />
+              <h3
+                style={{ color: sectionTitleColor }}
+                className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
+              >
+                SINERGIA TÁCTICA DE MAPAS ({selectedHero.name.toUpperCase()})
+              </h3>
+            </div>
+            <p className={`text-xs max-w-2xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              {mapBreakdown.archetypeSummary}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Best Maps */}
+            <div
+              className={`rounded-2xl border p-3.5 space-y-2.5 ${
+                isDark ? 'bg-slate-950/60 border-emerald-500/25' : 'bg-white border-emerald-200'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Mapas Favorables / Ideales</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">Impulsan su calificación en Coach</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {mapBreakdown.bestMaps.slice(0, 4).map(({ map, eval: ev }) => (
+                  <div
+                    key={map.id}
+                    className={`group relative rounded-xl overflow-hidden border flex items-stretch min-h-[68px] ${
+                      isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <div className="w-20 flex-shrink-0 relative overflow-hidden">
+                      <img
+                        src={map.image}
+                        alt={map.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition duration-300 group-hover:scale-110"
+                      />
+                      <span className="absolute bottom-1 left-1 px-1 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-mono font-black shadow">
+                        +{ev.score}
+                      </span>
+                    </div>
+                    <div className="p-2 flex-1 min-w-0 flex flex-col justify-center">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-xs font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {map.name}
+                        </span>
+                        <span className="text-[9px] font-mono uppercase text-slate-400 flex-shrink-0">
+                          {map.mode.split(' ')[0]}
+                        </span>
+                      </div>
+                      <p className={`text-[10px] leading-snug mt-0.5 line-clamp-2 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                        {ev.reason}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Worst Maps */}
+            <div
+              className={`rounded-2xl border p-3.5 space-y-2.5 ${
+                isDark ? 'bg-slate-950/60 border-rose-500/25' : 'bg-white border-rose-200'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase tracking-wider text-rose-500 flex items-center gap-1.5">
+                  <AlertOctagon className="w-3.5 h-3.5" />
+                  <span>Mapas Desfavorables / Incómodos</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">Penalizan su calificación en Coach</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {mapBreakdown.worstMaps.slice(0, 4).map(({ map, eval: ev }) => (
+                  <div
+                    key={map.id}
+                    className={`group relative rounded-xl overflow-hidden border flex items-stretch min-h-[68px] ${
+                      isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <div className="w-20 flex-shrink-0 relative overflow-hidden">
+                      <img
+                        src={map.image}
+                        alt={map.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover grayscale-[35%] transition duration-300 group-hover:scale-110"
+                      />
+                      <span className="absolute bottom-1 left-1 px-1 py-0.2 rounded bg-rose-600 text-white text-[9px] font-mono font-black shadow">
+                        {ev.score}
+                      </span>
+                    </div>
+                    <div className="p-2 flex-1 min-w-0 flex flex-col justify-center">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-xs font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                          {map.name}
+                        </span>
+                        <span className="text-[9px] font-mono uppercase text-slate-400 flex-shrink-0">
+                          {map.mode.split(' ')[0]}
+                        </span>
+                      </div>
+                      <p className={`text-[10px] leading-snug mt-0.5 line-clamp-2 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                        {ev.reason}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. BOTTOM QUICK MATCHUPS STRIP */}
         <footer
           className={`relative z-10 border-t px-5 sm:px-8 py-4 grid grid-cols-1 md:grid-cols-2 gap-4 ${
             isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-100/80 border-slate-200'

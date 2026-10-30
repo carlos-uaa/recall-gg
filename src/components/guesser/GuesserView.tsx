@@ -25,6 +25,8 @@ import {
   XCircle,
   HelpCircle,
   ArrowRight,
+  Crosshair,
+  Shuffle,
 } from 'lucide-react';
 
 interface GuesserViewProps {
@@ -33,6 +35,21 @@ interface GuesserViewProps {
 }
 
 type ArcadeGameId = 'classic' | 'kit-quiz' | 'counter-clash' | 'silhouette';
+
+export type SilhouetteCategory = 'mixed' | 'weapon' | 'ability-icon' | 'hero-icon' | 'hero-silhouette';
+type ConcreteVisualKind = Exclude<SilhouetteCategory, 'mixed'>;
+
+interface SilhouetteChallenge {
+  hero: Hero;
+  visualKind: ConcreteVisualKind;
+  imageUrl: string;
+  itemLabel: string; // e.g. weapon name or ability name when revealed
+  subCategoryLabel: string; // e.g. 'ARMA PRINCIPAL', 'ÍCONO DE HABILIDAD', etc.
+  initialAngle: number;
+  offsetX: number;
+  offsetY: number;
+  mirrored: boolean;
+}
 
 interface KitQuestion {
   hero: Hero;
@@ -221,6 +238,8 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
   const [kitStreak, setKitStreak] = useState<number>(0);
   const [kitBestStreak, setKitBestStreak] = useState<number>(0);
   const [kitScore, setKitScore] = useState<number>(0);
+  const [kitRound, setKitRound] = useState<number>(1);
+  const [kitCorrectCount, setKitCorrectCount] = useState<number>(0);
 
   const handlePickKitOption = (heroId: string) => {
     if (kitPickedId) return;
@@ -228,6 +247,7 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
     if (heroId === kitQ.hero.id) {
       const nextStreak = kitStreak + 1;
       setKitStreak(nextStreak);
+      setKitCorrectCount(c => c + 1);
       setKitBestStreak(prev => Math.max(prev, nextStreak));
       setKitScore(prev => prev + (kitShowNameHint ? 50 : 100) + nextStreak * 10);
       if (nextStreak % 5 === 0) {
@@ -242,6 +262,17 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
     setKitQ(generateKitQuestion(kitQ.hero.id));
     setKitPickedId(null);
     setKitShowNameHint(false);
+    setKitRound(r => r + 1);
+  };
+
+  const resetKitQuiz = () => {
+    setKitQ(generateKitQuestion(kitQ.hero.id));
+    setKitPickedId(null);
+    setKitShowNameHint(false);
+    setKitStreak(0);
+    setKitScore(0);
+    setKitRound(1);
+    setKitCorrectCount(0);
   };
 
   // ==================== GAME 3: COUNTER CLASH ARENA ====================
@@ -276,25 +307,132 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
     setCounterPickedId(null);
   };
 
-  // ==================== GAME 4: MYSTERY SILHOUETTE ====================
-  const [silHero, setSilHero] = useState<Hero>(() => getRandomHero());
+  const resetCounterArena = () => {
+    setCounterLives(3);
+    setCounterStreak(0);
+    setCounterPickedId(null);
+    setCounterQ(generateCounterQuestion(counterQ.enemy.id));
+  };
+
+  // ==================== GAME 4: HARDER VISUAL SILHOUETTE (WEAPONS, ABILITY ICONS, HERO ICONS & EXTREME CROPS) ====================
+  const buildVisualChallenge = useCallback(
+    (category: SilhouetteCategory, excludeHeroId?: string): SilhouetteChallenge => {
+      const pool = OVERWATCH_HEROES.filter(h => h.id !== excludeHeroId && OVERWATCH_HERO_KITS[h.id]);
+      const hero = pool[Math.floor(Math.random() * pool.length)] || getRandomHero();
+      const kit = OVERWATCH_HERO_KITS[hero.id];
+
+      const kinds: ConcreteVisualKind[] = ['weapon', 'ability-icon', 'hero-icon', 'hero-silhouette'];
+      let chosenKind: ConcreteVisualKind =
+        category === 'mixed' ? kinds[Math.floor(Math.random() * kinds.length)] : category;
+
+      const weaponWithIcon = kit?.weapons.find(w => w.icon);
+      const abilitiesPool = [
+        ...(kit?.abilities.filter(a => a.icon).map(a => ({ ...a, tag: 'ÍCONO DE HABILIDAD' })) || []),
+        ...(kit?.ultimate.filter(u => u.icon).map(u => ({ ...u, tag: 'ÍCONO DE DEFINITIVA' })) || []),
+        ...(kit?.perks.major.filter(p => p.icon).map(p => ({ ...p, tag: 'ÍCONO DE PERK' })) || []),
+      ];
+
+      if (chosenKind === 'weapon' && !weaponWithIcon) {
+        chosenKind = abilitiesPool.length > 0 ? 'ability-icon' : 'hero-icon';
+      }
+      if (chosenKind === 'ability-icon' && abilitiesPool.length === 0) {
+        chosenKind = 'hero-icon';
+      }
+
+      const angleChoices = [-135, -95, -55, 55, 95, 135];
+      const randomAngle = angleChoices[Math.floor(Math.random() * angleChoices.length)];
+      const offsetChoices = [-18, -12, 12, 18];
+      const ox = offsetChoices[Math.floor(Math.random() * offsetChoices.length)];
+      const oy = offsetChoices[Math.floor(Math.random() * offsetChoices.length)];
+
+      if (chosenKind === 'weapon' && weaponWithIcon?.icon) {
+        return {
+          hero,
+          visualKind: 'weapon',
+          imageUrl: weaponWithIcon.icon,
+          itemLabel: `Arma: ${weaponWithIcon.name}`,
+          subCategoryLabel: 'SILUETA DE ARMA',
+          initialAngle: randomAngle,
+          offsetX: 0,
+          offsetY: 0,
+          mirrored: Math.random() > 0.5,
+        };
+      }
+
+      if (chosenKind === 'ability-icon' && abilitiesPool.length > 0) {
+        const pickedAb = abilitiesPool[Math.floor(Math.random() * abilitiesPool.length)];
+        return {
+          hero,
+          visualKind: 'ability-icon',
+          imageUrl: pickedAb.icon!,
+          itemLabel: `${pickedAb.tag}: ${pickedAb.name}`,
+          subCategoryLabel: 'ÍCONO DE HABILIDAD / ULT',
+          initialAngle: randomAngle,
+          offsetX: 0,
+          offsetY: 0,
+          mirrored: Math.random() > 0.5,
+        };
+      }
+
+      if (chosenKind === 'hero-icon' && hero.icon) {
+        return {
+          hero,
+          visualKind: 'hero-icon',
+          imageUrl: hero.icon,
+          itemLabel: `Retrato de ${hero.name}`,
+          subCategoryLabel: 'ÍCONO DE PERSONAJE (ZOOM EXTREMO)',
+          initialAngle: Math.random() > 0.5 ? 18 : -18,
+          offsetX: ox,
+          offsetY: oy,
+          mirrored: true,
+        };
+      }
+
+      return {
+        hero,
+        visualKind: 'hero-silhouette',
+        imageUrl: kit?.fullPortrait || hero.icon || '',
+        itemLabel: `Silueta de ${hero.name}`,
+        subCategoryLabel: 'SILUETA EXTREMA (ENCUADRE CERRADO)',
+        initialAngle: Math.random() > 0.5 ? 22 : -22,
+        offsetX: ox,
+        offsetY: oy,
+        mirrored: true,
+      };
+    },
+    []
+  );
+
+  const [silCategory, setSilCategory] = useState<SilhouetteCategory>('mixed');
+  const [silChallenge, setSilChallenge] = useState<SilhouetteChallenge>(() =>
+    buildVisualChallenge('mixed')
+  );
   const [silAttempts, setSilAttempts] = useState<Hero[]>([]);
   const [silSearch, setSilSearch] = useState<string>('');
   const [silWon, setSilWon] = useState<boolean>(false);
   const [silGivenUp, setSilGivenUp] = useState<boolean>(false);
   const [silStreak, setSilStreak] = useState<number>(0);
 
+  const silHero = silChallenge.hero;
   const MAX_SIL_TRIES = 5;
   const silFinished = silWon || silGivenUp || silAttempts.length >= MAX_SIL_TRIES;
 
-  const resetSilhouette = useCallback(() => {
-    const pool = OVERWATCH_HEROES.filter(h => h.id !== silHero.id);
-    setSilHero(pool[Math.floor(Math.random() * pool.length)] || getRandomHero());
-    setSilAttempts([]);
-    setSilSearch('');
-    setSilWon(false);
-    setSilGivenUp(false);
-  }, [silHero.id]);
+  const resetSilhouette = useCallback(
+    (nextCat: SilhouetteCategory = silCategory, resetStreak = false) => {
+      setSilChallenge(prev => buildVisualChallenge(nextCat, prev.hero.id));
+      setSilAttempts([]);
+      setSilSearch('');
+      setSilWon(false);
+      setSilGivenUp(false);
+      if (resetStreak) setSilStreak(0);
+    },
+    [buildVisualChallenge, silCategory]
+  );
+
+  const handleChangeSilCategory = (cat: SilhouetteCategory) => {
+    setSilCategory(cat);
+    resetSilhouette(cat, false);
+  };
 
   const handleGuessSilhouette = (hero: Hero) => {
     if (silFinished || silAttempts.some(a => a.id === hero.id)) return;
@@ -377,9 +515,9 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
     },
     {
       id: 'silhouette',
-      title: 'Silueta Oculta',
-      subtitle: 'Descubre quién se esconde tras la sombra en 5 intentos',
-      badge: 'VISUAL',
+      title: 'Silueta & Ícono Oculto',
+      subtitle: 'Armas, íconos de habilidad, retratos y siluetas extremas',
+      badge: 'DIFÍCIL',
       icon: <Eye className="w-5 h-5" />,
       accentCls: 'from-orange-500 to-rose-600 border-orange-400/50 shadow-orange-500/25',
     },
@@ -387,7 +525,11 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
 
   const silKit = OVERWATCH_HERO_KITS[silHero.id];
   const silColor = silKit?.accentColor || '#f97316';
-  const zoomScale = silFinished ? 1 : Math.max(1, 1.32 - silAttempts.length * 0.08);
+  const progressFactor = Math.min(1, silAttempts.length / 4);
+  const currentAngle = silFinished ? 0 : Math.round(silChallenge.initialAngle * (1 - progressFactor));
+  const currentFlip = !silFinished && silChallenge.mirrored && silAttempts.length < 3 ? -1 : 1;
+  const currentOffsetX = silFinished ? 0 : Math.round(silChallenge.offsetX * (1 - progressFactor));
+  const currentOffsetY = silFinished ? 0 : Math.round(silChallenge.offsetY * (1 - progressFactor));
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -705,46 +847,60 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
             isDark ? 'bg-slate-900/85 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
-          {/* Stats Bar */}
+          {/* Stats Bar + Explicit Restart Button */}
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-700/30">
             <div>
               <span className="text-xs font-mono font-bold uppercase text-cyan-400">
-                TRIVIA DE HABILIDADES & PERKS OFICIALES
+                TRIVIA DE HABILIDADES & PERKS · RONDA #{kitRound} ({kitCorrectCount} ACIERTOS)
               </span>
               <h2 className="text-2xl font-black">¿A qué héroe pertenece este icono?</h2>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
               <div
-                className={`px-3.5 py-2 rounded-xl border text-center ${
+                className={`px-3 py-1.5 rounded-xl border text-center ${
                   isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'
                 }`}
               >
                 <div className="text-[10px] font-mono uppercase text-slate-400">Racha</div>
-                <div className="text-base font-black text-cyan-400 flex items-center justify-center gap-1">
+                <div className="text-sm sm:text-base font-black text-cyan-400 flex items-center justify-center gap-1">
                   <Flame className="w-4 h-4 text-orange-400" />
                   {kitStreak}
                 </div>
               </div>
               <div
-                className={`px-3.5 py-2 rounded-xl border text-center ${
+                className={`px-3 py-1.5 rounded-xl border text-center ${
                   isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'
                 }`}
               >
                 <div className="text-[10px] font-mono uppercase text-slate-400">Récord</div>
-                <div className="text-base font-black text-amber-400 flex items-center justify-center gap-1">
+                <div className="text-sm sm:text-base font-black text-amber-400 flex items-center justify-center gap-1">
                   <Trophy className="w-4 h-4" />
                   {kitBestStreak}
                 </div>
               </div>
               <div
-                className={`px-3.5 py-2 rounded-xl border text-center ${
+                className={`px-3 py-1.5 rounded-xl border text-center ${
                   isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'
                 }`}
               >
                 <div className="text-[10px] font-mono uppercase text-slate-400">Puntos</div>
-                <div className="text-base font-black text-emerald-400 font-mono">{kitScore}</div>
+                <div className="text-sm sm:text-base font-black text-emerald-400 font-mono">{kitScore}</div>
               </div>
+
+              <button
+                type="button"
+                onClick={resetKitQuiz}
+                title="Reiniciar puntuación, racha y partida desde cero"
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border font-bold text-xs transition cursor-pointer ${
+                  isDark
+                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-rose-500/20 hover:border-rose-500/50 hover:text-rose-300'
+                    : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-rose-50 hover:border-rose-400 hover:text-rose-700'
+                }`}
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>Reiniciar</span>
+              </button>
             </div>
           </div>
 
@@ -825,7 +981,7 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
             })}
           </div>
 
-          {/* Result & Next Button */}
+          {/* Result & Next / Restart Buttons */}
           {kitPickedId && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto pt-2">
               <div className="flex items-center gap-2 text-sm font-bold">
@@ -846,14 +1002,28 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                 )}
               </div>
 
-              <button
-                type="button"
-                onClick={nextKitQuestion}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm shadow-lg shadow-cyan-500/25 transition"
-              >
-                <span>Siguiente habilidad</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={resetKitQuiz}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border font-bold text-xs transition ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                      : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reiniciar</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={nextKitQuestion}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm shadow-lg shadow-cyan-500/25 transition"
+                >
+                  <span>Siguiente habilidad</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -868,7 +1038,7 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
             isDark ? 'bg-slate-900/85 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
-          {/* Top Bar: Lives & Streak */}
+          {/* Top Bar: Lives, Streak & Restart */}
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-700/30">
             <div>
               <span className="text-xs font-mono font-bold uppercase text-emerald-400">
@@ -877,7 +1047,7 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
               <h2 className="text-2xl font-black">¿Qué pick destruye a esta amenaza rival?</h2>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
               {/* Hearts */}
               <div className="flex items-center gap-1">
                 {Array.from({ length: 3 }).map((_, idx) => (
@@ -898,6 +1068,20 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                 <span className="text-[10px] font-mono uppercase text-slate-400 block">Racha</span>
                 <span className="text-sm font-black text-emerald-400">{counterStreak} (Máx {counterBest})</span>
               </div>
+
+              <button
+                type="button"
+                onClick={resetCounterArena}
+                title="Reiniciar vidas y racha"
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border font-bold text-xs transition ${
+                  isDark
+                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-emerald-500/20 hover:border-emerald-500/50'
+                    : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-emerald-50'
+                }`}
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reiniciar</span>
+              </button>
             </div>
           </div>
 
@@ -1002,23 +1186,23 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
       )}
 
       {/* ===================================================================== */}
-      {/* MODE 4: SILUETA OCULTA ("¿QUIÉN ES ESE HÉROE?")                       */}
+      {/* MODE 4: SILUETA & ÍCONO OCULTO (ARMAS, HABILIDADES, RETRATOS, ZOOM)   */}
       {/* ===================================================================== */}
       {activeGame === 'silhouette' && (
         <div
-          className={`border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 transition ${
+          className={`border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 transition ${
             isDark ? 'bg-slate-900/85 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-700/30">
             <div>
               <span className="text-xs font-mono font-bold uppercase text-orange-400">
-                DESAFÍO VISUAL — 5 INTENTOS
+                DESAFÍO VISUAL EXPERTO — 5 INTENTOS
               </span>
-              <h2 className="text-2xl font-black">¿Quién se oculta detrás de la silueta?</h2>
+              <h2 className="text-2xl font-black">¿A qué héroe pertenece esta pista visual?</h2>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
               <div
                 className={`px-3.5 py-1.5 rounded-xl border text-center ${
                   isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'
@@ -1037,39 +1221,173 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                 <span className="text-[10px] font-mono uppercase text-slate-400 block">Racha</span>
                 <span className="text-sm font-black text-amber-400">{silStreak}</span>
               </div>
+              <button
+                type="button"
+                onClick={() => resetSilhouette(silCategory, true)}
+                title="Reiniciar partida y racha"
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border font-bold text-xs transition ${
+                  isDark
+                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-orange-500/20 hover:border-orange-500/50'
+                    : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-orange-50'
+                }`}
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reiniciar</span>
+              </button>
             </div>
           </div>
 
+          {/* Visual Challenge Category Selector Pills */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {(
+              [
+                { id: 'mixed', label: 'Mixto Experto', icon: <Shuffle className="w-3.5 h-3.5" /> },
+                { id: 'weapon', label: 'Armas', icon: <Crosshair className="w-3.5 h-3.5" /> },
+                { id: 'ability-icon', label: 'Ícono Habilidad', icon: <Zap className="w-3.5 h-3.5" /> },
+                { id: 'hero-icon', label: 'Ícono Personaje', icon: <Eye className="w-3.5 h-3.5" /> },
+                { id: 'hero-silhouette', label: 'Silueta Extrema', icon: <Sparkles className="w-3.5 h-3.5" /> },
+              ] as Array<{ id: SilhouetteCategory; label: string; icon: React.ReactNode }>
+            ).map(cat => {
+              const active = silCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => handleChangeSilCategory(cat.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                    active
+                      ? 'bg-orange-500 border-orange-400 text-white shadow-md shadow-orange-500/25'
+                      : isDark
+                      ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:border-slate-500'
+                      : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  {cat.icon}
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-            {/* Silhouette Stage */}
+            {/* Multi-Mode Mystery Stage */}
             <div
               style={{
                 background: silFinished
-                  ? `radial-gradient(circle, color-mix(in oklab, ${silColor} 35%, transparent), transparent 70%)`
-                  : 'radial-gradient(circle, rgba(249,115,22,0.14), transparent 70%)',
+                  ? `radial-gradient(circle, color-mix(in oklab, ${silColor} 38%, transparent), transparent 72%)`
+                  : 'radial-gradient(circle, rgba(251,146,60,0.22), transparent 72%)',
               }}
-              className={`relative h-80 sm:h-96 rounded-3xl border-2 flex items-center justify-center overflow-hidden ${
-                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-200 border-slate-300'
+              className={`relative h-80 sm:h-96 rounded-3xl border-2 flex flex-col items-center justify-center overflow-hidden p-4 ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'
               }`}
             >
-              <img
-                key={silHero.id}
-                src={silKit?.fullPortrait || silHero.icon}
-                alt="Héroe misterioso"
-                style={{
-                  transform: `scale(${zoomScale})`,
-                  filter: silFinished ? 'none' : 'brightness(0) contrast(200%)',
-                }}
-                className="max-h-72 sm:max-h-80 w-auto object-contain select-none pointer-events-none transition-all duration-500"
-              />
+              {/* Top Mode Tag inside Stage */}
+              <span className="absolute top-3 left-3 z-20 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                {silChallenge.subCategoryLabel}
+              </span>
+
+              {/* 1) WEAPON OR ABILITY ICON MYSTERY */}
+              {(silChallenge.visualKind === 'weapon' || silChallenge.visualKind === 'ability-icon') && (
+                <div className="flex flex-col items-center gap-3">
+                  <div
+                    style={
+                      silFinished
+                        ? {
+                            borderColor: silColor,
+                            boxShadow: `0 0 36px color-mix(in oklab, ${silColor} 45%, transparent)`,
+                          }
+                        : undefined
+                    }
+                    className={`w-52 h-52 sm:w-60 sm:h-60 rounded-full border-4 flex items-center justify-center overflow-hidden transition-all duration-500 shadow-2xl ${
+                      silFinished
+                        ? 'bg-slate-950'
+                        : 'bg-gradient-to-br from-slate-200 via-orange-100 to-amber-100 border-orange-400/60'
+                    }`}
+                  >
+                    <img
+                      key={`${silHero.id}-${silChallenge.visualKind}-${silChallenge.imageUrl}`}
+                      src={silChallenge.imageUrl}
+                      alt="Ícono misterioso"
+                      style={{
+                        transform: `scale(${silFinished ? 1 : Math.max(1.05, 1.85 - silAttempts.length * 0.18)}) rotate(${currentAngle}deg) scaleX(${currentFlip})`,
+                        filter: silFinished ? 'brightness(1.15)' : 'brightness(0) contrast(220%)',
+                      }}
+                      className="w-28 h-28 sm:w-32 sm:h-32 object-contain select-none pointer-events-none transition-all duration-500"
+                    />
+                  </div>
+                  {silFinished && (
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-white text-xs font-bold shadow">
+                      <img src={silHero.icon} alt="" className="w-5 h-5 rounded-full object-cover" />
+                      <span>{silChallenge.itemLabel}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 2) HERO PORTRAIT ICON EXTREME ZOOM CROP */}
+              {silChallenge.visualKind === 'hero-icon' && (
+                <div
+                  style={
+                    silFinished
+                      ? {
+                          borderColor: silColor,
+                          boxShadow: `0 0 36px color-mix(in oklab, ${silColor} 45%, transparent)`,
+                        }
+                      : undefined
+                  }
+                  className="w-52 h-52 sm:w-60 sm:h-60 rounded-full border-4 border-orange-500/50 overflow-hidden shadow-2xl bg-slate-900 flex items-center justify-center"
+                >
+                  <img
+                    key={`${silHero.id}-hero-icon`}
+                    src={silChallenge.imageUrl}
+                    alt="Retrato misterioso"
+                    style={{
+                      transform: `translate(${currentOffsetX}%, ${currentOffsetY}%) scale(${
+                        silFinished ? 1 : Math.max(1.25, 3.1 - silAttempts.length * 0.42)
+                      }) rotate(${currentAngle}deg) scaleX(${currentFlip})`,
+                      filter: silFinished
+                        ? 'none'
+                        : `grayscale(100%) contrast(180%) brightness(0.75) blur(${Math.max(
+                            0,
+                            3.0 - silAttempts.length * 0.7
+                          )}px)`,
+                    }}
+                    className="w-full h-full object-cover select-none pointer-events-none transition-all duration-500"
+                  />
+                </div>
+              )}
+
+              {/* 3) EXTREME ZOOM + ROTATED HERO SILHOUETTE */}
+              {silChallenge.visualKind === 'hero-silhouette' && (
+                <div
+                  className={`w-60 h-60 sm:w-68 sm:h-68 rounded-full flex items-center justify-center overflow-hidden transition-all duration-500 ${
+                    silFinished
+                      ? ''
+                      : 'border-4 border-orange-400/50 bg-gradient-to-br from-slate-200 via-orange-100 to-slate-300 shadow-2xl'
+                  }`}
+                >
+                  <img
+                    key={`${silHero.id}-full-sil`}
+                    src={silChallenge.imageUrl}
+                    alt="Héroe misterioso"
+                    style={{
+                      transform: `translate(${currentOffsetX}%, ${currentOffsetY}%) scale(${
+                        silFinished ? 1 : Math.max(1.25, 2.55 - silAttempts.length * 0.3)
+                      }) rotate(${currentAngle}deg) scaleX(${currentFlip})`,
+                      filter: silFinished ? 'none' : 'brightness(0) contrast(200%)',
+                    }}
+                    className="max-h-64 sm:max-h-72 w-auto object-contain select-none pointer-events-none transition-all duration-500"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Progressive Clues + Search Input */}
             <div className="space-y-4">
-              {/* Progressive Clues */}
+              {/* Progressive Clues (harder progression!) */}
               <div className="space-y-2">
                 <div className="text-xs font-mono uppercase font-bold text-slate-400">
-                  Pistas desbloqueadas (cada fallo revela más):
+                  Pistas progresivas (cada intento fallido reduce el zoom/giro y revela datos):
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div
@@ -1081,14 +1399,10 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                         : 'border-slate-200 bg-slate-100 text-slate-400'
                     }`}
                   >
-                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 1 · Rol</span>
+                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 1 · Alcance / Estilo</span>
                     <strong>
                       {silAttempts.length >= 1 || silFinished
-                        ? silHero.role === 'tank'
-                          ? 'Tanque'
-                          : silHero.role === 'damage'
-                          ? 'Daño (DPS)'
-                          : 'Apoyo'
+                        ? `${silHero.range} · ${silHero.style.toUpperCase()}`
                         : '🔒 Bloqueada'}
                     </strong>
                   </div>
@@ -1102,10 +1416,14 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                         : 'border-slate-200 bg-slate-100 text-slate-400'
                     }`}
                   >
-                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 2 · Subrol</span>
+                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 2 · Rol</span>
                     <strong>
                       {silAttempts.length >= 2 || silFinished
-                        ? `${silHero.subrole} (${silHero.style.toUpperCase()})`
+                        ? silHero.role === 'tank'
+                          ? 'Tanque'
+                          : silHero.role === 'damage'
+                          ? 'Daño (DPS)'
+                          : 'Apoyo'
                         : '🔒 Bloqueada'}
                     </strong>
                   </div>
@@ -1119,9 +1437,11 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                         : 'border-slate-200 bg-slate-100 text-slate-400'
                     }`}
                   >
-                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 3 · Origen</span>
+                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 3 · Subrol & Debut</span>
                     <strong>
-                      {silAttempts.length >= 3 || silFinished ? silHero.country : '🔒 Bloqueada'}
+                      {silAttempts.length >= 3 || silFinished
+                        ? `${silHero.subrole} (${silHero.releaseYear})`
+                        : '🔒 Bloqueada'}
                     </strong>
                   </div>
 
@@ -1134,11 +1454,9 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                         : 'border-slate-200 bg-slate-100 text-slate-400'
                     }`}
                   >
-                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 4 · Definitiva</span>
+                    <span className="block text-[10px] font-mono uppercase opacity-70">Pista 4 · Origen</span>
                     <strong>
-                      {silAttempts.length >= 4 || silFinished
-                        ? silKit?.ultimate[0]?.name || 'Clasificada'
-                        : '🔒 Bloqueada'}
+                      {silAttempts.length >= 4 || silFinished ? silHero.country : '🔒 Bloqueada'}
                     </strong>
                   </div>
                 </div>
@@ -1190,7 +1508,14 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                     </div>
                   )}
 
-                  <div className="flex justify-end">
+                  <div className="flex items-center justify-between pt-1">
+                    <button
+                      type="button"
+                      onClick={() => resetSilhouette(silCategory, false)}
+                      className="text-xs text-slate-400 hover:text-orange-400 transition"
+                    >
+                      Saltar a otra pista visual ↻
+                    </button>
                     <button
                       type="button"
                       onClick={() => {
@@ -1211,18 +1536,24 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
                       : 'border-rose-500/50 bg-rose-500/10'
                   }`}
                 >
-                  <div className="font-black text-lg">
-                    {silWon
-                      ? `¡Lo adivinaste! Era ${silHero.name}`
-                      : `¡Se acabaron los intentos! Era ${silHero.name}`}
+                  <div className="flex items-center gap-3">
+                    <HeroAvatar hero={silHero} size="md" showRoleBadge />
+                    <div>
+                      <div className="font-black text-lg leading-tight">
+                        {silWon
+                          ? `¡Increíble ojo! Era ${silHero.name}`
+                          : `¡Era ${silHero.name}!`}
+                      </div>
+                      <div className="text-xs text-slate-400 mt-0.5">{silChallenge.itemLabel}</div>
+                    </div>
                   </div>
                   <button
                     type="button"
-                    onClick={resetSilhouette}
+                    onClick={() => resetSilhouette(silCategory, false)}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-white font-black text-xs uppercase tracking-wider shadow-lg transition"
                   >
                     <RotateCcw className="w-4 h-4" />
-                    <span>Nueva Silueta Misteriosa</span>
+                    <span>Siguiente Desafío Visual</span>
                   </button>
                 </div>
               )}
