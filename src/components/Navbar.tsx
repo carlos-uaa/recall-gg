@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import type { GameId } from '../types/game';
+import type { AppTab, GameId } from '../types/game';
 import { SUPPORTED_GAMES } from '../games/registry';
 import { TRANSLATIONS, type Language } from '../utils/i18n';
 import { 
   Crosshair, 
+  Users,
   Gamepad2, 
   BarChart3, 
   Swords, 
@@ -16,8 +17,8 @@ import {
 interface NavbarProps {
   currentGame: GameId;
   onSelectGame: (game: GameId) => void;
-  activeTab: 'coach' | 'guesser' | 'meta' | 'counters';
-  onSelectTab: (tab: 'coach' | 'guesser' | 'meta' | 'counters') => void;
+  activeTab: AppTab;
+  onSelectTab: (tab: AppTab) => void;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
   language: Language;
@@ -130,10 +131,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="flex items-center space-x-1 sm:space-x-2">
+          <nav className="flex items-center space-x-1 sm:space-x-1.5 overflow-x-auto">
             <button
               onClick={() => onSelectTab('coach')}
-              className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
+              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
                 activeTab === 'coach'
                   ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
                   : isDark
@@ -142,42 +143,27 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Crosshair className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.coachTab}</span>
-              <span className="sm:hidden">Coach</span>
+              <span className="hidden md:inline">{t.coachTab}</span>
+              <span className="md:hidden">Coach</span>
             </button>
 
             <button
-              onClick={() => onSelectTab('guesser')}
-              className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
-                activeTab === 'guesser'
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
+              onClick={() => onSelectTab('heroes')}
+              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+                activeTab === 'heroes'
+                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-lg shadow-cyan-500/25'
                   : isDark
                   ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
-              <Gamepad2 className="w-4 h-4" />
-              <span>{t.guesserTab}</span>
-            </button>
-
-            <button
-              onClick={() => onSelectTab('meta')}
-              className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
-                activeTab === 'meta'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                  : isDark
-                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.metaTab}</span>
-              <span className="sm:hidden">Meta</span>
+              <Users className="w-4 h-4" />
+              <span>{t.heroesTab}</span>
             </button>
 
             <button
               onClick={() => onSelectTab('counters')}
-              className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition ${
+              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
                 activeTab === 'counters'
                   ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
                   : isDark
@@ -187,6 +173,35 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Swords className="w-4 h-4" />
               <span>{t.countersTab}</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTab('meta')}
+              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+                activeTab === 'meta'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden md:inline">{t.metaTab}</span>
+              <span className="md:hidden">Meta</span>
+            </button>
+
+            <button
+              onClick={() => onSelectTab('guesser')}
+              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+                activeTab === 'guesser'
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <Gamepad2 className="w-4 h-4" />
+              <span>{t.guesserTab}</span>
             </button>
           </nav>
 

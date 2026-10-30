@@ -64,7 +64,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
           {t.countersTitle}
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          {t.countersSubtitle} — Basado en las 201 reglas dictadas por semi-profesionales, con distinción de counters duros y consejos directos.
+          {t.countersSubtitle} — Matriz 100% coherente y antisimétrica de los 54 héroes, con counters duros, motivos tácticos y consejos directos.
         </p>
       </div>
 

@@ -6,19 +6,23 @@ import { Shield, Swords, Heart, Lock, Star } from 'lucide-react';
 interface HeroSelectScreenProps {
   selectedHeroId: string | null;
   onSelectHero: (heroId: string) => void;
-  allyHeroIds: string[]; // Heroes already taken in ally team (cannot be repeated)
+  allyHeroIds?: string[]; // Heroes already taken in ally team (cannot be repeated)
   theme?: 'dark' | 'light';
   playerRole?: Role;
   onPlayerRoleChange?: (role: Role) => void;
+  title?: string;
+  hideRoleLock?: boolean;
 }
 
 export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
   selectedHeroId,
   onSelectHero,
-  allyHeroIds,
+  allyHeroIds = [],
   theme = 'dark',
   playerRole,
   onPlayerRoleChange,
+  title = 'SELECCIÓN DE TU HÉROE',
+  hideRoleLock = false,
 }) => {
   const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<Role | 'all'>('all');
@@ -130,8 +134,8 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
             <h2 className={`text-xs sm:text-sm font-black uppercase tracking-tight flex items-center space-x-1.5 ${
               isDark ? 'text-white' : 'text-slate-900'
             }`}>
-              <span>SELECCIÓN DE TU HÉROE</span>
-              <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/30 font-mono">
+              <span>{title}</span>
+              <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/30 font-mono">
                 {OVERWATCH_HEROES.length}
               </span>
             </h2>
@@ -148,7 +152,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
               className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition ${
                 activeTab === 'all'
                   ? 'bg-orange-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Todos
@@ -160,7 +164,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                 className={`flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold transition ${
                   activeTab === cat.role
                     ? 'bg-orange-500 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {cat.icon}
@@ -170,20 +174,22 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
           </div>
 
           {/* Role Queue Lock Button */}
-          <button
-            onClick={() => setRoleQueueLocked(!roleQueueLocked)}
-            className={`flex items-center space-x-1 px-2 py-0.5 rounded-lg text-[11px] font-bold border transition ${
-              roleQueueLocked
-                ? 'bg-amber-500/20 text-amber-500 border-amber-500/40 shadow-sm'
-                : isDark
-                ? 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white'
-                : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'
-            }`}
-            title="Simula la cola de roles competitiva bloqueando los demás roles"
-          >
-            <Lock className={`w-2.5 h-2.5 ${roleQueueLocked ? 'text-amber-500' : 'text-slate-400'}`} />
-            <span>Role Queue {roleQueueLocked ? 'Fijo' : 'Libre'}</span>
-          </button>
+          {!hideRoleLock && (
+            <button
+              onClick={() => setRoleQueueLocked(!roleQueueLocked)}
+              className={`flex items-center space-x-1 px-2 py-0.5 rounded-lg text-[11px] font-bold border transition ${
+                roleQueueLocked
+                  ? 'bg-amber-500/20 text-amber-500 border-amber-500/40 shadow-sm'
+                  : isDark
+                  ? 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white'
+                  : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'
+              }`}
+              title="Simula la cola de roles competitiva bloqueando los demás roles"
+            >
+              <Lock className={`w-2.5 h-2.5 ${roleQueueLocked ? 'text-amber-500' : 'text-slate-400'}`} />
+              <span>Role Queue {roleQueueLocked ? 'Fijo' : 'Libre'}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -231,7 +237,9 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                       <React.Fragment key={sub}>
                         {/* Subrole Group: Tiny Label at Top + Heroes in a tight row */}
                         <div className="flex flex-col items-center">
-                          <span className="text-[7.5px] font-mono uppercase tracking-wider text-slate-400 font-bold mb-0.5 px-1 py-0.2 rounded bg-slate-800/40 border border-slate-700/40 truncate max-w-[100px]">
+                          <span className={`text-[7.5px] font-mono uppercase tracking-wider font-bold mb-0.5 px-1 py-0.2 rounded border truncate max-w-[100px] ${
+                            isDark ? 'text-slate-400 bg-slate-800/40 border-slate-700/40' : 'text-slate-600 bg-slate-100 border-slate-200'
+                          }`}>
                             {subLabel} ({heroesInSub.length})
                           </span>
 

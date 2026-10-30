@@ -4,11 +4,43 @@ export type CompStyle = 'brawl' | 'dive' | 'poke';
 
 export type GameId = 'overwatch' | 'valorant' | 'marvel-rivals';
 
+export type AppTab = 'coach' | 'heroes' | 'counters' | 'meta' | 'guesser';
+
 export type RankTier = 'bronze_gold' | 'plat_diamond' | 'master_top500';
 
 export interface CounterDetail {
   hard: boolean;
   motivo?: string;
+}
+
+export interface HeroAbilityItem {
+  name: string;
+  description: string;
+  icon?: string;
+}
+
+export interface HeroPerkItem {
+  name: string;
+  description: string;
+  icon?: string;
+}
+
+export interface HeroKitData {
+  fullPortrait: string;
+  hitpoints: {
+    health: number;
+    armor: number;
+    shields: number;
+    total: number;
+  };
+  weapons: HeroAbilityItem[];
+  ultimate: HeroAbilityItem[];
+  abilities: HeroAbilityItem[];
+  passives: HeroAbilityItem[];
+  perks: {
+    minor: HeroPerkItem[];
+    major: HeroPerkItem[];
+  };
 }
 
 export interface Hero {

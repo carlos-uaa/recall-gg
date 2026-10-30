@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import type { GameId } from './types/game';
+import type { AppTab, GameId } from './types/game';
 import type { Language } from './utils/i18n';
 import { Navbar } from './components/Navbar';
 import { CoachView } from './components/coach/CoachView';
+import { HeroesView } from './components/heroes/HeroesView';
 import { GuesserView } from './components/guesser/GuesserView';
 import { MetaView } from './components/meta/MetaView';
 import { CountersView } from './components/counters/CountersView';
@@ -10,7 +11,7 @@ import { Gamepad2 } from 'lucide-react';
 
 export function App() {
   const [currentGame, setCurrentGame] = useState<GameId>('overwatch');
-  const [activeTab, setActiveTab] = useState<'coach' | 'guesser' | 'meta' | 'counters'>('coach');
+  const [activeTab, setActiveTab] = useState<AppTab>('coach');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [language, setLanguage] = useState<Language>('es');
 
@@ -52,6 +53,7 @@ export function App() {
         {currentGame === 'overwatch' ? (
           <>
             {activeTab === 'coach' && <CoachView language={language} theme={theme} />}
+            {activeTab === 'heroes' && <HeroesView language={language} theme={theme} />}
             {activeTab === 'guesser' && <GuesserView language={language} theme={theme} />}
             {activeTab === 'meta' && <MetaView language={language} theme={theme} />}
             {activeTab === 'counters' && <CountersView language={language} theme={theme} />}

@@ -41,6 +41,15 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
   const allyHeroes = OVERWATCH_HEROES.filter(h => allyHeroIds.includes(h.id));
   const enemyHeroes = OVERWATCH_HEROES.filter(h => enemyHeroIds.includes(h.id));
 
+  // Macro RPS helper: Dive > Poke > Brawl > Dive
+  const styleAdvantage = (a: string, b: string): number => {
+    if (a === b) return 0;
+    if ((a === 'dive' && b === 'poke') || (a === 'poke' && b === 'brawl') || (a === 'brawl' && b === 'dive')) {
+      return 3;
+    }
+    return -3;
+  };
+
   // Determine dominant ally composition style
   const styleCounts: Record<string, number> = { brawl: 0, dive: 0, poke: 0 };
   allyHeroes.forEach(h => {
@@ -59,62 +68,67 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
     const pros: string[] = [];
     const cons: string[] = [];
 
-    // 0. Base Meta Tier Points (PESOS.tier from Toniki: S=7, A=6, B=5, C=4, D=3)
+    // 0. Base Meta Tier Points
     let tierBaseScore = 0;
     const tier = hero.tier || 'B';
     if (tier === 'S') {
-      tierBaseScore = 14;
+      tierBaseScore = 10;
       pros.push(`Héroe Tier S en el meta actual (máxima prioridad competitiva)`);
     } else if (tier === 'A') {
-      tierBaseScore = 10;
+      tierBaseScore = 7;
       pros.push(`Tier A: Pick muy sólido y consistente en el parche actual`);
     } else if (tier === 'B') {
-      tierBaseScore = 6;
+      tierBaseScore = 3;
     } else if (tier === 'C') {
-      tierBaseScore = 2;
+      tierBaseScore = 0;
       cons.push(`Tier C: Rendimiento situacional en este meta`);
     } else {
       tierBaseScore = -4;
       cons.push(`Tier D: Requiere condiciones muy favorables para brillar`);
     }
 
-    // 1. Counter Matchups vs Enemy Team (Toniki counter / counterHard weights)
+    // 1. Coherent Anti-Symmetric Counter Matchups vs Enemy Team
     let rawCounterScore = 0;
     enemyHeroes.forEach(enemy => {
+      if (enemy.id === hero.id) return; // Mirror match is 50/50 skill matchup
+
       const isHardStrong = hero.counters.hardStrongAgainst?.includes(enemy.id);
       const isSoftStrong = hero.counters.strongAgainst.includes(enemy.id);
       const strongMotivo = hero.counters.strongDetails?.[enemy.id]?.motivo;
 
-      const isHardWeak = hero.counters.hardWeakAgainst?.includes(enemy.id) || enemy.counters.hardStrongAgainst?.includes(hero.id);
-      const isSoftWeak = hero.counters.weakAgainst.includes(enemy.id) || enemy.counters.strongAgainst.includes(hero.id);
-      const weakMotivo = hero.counters.weakDetails?.[enemy.id]?.motivo || enemy.counters.strongDetails?.[hero.id]?.motivo;
+      const isHardWeak = hero.counters.hardWeakAgainst?.includes(enemy.id);
+      const isSoftWeak = hero.counters.weakAgainst.includes(enemy.id);
+      const weakMotivo = hero.counters.weakDetails?.[enemy.id]?.motivo;
 
       if (isHardStrong) {
-        rawCounterScore += 26;
+        rawCounterScore += 16;
         pros.push(strongMotivo ? `★ Counter duro de ${enemy.name}: "${strongMotivo}"` : `★ Counter duro directo contra ${enemy.name}`);
       } else if (isSoftStrong) {
-        rawCounterScore += 16;
+        rawCounterScore += 10;
         pros.push(strongMotivo ? `Favorable contra ${enemy.name}: ${strongMotivo}` : `Favorable contra el kit de ${enemy.name}`);
-      }
-
-      if (isHardWeak) {
-        rawCounterScore -= 26;
+      } else if (isHardWeak) {
+        rawCounterScore -= 16;
         cons.push(weakMotivo ? `★ ${enemy.name} es tu counter duro: "${weakMotivo}"` : `★ ${enemy.name} es counter duro directo y anula tu kit`);
       } else if (isSoftWeak) {
-        rawCounterScore -= 16;
+        rawCounterScore -= 10;
         cons.push(weakMotivo ? `Desfavorable contra ${enemy.name}: ${weakMotivo}` : `Desfavorable frente a ${enemy.name}`);
+      } else {
+        // Subtle macro-style interaction (Dive > Poke > Brawl > Dive)
+        rawCounterScore += styleAdvantage(hero.style, enemy.style);
       }
     });
 
-    // 2. Synergy with Ally Team
+    // 2. Synergy with Ally Team (excluding self)
     let rawSynergyScore = 0;
     allyHeroes.forEach(ally => {
+      if (ally.id === hero.id) return;
+
       // Check for Anti-Synergies
       const anti = ANTI_SYNERGIES.find(
         p => (p.a === hero.id && p.b === ally.id) || (p.b === hero.id && p.a === ally.id)
       );
       if (anti) {
-        rawSynergyScore -= anti.penalty;
+        rawSynergyScore -= 12;
         cons.push(anti.reason);
       }
 
@@ -123,16 +137,18 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
         p => (p.a === hero.id && p.b === ally.id) || (p.b === hero.id && p.a === ally.id)
       );
       if (perfect) {
-        rawSynergyScore += perfect.bonus;
+        rawSynergyScore += 14;
         pros.push(`Sinergia perfecta con ${ally.name}: ${perfect.reason}`);
-      } else if (hero.synergies.includes(ally.id)) {
-        rawSynergyScore += 12;
+      } else if (hero.synergies.includes(ally.id) || ally.synergies.includes(hero.id)) {
+        rawSynergyScore += 9;
         pros.push(`Gran sinergia con ${ally.name}`);
+      } else if (ally.style === hero.style) {
+        rawSynergyScore += 3;
       }
     });
 
     if (dominantAllyStyle && hero.style === dominantAllyStyle && maxStyleCount >= 2) {
-      rawSynergyScore += 8;
+      rawSynergyScore += 6;
       pros.push(`Encaja con el estilo del equipo (${hero.style.toUpperCase()})`);
     }
 
@@ -140,20 +156,20 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
     let rawMapScore = 0;
     if (gameMap) {
       if (gameMap.favoredStyles.includes(hero.style)) {
-        rawMapScore += 12;
+        rawMapScore += 8;
         pros.push(`Favorable en ${gameMap.name} por su estilo ${hero.style.toUpperCase()}`);
       }
 
       if (gameMap.longSightlines && (hero.range === 'Largo' || hero.range === 'Medio')) {
-        rawMapScore += 8;
+        rawMapScore += 5;
         pros.push(`Aprovecha las líneas de visión largas de ${gameMap.name}`);
       } else if (gameMap.isCloseQuarters && (hero.range === 'Corto' || hero.range === 'Melee')) {
-        rawMapScore += 8;
+        rawMapScore += 5;
         pros.push(`Efectivo en las distancias cerradas de este mapa`);
       }
 
       if (gameMap.hasHighGround && hero.style === 'brawl' && hero.range === 'Melee' && hero.id !== 'doomfist') {
-        rawMapScore -= 10;
+        rawMapScore -= 7;
         cons.push(`Dificultades disputando el High Ground en ${gameMap.name}`);
       }
     }
@@ -162,22 +178,22 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
     let rankModifier = 0;
     if (rankTier === 'bronze_gold') {
       if (hero.difficulty === 1) {
-        rankModifier += 8;
+        rankModifier += 6;
         pros.push('Mecánicamente consistente y de alto impacto en este rango');
       } else if (hero.difficulty === 3) {
-        rankModifier -= 8;
+        rankModifier -= 6;
         cons.push('Exige alta precisión mecánica para sacarle valor óptimo');
       }
     } else if (rankTier === 'master_top500') {
       if (hero.difficulty === 3) {
-        rankModifier += 6;
+        rankModifier += 5;
         pros.push('Techo de habilidad altísimo en rangos altos');
       }
     }
 
-    // Normalized Total Score (Target 10 - 99)
-    let totalScore = 48 + tierBaseScore + rawCounterScore + rawSynergyScore + rawMapScore + rankModifier;
-    totalScore = Math.max(10, Math.min(99, Math.round(totalScore)));
+    // Normalized Total Score (Target 5 - 99)
+    let totalScore = 50 + tierBaseScore + rawCounterScore + rawSynergyScore + rawMapScore + rankModifier;
+    totalScore = Math.max(5, Math.min(99, Math.round(totalScore)));
 
     let tacticalVerdict = '';
     if (totalScore >= 82) {
@@ -248,20 +264,20 @@ export function analyzePlayerPick(
   const currentPickData = allRoleRecommendations.find(r => r.hero.id === playerHeroId);
   const currentScore = currentPickData ? currentPickData.totalScore : 50;
 
-  // Identify direct and hard enemy threats
+  // Identify direct and hard enemy threats (strictly anti-symmetric, excluding mirror)
   const directThreats = enemyHeroes.filter(
-    enemy => playerHero.counters.weakAgainst.includes(enemy.id) || enemy.counters.strongAgainst.includes(playerHero.id)
+    enemy => enemy.id !== playerHeroId && playerHero.counters.weakAgainst.includes(enemy.id)
   );
   const hardThreats = enemyHeroes.filter(
-    enemy => playerHero.counters.hardWeakAgainst?.includes(enemy.id) || enemy.counters.hardStrongAgainst?.includes(playerHero.id)
+    enemy => enemy.id !== playerHeroId && playerHero.counters.hardWeakAgainst?.includes(enemy.id)
   );
 
   // Identify favorable and hard targets
   const favorableTargets = enemyHeroes.filter(
-    enemy => playerHero.counters.strongAgainst.includes(enemy.id)
+    enemy => enemy.id !== playerHeroId && playerHero.counters.strongAgainst.includes(enemy.id)
   );
   const hardTargets = enemyHeroes.filter(
-    enemy => playerHero.counters.hardStrongAgainst?.includes(enemy.id)
+    enemy => enemy.id !== playerHeroId && playerHero.counters.hardStrongAgainst?.includes(enemy.id)
   );
 
   let verdict = '';

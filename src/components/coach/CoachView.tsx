@@ -108,14 +108,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
       if (allySlots.length === 5) {
         setAllySlots([
           allySlots[0],
-          { id: 'a-tank-2', role: 'tank', label: 'Tanque 2', heroId: 'dva' },
+          { id: 'a-tank-2', role: 'tank', label: 'Tanque 2', heroId: null },
           ...allySlots.slice(1)
         ]);
       }
       if (enemySlots.length === 5) {
         setEnemySlots([
           enemySlots[0],
-          { id: 'e-tank-2', role: 'tank', label: 'Tanque Rival 2', heroId: 'zarya' },
+          { id: 'e-tank-2', role: 'tank', label: 'Tanque Rival 2', heroId: null },
           ...enemySlots.slice(1)
         ]);
       }
@@ -138,9 +138,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
     return OVERWATCH_MAPS.find(m => m.id === selectedMapId) || OVERWATCH_MAPS[0];
   }, [selectedMapId]);
 
-  // Flattened ally and enemy IDs for calculations
+  // Flattened teammate IDs (excluding player's own slot so candidate switches don't count replaced hero as a teammate)
   const allyHeroIds = useMemo(() => {
-    return allySlots.map(s => s.heroId).filter((id): id is string => Boolean(id));
+    return allySlots.filter(s => !s.isMyPick).map(s => s.heroId).filter((id): id is string => Boolean(id));
   }, [allySlots]);
 
   const enemyHeroIds = useMemo(() => {
@@ -374,14 +374,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
           {/* Rank Visual Card Picker */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
-                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <label className={`text-xs font-bold flex items-center space-x-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                <Trophy className="w-3.5 h-3.5 text-amber-500" />
                 <span>RANGO COMPETITIVO</span>
               </label>
               <button
                 type="button"
                 onClick={() => setRankPickerOpen(true)}
-                className="text-xs font-bold text-amber-400 hover:text-amber-300 transition"
+                className="text-xs font-bold text-amber-500 hover:text-amber-400 transition"
               >
                 Cambiar Rango →
               </button>
@@ -391,35 +391,41 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <div
               onClick={() => setRankPickerOpen(true)}
               className={`group relative h-28 sm:h-32 rounded-2xl border p-4 flex items-center justify-between cursor-pointer shadow-lg transition hover:border-amber-400 hover:scale-[1.01] ${
-                rankTier === 'master_top500'
-                  ? 'border-purple-500/50 bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-900'
+                isDark
+                  ? rankTier === 'master_top500'
+                    ? 'border-purple-500/50 bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-900'
+                    : rankTier === 'plat_diamond'
+                    ? 'border-cyan-500/50 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900'
+                    : 'border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900'
+                  : rankTier === 'master_top500'
+                  ? 'border-purple-300 bg-gradient-to-r from-purple-50 via-white to-white'
                   : rankTier === 'plat_diamond'
-                  ? 'border-cyan-500/50 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900'
-                  : 'border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900'
+                  ? 'border-cyan-300 bg-gradient-to-r from-cyan-50 via-white to-white'
+                  : 'border-amber-300 bg-gradient-to-r from-amber-50 via-white to-white'
               }`}
             >
               <div className="flex items-center space-x-4">
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl border shadow-lg ${
                   rankTier === 'master_top500'
-                    ? 'bg-purple-900/60 border-purple-400 text-purple-300 shadow-purple-500/30'
+                    ? isDark ? 'bg-purple-900/60 border-purple-400 text-purple-300 shadow-purple-500/30' : 'bg-purple-100 border-purple-400 text-purple-700'
                     : rankTier === 'plat_diamond'
-                    ? 'bg-cyan-900/60 border-cyan-400 text-cyan-300 shadow-cyan-500/30'
-                    : 'bg-amber-900/60 border-amber-400 text-amber-300 shadow-amber-500/30'
+                    ? isDark ? 'bg-cyan-900/60 border-cyan-400 text-cyan-300 shadow-cyan-500/30' : 'bg-cyan-100 border-cyan-400 text-cyan-700'
+                    : isDark ? 'bg-amber-900/60 border-amber-400 text-amber-300 shadow-amber-500/30' : 'bg-amber-100 border-amber-400 text-amber-700'
                 }`}>
                   {rankTier === 'master_top500' ? 'GM' : rankTier === 'plat_diamond' ? 'DIA' : 'ORO'}
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono uppercase font-bold text-slate-400">
+                  <span className={`text-[10px] font-mono uppercase font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Modificador de Habilidad
                   </span>
-                  <h3 className="text-lg font-black text-white">
+                  <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {rankTier === 'bronze_gold'
                       ? 'Bronce — Oro'
                       : rankTier === 'plat_diamond'
                       ? 'Platino — Diamante'
                       : 'Master — Top 500'}
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     {rankTier === 'bronze_gold'
                       ? 'Premia consistencia y castiga exigencia mecánica'
                       : rankTier === 'plat_diamond'
