@@ -70,7 +70,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/fe56a0ef536dd3f17d3c7728151ff60ef1a48071e93c2071c095f4e1712e6721.png"
         }
       ]
-    }
+    },
+    "accentColor": "#6f8fc9"
   },
   "anran": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/anran.webp",
@@ -156,7 +157,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/110e0b00345b359281b3ae871725d149051bed40fce266435806b4c390729722.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e0533d"
   },
   "ashe": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/ashe.webp",
@@ -227,7 +229,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/5c01e6810c9aac8d790e97f6b1e090aef6e89970c16eb9601812332e1cdb8f8f.png"
         }
       ]
-    }
+    },
+    "accentColor": "#b8a08a"
   },
   "baptiste": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/baptiste.webp",
@@ -303,7 +306,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/d2a943d5fce3bba49e1f482c0cd56973cb287fb40d2fd089f40a15047856a378.png"
         }
       ]
-    }
+    },
+    "accentColor": "#4fb3c8"
   },
   "bastion": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/bastion.webp",
@@ -379,7 +383,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/0322e5394e3b67a011c27be4d8c84c0a4f74771d557339ac680dae7edbc3aaf7.png"
         }
       ]
-    }
+    },
+    "accentColor": "#8fae6f"
   },
   "brigitte": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/brigitte.webp",
@@ -465,7 +470,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/9d6a8ce740dd9b84adc1b60a518501c66d83f4c592ae84dec4cd3c9e4f159a40.png"
         }
       ]
-    }
+    },
+    "accentColor": "#d0705e"
   },
   "cassidy": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/cassidy.webp",
@@ -535,7 +541,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/383425b058c7a8a60439132ecb199ea59e91be71b7e57835019c28beb7f080a2.png"
         }
       ]
-    }
+    },
+    "accentColor": "#c4504a"
   },
   "dmon": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/dmon.webp",
@@ -631,7 +638,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/46d8466d7de4b04dea213c55cae621e407206055eb3b9247796b3f8cd7ba2b4e.png"
         }
       ]
-    }
+    },
+    "accentColor": "#9b5de5"
   },
   "doctrine": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/doctrine.webp",
@@ -707,7 +715,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/1f60c2577f3709fe41fbf494432e7539b4a942374b301b06a97ed7c0bb11017f.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e05596"
   },
   "domina": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/domina.webp",
@@ -783,7 +792,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/6006092e920e1e719a22090967108f164083e4217a748fabfc00eb905724b421.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e0a83c"
   },
   "doomfist": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/doomfist.webp",
@@ -859,7 +869,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/0b831053f68b3255806c0da470c2c8b9a8fff17f5bd04839bba0fa407618ea43.png"
         }
       ]
-    }
+    },
+    "accentColor": "#a0583f"
   },
   "dva": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/dva.webp",
@@ -950,7 +961,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/8399d146264d0b180cf50a2e96661d7ae408a4a7eb60cad67c80812a18c35f1a.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f07cc0"
   },
   "echo": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/echo.webp",
@@ -1031,7 +1043,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/13a06093b579b9a0588d37534cf8fd8f31e3c129f67b3585b58dca171fcdca68.png"
         }
       ]
-    }
+    },
+    "accentColor": "#7fc4ff"
   },
   "emre": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/emre.webp",
@@ -1102,7 +1115,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/c1e486e48f92254734e19a47d63672f81c187bfbcb524f9634fe295ea89d36ee.png"
         }
       ]
-    }
+    },
+    "accentColor": "#d1823c"
   },
   "freja": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/freja.webp",
@@ -1181,7 +1195,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/4ac4daca1df0efba3715a3406834bf8efb379dc636682e7d771377dc5139c3f9.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e0a25a"
   },
   "genji": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/genji.webp",
@@ -1257,7 +1272,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/f6046ca3bc6b1dde0cece4f255b2e30eba0ef50aecff6ecfbe3858b0ee7cc4c2.png"
         }
       ]
-    }
+    },
+    "accentColor": "#8ee048"
   },
   "hanzo": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/hanzo.webp",
@@ -1338,7 +1354,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/32b18f33f63e27446cb66662a1e26ec9fff6456bbfe75e17634174ca44885c14.png"
         }
       ]
-    }
+    },
+    "accentColor": "#c9b67a"
   },
   "hazard": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/hazard.webp",
@@ -1419,7 +1436,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/d6c6cff5997b09cc6c02c03b0d2bfce48afc4bbf3f95717ea337f633af985b5f.png"
         }
       ]
-    }
+    },
+    "accentColor": "#8b5cf6"
   },
   "illari": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/illari.webp",
@@ -1490,7 +1508,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/2405e6d589b8d6c7bd5e072f7788480bbcfeda6a1ce48ad67e2d8915289e8798.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f2c94c"
   },
   "jetpack-cat": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/jetpack-cat.webp",
@@ -1566,7 +1585,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/989caae5faf782438c32b4ed7451ac93ebff03d884c065c768c1cee265b8aae9.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f0a040"
   },
   "junker-queen": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/junker-queen.webp",
@@ -1642,7 +1662,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/6f359a8501d72e8e4b4fcceff1dc353b68a4303bfb5e0f853d894b2478d0bce4.png"
         }
       ]
-    }
+    },
+    "accentColor": "#4f9fd6"
   },
   "junkrat": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/junkrat.webp",
@@ -1718,7 +1739,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/046617c7617e09bec3445e0b3059d6157f1bdabe842650ec2ed3962634a52da0.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e8b84a"
   },
   "juno": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/juno.webp",
@@ -1799,7 +1821,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/7b122bd8091f5005bfee07aa787f98126ddbe80aacdd11e7a2d076b9d03e35b2.png"
         }
       ]
-    }
+    },
+    "accentColor": "#c07cf0"
   },
   "kiriko": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/kiriko.webp",
@@ -1875,7 +1898,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/cd3b70802f80c187212db9a9db342e6aa4f0cd349d1979055e52eb7539a8cc30.png"
         }
       ]
-    }
+    },
+    "accentColor": "#ef4f66"
   },
   "lifeweaver": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/lifeweaver.webp",
@@ -1956,7 +1980,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/fc70f669169965a725f86e2d4dc21d3bd2f1610b2dd2c1a5b4abb948413e1c05.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f0a3cf"
   },
   "lucio": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/lucio.webp",
@@ -2037,7 +2062,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/c932c84f75d245fb1308f918d80e6a0a9ba93004e40f27e55d63016bd29fb340.png"
         }
       ]
-    }
+    },
+    "accentColor": "#7fd04a"
   },
   "mauga": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/mauga.webp",
@@ -2112,7 +2138,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/69aae6d3636721510e30bc9d1578944c8e9705ab403d9e421798aceebf0f1a9b.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e0503a"
   },
   "mei": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/mei.webp",
@@ -2183,7 +2210,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/6d0f58c3d4df90c6562b381a584da6608beef0826e03d34a0bcf7b964afaff3a.png"
         }
       ]
-    }
+    },
+    "accentColor": "#6fb6f0"
   },
   "mercy": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/mercy.webp",
@@ -2264,7 +2292,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/e0887d16a296e6419cf0e8a32ed74ceea31bd96efbd25576511516ba0339c870.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f2d77a"
   },
   "mizuki": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/mizuki.webp",
@@ -2345,7 +2374,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/d29b3404035091c9429058c468bef3b7cd9299a366e8fa203ef343177db586bd.png"
         }
       ]
-    }
+    },
+    "accentColor": "#2fbf71"
   },
   "moira": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/moira.webp",
@@ -2416,7 +2446,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/6d3b8b3719ce56537a1279e91318980d66752490946799643bd5226987115ed6.png"
         }
       ]
-    }
+    },
+    "accentColor": "#8c3cc8"
   },
   "orisa": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/orisa.webp",
@@ -2492,7 +2523,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/88b6e3613c49bf6c6edbd2e32fb8aaa71ba58d556ff0d6403688d1ceabc70f31.png"
         }
       ]
-    }
+    },
+    "accentColor": "#4fa64a"
   },
   "pharah": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/pharah.webp",
@@ -2573,7 +2605,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/34efa97b9ef729fabe003953ca7e5e33e23d07c07c37aee8a6ffa4c5a88cf6bd.png"
         }
       ]
-    }
+    },
+    "accentColor": "#3f80d9"
   },
   "ramattra": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/ramattra.webp",
@@ -2649,7 +2682,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/0f01814ad4c072dbbaddb1f15e72178f6bb5e7bc2c0eb3874c9f5838f98e30e7.png"
         }
       ]
-    }
+    },
+    "accentColor": "#8e5be0"
   },
   "reaper": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/reaper.webp",
@@ -2725,7 +2759,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/668cd4b407c22f66b8c0f703c352293542dce4d6e0535efd2fb4f2123ff8ed1a.png"
         }
       ]
-    }
+    },
+    "accentColor": "#a33240"
   },
   "reinhardt": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/reinhardt.webp",
@@ -2801,7 +2836,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/543ee152a75898b667a5c0a0127326b36716df02b6e2baace4bb0d9784571c6a.png"
         }
       ]
-    }
+    },
+    "accentColor": "#a5b4bf"
   },
   "roadhog": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/roadhog.webp",
@@ -2877,7 +2913,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/d9dcccfe7fb8e200ca9b3eec39dc3eec0789f99f8d6de38d26997bd591963eae.png"
         }
       ]
-    }
+    },
+    "accentColor": "#c49052"
   },
   "shion": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/shion.webp",
@@ -2953,7 +2990,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/60e45c630f647bf5b254bb31b02c2597b8d7ace1e7444b05357b694dac3a1d54.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e04a5f"
   },
   "sierra": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/sierra.webp",
@@ -3029,7 +3067,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/656d1dee1ba31c2433d36512c973f0958231dae8dcfc70226c16497819ddc65f.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e0394b"
   },
   "sigma": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/sigma.webp",
@@ -3105,7 +3144,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/15828d0a39a88da3687e84e52a1a119fb0b5b08812e11c356bfffb8fe90d8a41.png"
         }
       ]
-    }
+    },
+    "accentColor": "#7fb5c4"
   },
   "sojourn": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/sojourn.webp",
@@ -3176,7 +3216,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/78ec26ed402e4ea8a1a2cafcbab9759f35886d3d529c7fa653527cd554f2ed9f.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e05044"
   },
   "soldier76": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/soldier-76.webp",
@@ -3252,7 +3293,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/534498771c3a5a981a3d3f8c2f55df2998753e791f2fd77b51ac95fe501edafd.png"
         }
       ]
-    }
+    },
+    "accentColor": "#5873b8"
   },
   "sombra": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/sombra.webp",
@@ -3328,7 +3370,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/28a09178c65bff6e100c872bf029d5c8f98f13f57679ad793b30782546eb027b.png"
         }
       ]
-    }
+    },
+    "accentColor": "#9d5cf0"
   },
   "symmetra": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/symmetra.webp",
@@ -3399,7 +3442,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/2bec4e3cd61b5516075b478abdb34676bd458579ab1764699a1ab106a1dbaefb.png"
         }
       ]
-    }
+    },
+    "accentColor": "#5fc6dc"
   },
   "torbjorn": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/torbjorn.webp",
@@ -3475,7 +3519,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/c6eb6f52be58ddb12bf57b744d374f00871fd0068345e61b0c962eb04c0901b5.png"
         }
       ]
-    }
+    },
+    "accentColor": "#d06a4a"
   },
   "tracer": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/tracer.webp",
@@ -3546,7 +3591,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/ace0ed5106148847a2b2f4dfcee58b883ed38bb2851ccbd106528f4ddea6cf41.png"
         }
       ]
-    }
+    },
+    "accentColor": "#ff9c2a"
   },
   "vendetta": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/vendetta.webp",
@@ -3627,7 +3673,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/6f16af6f1ddffb07db1c5885caf9ed63754c025d0ad7d0be09d7b45908fad80e.png"
         }
       ]
-    }
+    },
+    "accentColor": "#c0303f"
   },
   "venture": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/venture.webp",
@@ -3698,7 +3745,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/bd3a6e0335e5c643bac274f1c7e6920712eb2844d2ef60e19434f1841990a238.png"
         }
       ]
-    }
+    },
+    "accentColor": "#e0a84d"
   },
   "widowmaker": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/widowmaker.webp",
@@ -3769,7 +3817,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/0643cb690b369b1c2bcaab485ea20113ad629755c37bf2e14b7beb9b470cddba.png"
         }
       ]
-    }
+    },
+    "accentColor": "#a05fc0"
   },
   "winston": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/winston.webp",
@@ -3840,7 +3889,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/92c7620c5f92eb1eabb51b9ffeeab93e6be9e0966e7981b3cf515f3fe6ae27ae.png"
         }
       ]
-    }
+    },
+    "accentColor": "#7d9fd6"
   },
   "wrecking-ball": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/wrecking-ball.webp",
@@ -3921,7 +3971,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/91c944d1e02f4bf1619b3b2f81d4af774a08c61d2974ee956e501dfc21a20f41.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f0a540"
   },
   "wuyang": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/wuyang.webp",
@@ -3997,7 +4048,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/b4b736a801ab836d8c66825bb8dfc7051333b54f42406ef79520c11d43159a7a.png"
         }
       ]
-    }
+    },
+    "accentColor": "#3fa7d6"
   },
   "zarya": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/zarya.webp",
@@ -4073,7 +4125,8 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/7592ce85cb4ce0f6bc90aeca6da706a2e73dcc42f31372553c8fa44c501931ea.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f070b0"
   },
   "zenyatta": {
     "fullPortrait": "https://tonikiraw.com/assets/img/heroes-full/zenyatta.webp",
@@ -4149,6 +4202,7 @@ export const OVERWATCH_HERO_KITS: Record<string, HeroKitData> = {
           "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/9898f52ec09a2846050183112728e3baa06bd46061897644db6423f357486628.png"
         }
       ]
-    }
+    },
+    "accentColor": "#f0d860"
   }
 };

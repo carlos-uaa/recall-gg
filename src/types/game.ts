@@ -26,6 +26,7 @@ export interface HeroPerkItem {
 }
 
 export interface HeroKitData {
+  accentColor: string;
   fullPortrait: string;
   hitpoints: {
     health: number;

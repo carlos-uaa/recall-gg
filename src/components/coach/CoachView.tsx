@@ -909,8 +909,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 {OVERWATCH_HEROES.filter(
                   h => h.role === activeSlotTarget.role && h.name.toLowerCase().includes(searchFilter.toLowerCase())
                 ).map(hero => {
+                  const targetSlot = allySlots.find(s => s.id === activeSlotTarget.slotId);
                   const isTaken = activeSlotTarget.team === 'ally'
-                    ? allyHeroIds.includes(hero.id)
+                    ? allyHeroIds.includes(hero.id) || (!targetSlot?.isMyPick && hero.id === playerHeroId)
                     : enemyHeroIds.includes(hero.id);
 
                   return (
@@ -918,7 +919,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       key={hero.id}
                       disabled={isTaken}
                       onClick={() => assignHeroToSlot(hero.id)}
-                      className={`relative p-3 rounded-2xl border flex items-center space-x-3 transition text-left group ${
+                      className={`relative p-3 rounded-2xl border flex items-center space-x-3 transition text-left group overflow-hidden ${
                         isTaken
                           ? 'opacity-35 grayscale cursor-not-allowed border-slate-800 bg-slate-900/40'
                           : isDark
@@ -926,17 +927,32 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                           : 'bg-slate-50 border-slate-200 hover:bg-orange-50 hover:border-orange-400'
                       }`}
                     >
-                      {isTaken && (
-                        <div className="absolute top-1 right-1">
+                      {/* Top-right corner style pill */}
+                      {isTaken ? (
+                        <div className="absolute top-1.5 right-1.5">
                           <Lock className="w-3.5 h-3.5 text-slate-500" />
                         </div>
+                      ) : (
+                        <span
+                          className={`absolute top-0 right-0 px-1.5 py-0.5 rounded-bl-lg text-[8px] font-mono font-black uppercase leading-none border-b border-l ${
+                            hero.style === 'dive'
+                              ? 'bg-purple-950/90 text-purple-200 border-purple-500/40'
+                              : hero.style === 'brawl'
+                              ? 'bg-amber-950/90 text-amber-200 border-amber-500/40'
+                              : 'bg-cyan-950/90 text-cyan-200 border-cyan-500/40'
+                          }`}
+                        >
+                          {hero.style}
+                        </span>
                       )}
                       <HeroAvatar hero={hero} size="sm" />
-                      <div className="truncate">
-                        <div className="text-xs font-bold text-white group-hover:text-orange-400 transition truncate">
+                      <div className="truncate pr-4">
+                        <div className={`text-xs font-bold group-hover:text-orange-500 transition truncate ${
+                          isDark ? 'text-white' : 'text-slate-900'
+                        }`}>
                           {hero.name}
                         </div>
-                        <div className="text-[10px] text-slate-400 uppercase font-mono">
+                        <div className="text-[10px] text-slate-400 uppercase font-mono truncate">
                           {hero.subrole}
                         </div>
                       </div>

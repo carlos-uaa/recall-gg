@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import type { Hero, HeroAbilityItem, HeroPerkItem } from '../../types/game';
 import { HeroSelectScreen } from '../coach/HeroSelectScreen';
-import { TRANSLATIONS, type Language } from '../../utils/i18n';
+import type { Language } from '../../utils/i18n';
 import {
   Shield,
-  Swords,
-  Heart,
   Crosshair,
   Zap,
   Sparkles,
@@ -18,6 +16,8 @@ import {
   Calendar,
   CheckCircle2,
   AlertOctagon,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 interface HeroesViewProps {
@@ -25,7 +25,6 @@ interface HeroesViewProps {
   theme?: 'dark' | 'light';
 }
 
-// Official-style Overwatch Role Emblem SVG (Tank shield / Damage 3-rounds / Support cross)
 const RoleEmblem: React.FC<{ role: Hero['role']; className?: string }> = ({ role, className = 'w-6 h-6' }) => {
   if (role === 'tank') {
     return (
@@ -37,7 +36,7 @@ const RoleEmblem: React.FC<{ role: Hero['role']; className?: string }> = ({ role
   if (role === 'damage') {
     return (
       <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-        <path d="M6.5 4C5.7 4 5 5.3 5 7v5h3V7c0-1.7-.7-3-1.5-3zM5 13.5V19h3v-5.5H5zm7-9.5c-.8 0-1.5 1.3-1.5 3v5h3V7c0-1.7-.7-3-1.5-3zm-1.5 9.5V19h3v-5.5h-3zm7-9.5c-.8 0-1.5 1.3-1.5 3v5h3V7c0-1.7-.7-3-1.5-3zM16 13.5V19h3v-5.5h-3z" />
+        <path d="M6.5 4C5.7 4 5 5.3 5 7v5h3V7c0-1.7-.7-3-1.5-3zM5 13.5V19h3v-5.5H5zm7-9.5c-.8 0-1.5 1.3-1.5 3v5h3V7c0-1.7-.7-3-1.5-3zm-1.5 9.5V19h3v-5.5h-3zm7-9.5c-.8 0-1.5 1.5-1.5 3v5h3V7c0-1.7-.7-3-1.5-3zM16 13.5V19h3v-5.5h-3z" />
       </svg>
     );
   }
@@ -48,12 +47,12 @@ const RoleEmblem: React.FC<{ role: Hero['role']; className?: string }> = ({ role
   );
 };
 
-// Circular double-ring icon badge (always dark interior so official white Blizzard PNG icons stay crisp in both themes)
 const KitIconBadge: React.FC<{
   iconUrl?: string;
   fallbackType: 'weapon' | 'ult' | 'ability' | 'passive' | 'perk' | 'role-tank' | 'role-damage' | 'role-support';
   accent?: boolean;
-}> = ({ iconUrl, fallbackType, accent = false }) => {
+  heroColor: string;
+}> = ({ iconUrl, fallbackType, accent = false, heroColor }) => {
   const [imgErr, setImgErr] = useState(false);
 
   const renderFallback = () => {
@@ -61,33 +60,40 @@ const KitIconBadge: React.FC<{
     if (fallbackType === 'role-damage') return <RoleEmblem role="damage" className="w-6 h-6 text-white" />;
     if (fallbackType === 'role-support') return <RoleEmblem role="support" className="w-6 h-6 text-white" />;
     if (fallbackType === 'weapon') return <Crosshair className="w-6 h-6 text-white" />;
-    if (fallbackType === 'ult') return <Flame className="w-6 h-6 text-cyan-300" />;
-    if (fallbackType === 'perk') return <Sparkles className="w-5 h-5 text-cyan-300" />;
+    if (fallbackType === 'ult') return <Flame className="w-6 h-6 text-white" />;
+    if (fallbackType === 'perk') return <Sparkles className="w-5 h-5 text-white" />;
     if (fallbackType === 'passive') return <Shield className="w-5 h-5 text-white" />;
     return <Zap className="w-5 h-5 text-white" />;
   };
 
   return (
     <div
-      className={`relative flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full p-0.5 flex items-center justify-center shadow-md ${
+      style={
         accent
-          ? 'bg-gradient-to-br from-cyan-300 to-teal-500 shadow-cyan-500/25'
-          : 'bg-gradient-to-br from-slate-300/80 to-slate-500/80'
-      }`}
+          ? {
+              background: `linear-gradient(135deg, color-mix(in oklab, ${heroColor} 80%, white), ${heroColor})`,
+              boxShadow: `0 6px 18px color-mix(in oklab, ${heroColor} 38%, transparent)`,
+            }
+          : {
+              background: `linear-gradient(135deg, color-mix(in oklab, ${heroColor} 45%, #cbd5e1), color-mix(in oklab, ${heroColor} 25%, #475569))`,
+            }
+      }
+      className="relative flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full p-0.5 flex items-center justify-center shadow-md transition-all duration-300 group-hover/item:scale-105"
     >
       <div
-        className={`w-full h-full rounded-full flex items-center justify-center border ${
+        style={
           accent
-            ? 'bg-slate-950 border-cyan-400/60'
-            : 'bg-slate-900 border-slate-600/80'
-        }`}
+            ? { borderColor: `color-mix(in oklab, ${heroColor} 70%, white)` }
+            : { borderColor: `color-mix(in oklab, ${heroColor} 35%, #475569)` }
+        }
+        className="w-full h-full rounded-full flex items-center justify-center border bg-slate-950"
       >
         {iconUrl && !imgErr ? (
           <img
             src={iconUrl}
             alt=""
+            decoding="async"
             className="w-7 h-7 sm:w-8 sm:h-8 object-contain brightness-110"
-            loading="lazy"
             onError={() => setImgErr(true)}
           />
         ) : (
@@ -99,15 +105,38 @@ const KitIconBadge: React.FC<{
 };
 
 export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme = 'dark' }) => {
-  const t = TRANSLATIONS[language];
   const isDark = theme === 'dark';
 
   const [selectedHeroId, setSelectedHeroId] = useState<string>('freja');
+  const [portraitLoaded, setPortraitLoaded] = useState<boolean>(false);
 
+  const selectedIndex = OVERWATCH_HEROES.findIndex(h => h.id === selectedHeroId);
   const selectedHero: Hero =
-    OVERWATCH_HEROES.find(h => h.id === selectedHeroId) || OVERWATCH_HEROES[0];
+    selectedIndex >= 0 ? OVERWATCH_HEROES[selectedIndex] : OVERWATCH_HEROES[0];
 
   const kit = OVERWATCH_HERO_KITS[selectedHero.id];
+  const heroColor = kit?.accentColor || '#38bdf8';
+
+  // Reset smooth fade state and preload neighbor heroes so Prev/Next & browsing are instant
+  useEffect(() => {
+    setPortraitLoaded(false);
+    if (typeof window === 'undefined') return;
+    const prevIdx = (selectedIndex - 1 + OVERWATCH_HEROES.length) % OVERWATCH_HEROES.length;
+    const nextIdx = (selectedIndex + 1) % OVERWATCH_HEROES.length;
+    [OVERWATCH_HEROES[prevIdx]?.id, OVERWATCH_HEROES[nextIdx]?.id].forEach(nid => {
+      const nkit = nid ? OVERWATCH_HERO_KITS[nid] : undefined;
+      if (nkit?.fullPortrait) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = nkit.fullPortrait;
+      }
+    });
+  }, [selectedHero.id, selectedIndex]);
+
+  const stepHero = (delta: number) => {
+    const nextIdx = (selectedIndex + delta + OVERWATCH_HEROES.length) % OVERWATCH_HEROES.length;
+    setSelectedHeroId(OVERWATCH_HEROES[nextIdx].id);
+  };
 
   const hp = kit?.hitpoints || { health: 250, armor: 0, shields: 0, total: 250 };
   const healthPct = Math.round((hp.health / hp.total) * 100);
@@ -134,6 +163,17 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
     })
     .slice(0, 6);
 
+  // Readable dynamic heading color using color-mix in oklab (maintains strong contrast in both Light and Dark mode)
+  const sectionTitleColor = isDark
+    ? `color-mix(in oklab, ${heroColor} 78%, white)`
+    : `color-mix(in oklab, ${heroColor} 72%, #0f172a)`;
+
+  const panelBorderColor = isDark
+    ? `color-mix(in oklab, ${heroColor} 58%, #1e293b)`
+    : `color-mix(in oklab, ${heroColor} 65%, #cbd5e1)`;
+
+  const stripGradient = `linear-gradient(180deg, color-mix(in oklab, ${heroColor} 75%, white), ${heroColor}, color-mix(in oklab, ${heroColor} 82%, black))`;
+
   const renderKitItem = (
     item: HeroAbilityItem | HeroPerkItem,
     fallbackType: 'weapon' | 'ult' | 'ability' | 'passive' | 'perk',
@@ -146,16 +186,23 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
     else if (item.name.startsWith('ROL: APOYO')) resolvedFallback = 'role-support';
 
     return (
-      <div key={item.name} className="flex items-start gap-3.5">
+      <div
+        key={item.name}
+        className={`group/item flex items-start gap-3.5 p-2 -m-2 rounded-xl transition ${
+          isDark ? 'hover:bg-white/[0.03]' : 'hover:bg-slate-900/[0.03]'
+        }`}
+      >
         <KitIconBadge
           iconUrl={item.icon}
           fallbackType={resolvedFallback}
           accent={accent}
+          heroColor={heroColor}
         />
         <div className="min-w-0 flex-1 pt-0.5">
           <h4
+            style={accent ? { color: sectionTitleColor } : undefined}
             className={`text-xs sm:text-sm font-black uppercase tracking-wide leading-tight ${
-              isDark ? 'text-white' : 'text-slate-900'
+              !accent ? (isDark ? 'text-white' : 'text-slate-900') : ''
             }`}
           >
             {item.name}
@@ -174,71 +221,122 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
 
   return (
     <div className="space-y-6">
-      {/* 1. COMPACT OVERWATCH HERO SELECTOR (IDENTICAL STYLE TO TACTICAL COACH) */}
+      {/* 1. COMPACT OVERWATCH HERO SELECTOR WITH HOVER PRELOADING & HERO SIGNATURE HIGHLIGHT */}
       <HeroSelectScreen
         selectedHeroId={selectedHeroId}
         onSelectHero={setSelectedHeroId}
         theme={theme}
         title={language === 'es' ? 'GALERÍA DE HÉROES — SELECCIONA UN PERSONAJE' : 'HERO GALLERY — SELECT A CHARACTER'}
         hideRoleLock={true}
+        preloadFullKits={true}
+        accentColor={heroColor}
       />
 
-      {/* 2. OFFICIAL OVERWATCH 2 INFOGRAPHIC HERO CARD (CONTAINER-QUERY ADAPTIVE) */}
+      {/* 2. OFFICIAL OVERWATCH 2 INFOGRAPHIC HERO CARD WITH DYNAMIC HERO SIGNATURE COLOR */}
       <article
-        style={{ containerType: 'inline-size' }}
-        className={`relative rounded-3xl border overflow-hidden shadow-2xl transition-colors duration-200 ${
-          isDark
-            ? 'bg-[#12161f] border-slate-800 text-white'
-            : 'bg-white border-slate-200 text-slate-900'
+        style={
+          {
+            containerType: 'inline-size',
+            '--hero-color': heroColor,
+            borderColor: panelBorderColor,
+            boxShadow: isDark
+              ? `0 24px 60px -15px color-mix(in oklab, ${heroColor} 24%, black)`
+              : `0 20px 50px -15px color-mix(in oklab, ${heroColor} 22%, #64748b)`,
+          } as React.CSSProperties
+        }
+        className={`relative rounded-3xl border-2 overflow-hidden transition-all duration-300 ${
+          isDark ? 'bg-[#111520] text-white' : 'bg-white text-slate-900'
         }`}
       >
-        {/* Subtle decorative background geometric pattern & cyan arc */}
+        {/* Dynamic Hero Ambient Spotlight & Signature Geometric Arc */}
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute -left-24 top-28 w-[420px] h-[520px] rounded-full border-[26px] opacity-35 ${
-            isDark ? 'border-cyan-400/30' : 'border-cyan-400/40'
-          }`}
+          style={{
+            background: `radial-gradient(circle at 18% 35%, color-mix(in oklab, ${heroColor} ${isDark ? '24%' : '18%'}, transparent), transparent 62%)`,
+          }}
+          className="pointer-events-none absolute inset-0 transition-all duration-500"
         />
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 opacity-[0.03] ${
-            isDark ? 'bg-[radial-gradient(#38bdf8_1px,transparent_1px)]' : 'bg-[radial-gradient(#0284c7_1px,transparent_1px)]'
-          } [background-size:20px_20px]`}
+          style={{
+            borderColor: `color-mix(in oklab, ${heroColor} 40%, transparent)`,
+          }}
+          className="pointer-events-none absolute -left-24 top-24 w-[430px] h-[520px] rounded-full border-[26px] opacity-60 transition-colors duration-500"
         />
 
         <div className="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-6 p-5 sm:p-7 lg:p-8 items-stretch">
-          {/* LEFT SHOWCASE COLUMN: LOGO, GIANT HERO NAME, STATS & FULL-BODY RENDER */}
+          {/* LEFT SHOWCASE COLUMN */}
           <div className="xl:col-span-4 flex flex-col justify-between relative">
-            <header className="space-y-2 z-10">
-              {/* OVERWATCH 2 Header Badge */}
-              <div className="inline-flex items-center space-x-1.5 select-none">
-                <span
-                  className={`text-sm sm:text-base font-black uppercase tracking-[0.22em] ${
-                    isDark ? 'text-slate-100' : 'text-slate-800'
-                  }`}
-                >
-                  OVERWATCH
-                </span>
-                <span className="px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950 font-black text-xs sm:text-sm leading-none shadow-sm">
-                  2
-                </span>
+            <header className="space-y-2.5 z-10">
+              {/* Top Row: OVERWATCH 2 + Prev/Next Hero Switcher */}
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center space-x-1.5 select-none">
+                  <span
+                    className={`text-sm sm:text-base font-black uppercase tracking-[0.22em] ${
+                      isDark ? 'text-slate-100' : 'text-slate-800'
+                    }`}
+                  >
+                    OVERWATCH
+                  </span>
+                  <span
+                    style={{ backgroundColor: heroColor }}
+                    className="px-1.5 py-0.5 rounded text-slate-950 font-black text-xs sm:text-sm leading-none shadow-sm transition-colors duration-300"
+                  >
+                    2
+                  </span>
+                </div>
+
+                {/* Quick Prev / Next Hero Stepper */}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => stepHero(-1)}
+                    title="Héroe anterior"
+                    className={`p-1.5 rounded-lg border transition ${
+                      isDark
+                        ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
+                        : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => stepHero(1)}
+                    title="Siguiente héroe"
+                    className={`p-1.5 rounded-lg border transition ${
+                      isDark
+                        ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
+                        : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
-              {/* Giant Italic Hero Name + Role Circle Badge */}
+              {/* Giant Italic Hero Name in Hero Signature Gradient + Role Emblem */}
               <div className="flex items-center gap-3 flex-wrap">
                 <h1
-                  style={{ fontSize: 'clamp(2.35rem, 1.5rem + 3.6vw, 4.1rem)' }}
-                  className={`font-black italic uppercase leading-[0.92] tracking-tight bg-clip-text text-transparent ${
-                    isDark
-                      ? 'bg-gradient-to-b from-white via-cyan-100 to-cyan-300 drop-shadow-[0_4px_18px_rgba(34,211,238,0.2)]'
-                      : 'bg-gradient-to-b from-slate-900 via-slate-800 to-cyan-700'
-                  }`}
+                  style={{
+                    fontSize: 'clamp(2.35rem, 1.5rem + 3.6vw, 4.1rem)',
+                    backgroundImage: isDark
+                      ? `linear-gradient(180deg, #ffffff 10%, color-mix(in oklab, ${heroColor} 55%, white) 55%, ${heroColor} 100%)`
+                      : `linear-gradient(180deg, #0f172a 5%, color-mix(in oklab, ${heroColor} 75%, #0f172a) 100%)`,
+                    filter: isDark
+                      ? `drop-shadow(0 6px 20px color-mix(in oklab, ${heroColor} 32%, transparent))`
+                      : undefined,
+                  }}
+                  className="font-black italic uppercase leading-[0.92] tracking-tight bg-clip-text text-transparent transition-all duration-300"
                 >
                   {selectedHero.name}
                 </h1>
 
-                {/* Role Double-Ring Badge (like Freja's Damage circle) */}
                 <div
+                  style={{
+                    borderColor: heroColor,
+                    boxShadow: `0 0 16px color-mix(in oklab, ${heroColor} 35%, transparent)`,
+                  }}
                   title={
                     selectedHero.role === 'tank'
                       ? 'Rol: Tanque'
@@ -246,26 +344,26 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                       ? 'Rol: Daño (DPS)'
                       : 'Rol: Apoyo'
                   }
-                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 p-0.5 flex items-center justify-center flex-shrink-0 ${
-                    isDark
-                      ? 'border-white/80 bg-slate-900/90 text-white'
-                      : 'border-slate-800 bg-slate-900 text-white'
-                  }`}
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 p-0.5 flex items-center justify-center flex-shrink-0 bg-slate-950 text-white transition-all duration-300"
                 >
-                  <div className="w-full h-full rounded-full border border-white/40 flex items-center justify-center">
+                  <div
+                    style={{ borderColor: `color-mix(in oklab, ${heroColor} 55%, white)` }}
+                    className="w-full h-full rounded-full border flex items-center justify-center"
+                  >
                     <RoleEmblem role={selectedHero.role} className="w-6 h-6" />
                   </div>
                 </div>
               </div>
 
-              {/* Tactical Pills: Subrole, Style, Tier & Difficulty */}
+              {/* Tactical Pills */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
                 <span
-                  className={`text-[10px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full border ${
-                    isDark
-                      ? 'bg-cyan-500/15 text-cyan-300 border-cyan-400/40'
-                      : 'bg-cyan-50 text-cyan-800 border-cyan-300'
-                  }`}
+                  style={{
+                    color: sectionTitleColor,
+                    borderColor: `color-mix(in oklab, ${heroColor} 50%, transparent)`,
+                    backgroundColor: `color-mix(in oklab, ${heroColor} 14%, transparent)`,
+                  }}
+                  className="text-[10px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full border transition-colors duration-300"
                 >
                   {selectedHero.subrole}
                 </span>
@@ -286,7 +384,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 >
                   {selectedHero.style}
                 </span>
-                <span className="text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-full bg-orange-500 text-white shadow-sm">
+                <span
+                  style={{ backgroundColor: heroColor }}
+                  className="text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-full text-slate-950 shadow-sm"
+                >
                   Tier {selectedHero.tier || 'B'}
                 </span>
                 <span
@@ -315,7 +416,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               >
                 <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase mb-1.5">
                   <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-                    SALUD TOTAL: <strong className="text-cyan-400 text-xs">{hp.total} HP</strong>
+                    SALUD TOTAL:{' '}
+                    <strong style={{ color: sectionTitleColor }} className="text-xs">
+                      {hp.total} HP
+                    </strong>
                   </span>
                   <span className="text-slate-400">
                     {hp.health} Vida
@@ -343,19 +447,46 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               </div>
             </header>
 
-            {/* Full-Body Hero Render */}
-            <div className="relative my-3 flex-1 min-h-[280px] sm:min-h-[360px] flex items-end justify-center overflow-hidden">
+            {/* Full-Body Hero Render with High Fetch Priority & Instant Shimmer Fallback */}
+            <div className="relative my-3 flex-1 min-h-[290px] sm:min-h-[370px] flex items-end justify-center overflow-hidden">
+              {!portraitLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <div
+                    style={{
+                      borderColor: heroColor,
+                      boxShadow: `0 0 40px color-mix(in oklab, ${heroColor} 45%, transparent)`,
+                    }}
+                    className="w-24 h-24 rounded-full border-2 overflow-hidden animate-pulse bg-slate-900/60"
+                  >
+                    <img
+                      src={selectedHero.icon}
+                      alt=""
+                      className="w-full h-full object-cover opacity-80"
+                    />
+                  </div>
+                </div>
+              )}
+
               <img
                 key={selectedHero.id}
                 src={kit?.fullPortrait || selectedHero.icon}
                 alt={selectedHero.name}
-                style={{ aspectRatio: '4 / 5' }}
+                fetchPriority="high"
+                decoding="async"
+                style={{
+                  aspectRatio: '4 / 5',
+                  filter: `drop-shadow(0 18px 28px rgba(0,0,0,0.55)) drop-shadow(0 0 26px color-mix(in oklab, ${heroColor} 25%, transparent))`,
+                }}
+                onLoad={() => setPortraitLoaded(true)}
                 onError={(e) => {
+                  setPortraitLoaded(true);
                   if (selectedHero.icon && e.currentTarget.src !== selectedHero.icon) {
                     e.currentTarget.src = selectedHero.icon;
                   }
                 }}
-                className="max-h-[430px] w-auto object-contain object-bottom drop-shadow-[0_18px_28px_rgba(0,0,0,0.55)] transition-transform duration-300 hover:scale-[1.03]"
+                className={`max-h-[430px] w-auto object-contain object-bottom transition-all duration-300 hover:scale-[1.03] ${
+                  portraitLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                }`}
               />
             </div>
 
@@ -370,7 +501,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               <p className="leading-relaxed text-[11px] sm:text-xs">{selectedHero.description}</p>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 border-t border-slate-700/30 text-[10px] font-mono text-slate-400">
                 <span className="inline-flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-cyan-400" />
+                  <MapPin style={{ color: sectionTitleColor }} className="w-3 h-3" />
                   {selectedHero.country}
                 </span>
                 <span className="inline-flex items-center gap-1">
@@ -389,29 +520,28 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           <div className="xl:col-span-8 flex flex-col gap-5 justify-between">
             {/* PANEL 1: ABILITY KIT */}
             <section
-              className={`rounded-2xl border-2 overflow-hidden flex flex-col sm:flex-row flex-1 shadow-lg ${
-                isDark
-                  ? 'bg-[#1a202c]/90 border-cyan-400/50'
-                  : 'bg-slate-50/90 border-cyan-500/60'
+              style={{ borderColor: panelBorderColor }}
+              className={`rounded-2xl border-2 overflow-hidden flex flex-col sm:flex-row flex-1 shadow-lg transition-colors duration-300 ${
+                isDark ? 'bg-[#171c28]/90' : 'bg-slate-50/90'
               }`}
             >
-              {/* Left Vertical Cyan Strip ("ABILITY KIT") */}
-              <div className="bg-gradient-to-b from-cyan-300 via-cyan-400 to-teal-400 text-slate-950 px-3 py-2 sm:py-6 flex items-center justify-center sm:w-10 flex-shrink-0">
+              {/* Left Vertical Dynamic Hero Color Strip ("KIT DE HABILIDADES") */}
+              <div
+                style={{ background: stripGradient }}
+                className="text-slate-950 px-3 py-2 sm:py-6 flex items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
+              >
                 <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm sm:[writing-mode:vertical-rl] sm:rotate-180 select-none">
                   {language === 'es' ? 'KIT DE HABILIDADES' : 'ABILITY KIT'}
                 </span>
               </div>
 
-              {/* 2-Column Content Inside Ability Kit */}
               <div className="flex-1 p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Sub-column Left: WEAPON + ULTIMATE */}
                 <div className="space-y-6">
-                  {/* WEAPON */}
                   <div className="space-y-3.5">
                     <h3
-                      className={`text-xs sm:text-sm font-black uppercase tracking-[0.14em] ${
-                        isDark ? 'text-cyan-300' : 'text-cyan-700'
-                      }`}
+                      style={{ color: sectionTitleColor }}
+                      className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
                       {language === 'es' ? 'ARMA' : 'WEAPON'}
                     </h3>
@@ -420,12 +550,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     </div>
                   </div>
 
-                  {/* ULTIMATE */}
-                  <div className="space-y-3.5 pt-2 border-t border-slate-700/30">
+                  <div className="space-y-3.5 pt-3 border-t border-slate-700/30">
                     <h3
-                      className={`text-xs sm:text-sm font-black uppercase tracking-[0.14em] ${
-                        isDark ? 'text-cyan-300' : 'text-cyan-700'
-                      }`}
+                      style={{ color: sectionTitleColor }}
+                      className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
                       {language === 'es' ? 'DEFINITIVA' : 'ULTIMATE'}
                     </h3>
@@ -437,13 +565,11 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
 
                 {/* Sub-column Right: ABILITIES + PASSIVES */}
                 <div className="space-y-6">
-                  {/* ABILITIES */}
                   {kit?.abilities && kit.abilities.length > 0 && (
                     <div className="space-y-3.5">
                       <h3
-                        className={`text-xs sm:text-sm font-black uppercase tracking-[0.14em] ${
-                          isDark ? 'text-cyan-300' : 'text-cyan-700'
-                        }`}
+                        style={{ color: sectionTitleColor }}
+                        className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                       >
                         {language === 'es' ? 'HABILIDADES' : 'ABILITIES'}
                       </h3>
@@ -453,12 +579,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     </div>
                   )}
 
-                  {/* PASSIVES */}
-                  <div className="space-y-3.5 pt-2 border-t border-slate-700/30">
+                  <div className="space-y-3.5 pt-3 border-t border-slate-700/30">
                     <h3
-                      className={`text-xs sm:text-sm font-black uppercase tracking-[0.14em] ${
-                        isDark ? 'text-cyan-300' : 'text-cyan-700'
-                      }`}
+                      style={{ color: sectionTitleColor }}
+                      className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
                       {language === 'es' ? 'PASIVAS' : 'PASSIVES'}
                     </h3>
@@ -472,26 +596,26 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
 
             {/* PANEL 2: PERKS (MINOR LEVEL 2 & MAJOR LEVEL 3) */}
             <section
-              className={`rounded-2xl border-2 overflow-hidden flex flex-col sm:flex-row shadow-lg ${
-                isDark
-                  ? 'bg-[#1a202c]/90 border-cyan-400/50'
-                  : 'bg-slate-50/90 border-cyan-500/60'
+              style={{ borderColor: panelBorderColor }}
+              className={`rounded-2xl border-2 overflow-hidden flex flex-col sm:flex-row shadow-lg transition-colors duration-300 ${
+                isDark ? 'bg-[#171c28]/90' : 'bg-slate-50/90'
               }`}
             >
-              {/* Left Vertical Cyan Strip ("PERKS") */}
-              <div className="bg-gradient-to-b from-cyan-300 via-cyan-400 to-teal-400 text-slate-950 px-3 py-2 sm:py-6 flex items-center justify-center sm:w-10 flex-shrink-0">
+              {/* Left Vertical Dynamic Hero Color Strip ("PERKS") */}
+              <div
+                style={{ background: stripGradient }}
+                className="text-slate-950 px-3 py-2 sm:py-6 flex items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
+              >
                 <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm sm:[writing-mode:vertical-rl] sm:rotate-180 select-none">
                   PERKS
                 </span>
               </div>
 
               <div className="flex-1 p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* MINOR (LEVEL 2) */}
                 <div className="space-y-3.5">
                   <h3
-                    className={`text-xs sm:text-sm font-black uppercase tracking-[0.14em] ${
-                      isDark ? 'text-cyan-300' : 'text-cyan-700'
-                    }`}
+                    style={{ color: sectionTitleColor }}
+                    className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                   >
                     {language === 'es' ? 'MENOR (NIVEL 2)' : 'MINOR (LEVEL 2)'}
                   </h3>
@@ -500,12 +624,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                   </div>
                 </div>
 
-                {/* MAJOR (LEVEL 3) */}
                 <div className="space-y-3.5">
                   <h3
-                    className={`text-xs sm:text-sm font-black uppercase tracking-[0.14em] ${
-                      isDark ? 'text-cyan-300' : 'text-cyan-700'
-                    }`}
+                    style={{ color: sectionTitleColor }}
+                    className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                   >
                     {language === 'es' ? 'MAYOR (NIVEL 3)' : 'MAJOR (LEVEL 3)'}
                   </h3>
@@ -518,19 +640,16 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           </div>
         </div>
 
-        {/* 3. BOTTOM QUICK MATCHUPS STRIP (CLICK ANY HERO TO JUMP DIRECTLY TO THEIR KIT CARD!) */}
+        {/* 3. BOTTOM QUICK MATCHUPS STRIP */}
         <footer
           className={`relative z-10 border-t px-5 sm:px-8 py-4 grid grid-cols-1 md:grid-cols-2 gap-4 ${
             isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-100/80 border-slate-200'
           }`}
         >
-          {/* Strong Against Quick Chips */}
           <div>
             <div className="flex items-center space-x-1.5 text-xs font-black uppercase tracking-wider text-emerald-500 mb-2">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>
-                Favorable contra ({selectedHero.counters.strongAgainst.length})
-              </span>
+              <span>Favorable contra ({selectedHero.counters.strongAgainst.length})</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {topStrong.map(target => {
@@ -554,6 +673,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     <img
                       src={target.icon}
                       alt=""
+                      loading="lazy"
                       className="w-5 h-5 rounded-full object-cover"
                     />
                     <span>{target.name}</span>
@@ -568,13 +688,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
             </div>
           </div>
 
-          {/* Weak Against Quick Chips */}
           <div>
             <div className="flex items-center space-x-1.5 text-xs font-black uppercase tracking-wider text-rose-500 mb-2">
               <AlertOctagon className="w-3.5 h-3.5" />
-              <span>
-                Sufre contra / Counters ({selectedHero.counters.weakAgainst.length})
-              </span>
+              <span>Sufre contra / Counters ({selectedHero.counters.weakAgainst.length})</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {topWeak.map(threat => {
@@ -598,6 +715,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     <img
                       src={threat.icon}
                       alt=""
+                      loading="lazy"
                       className="w-5 h-5 rounded-full object-cover"
                     />
                     <span>{threat.name}</span>
