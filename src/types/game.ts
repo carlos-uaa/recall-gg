@@ -51,6 +51,9 @@ export interface HeroPerkItem {
   name: string;
   description: string;
   icon?: string;
+  pickRate?: number; // Porcentaje de selección en competitivo/ladder (0 a 100)
+  proPick?: boolean; // Verdadero si es la selección prioritaria de profesionales (OWCS / Top 500)
+  proReason?: string; // Justificación táctica de por qué los profesionales la eligen
 }
 
 export interface HeroKitData {

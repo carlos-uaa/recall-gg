@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import { getHeroMapBreakdown } from '../../games/overwatch/mapSynergies';
+import { getEnrichedHeroPerks } from '../../games/overwatch/heroPerksMeta';
 import type { Hero, HeroAbilityItem, HeroPerkItem } from '../../types/game';
 import { HeroSelectScreen } from '../coach/HeroSelectScreen';
 import { useFavoriteHeroes } from '../../utils/favorites';
@@ -120,6 +121,11 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
   const kit = OVERWATCH_HERO_KITS[selectedHero.id];
   const heroColor = kit?.accentColor || '#38bdf8';
 
+  const enrichedPerks = useMemo(
+    () => getEnrichedHeroPerks(selectedHero.id, kit?.perks),
+    [selectedHero.id, kit?.perks]
+  );
+
   // Reset smooth fade state and preload neighbor heroes so Prev/Next & browsing are instant
   useEffect(() => {
     setPortraitLoaded(false);
@@ -219,6 +225,269 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           >
             {item.description}
           </p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPerkTier = (
+    tierTitle: string,
+    tierSubtitle: string,
+    perks: HeroPerkItem[],
+    isMajor: boolean
+  ) => {
+    const p0 = perks[0];
+    const p1 = perks[1];
+    const p0Rate = p0?.pickRate ?? 50;
+    const p1Rate = p1?.pickRate ?? 50;
+
+    return (
+      <div className="space-y-3.5">
+        {/* Tier Header with Pro Meta and Pick Rate Legend */}
+        <div className="flex items-center justify-between flex-wrap gap-2 pb-1 border-b border-slate-700/20">
+          <div>
+            <h3
+              style={{ color: sectionTitleColor }}
+              className="text-xs sm:text-sm font-black uppercase tracking-[0.14em] flex items-center gap-1.5"
+            >
+              <span>{tierTitle}</span>
+              {isMajor && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  {language === 'es' ? 'MAYOR' : 'MAJOR'}
+                </span>
+              )}
+            </h3>
+            <p className="text-[10px] text-slate-400">
+              {tierSubtitle}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 text-[10px] font-mono">
+            <span className="inline-flex items-center gap-1 text-amber-400 font-bold">
+              <Star className="w-3 h-3 fill-amber-400" />
+              {language === 'es' ? 'Meta Pro' : 'Pro Meta'}
+            </span>
+            <span className="text-slate-500">·</span>
+            <span className="text-slate-400">
+              {language === 'es' ? '% Selección' : 'Pick Rate'}
+            </span>
+          </div>
+        </div>
+
+        {/* Comparative Popularity Bar (Perk 1 vs Perk 2) */}
+        {p0 && p1 && (
+          <div
+            className={`p-2.5 rounded-xl border space-y-1.5 transition-colors ${
+              isDark ? 'bg-slate-900/70 border-slate-800' : 'bg-white/90 border-slate-200'
+            }`}
+          >
+            <div className="flex items-center justify-between text-[11px] font-mono font-bold">
+              <div className="flex items-center gap-1.5 truncate max-w-[48%]">
+                {p0.proPick && (
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0 animate-pulse" />
+                )}
+                <span
+                  className={`truncate ${
+                    p0.proPick
+                      ? 'text-amber-400 font-black'
+                      : isDark
+                      ? 'text-slate-200'
+                      : 'text-slate-700'
+                  }`}
+                >
+                  {p0.name}
+                </span>
+                <span
+                  style={{
+                    color: p0.proPick
+                      ? '#f59e0b'
+                      : isDark
+                      ? '#38bdf8'
+                      : '#0284c7',
+                  }}
+                  className="text-xs font-black"
+                >
+                  {p0Rate}%
+                </span>
+              </div>
+
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-1">
+                VS
+              </span>
+
+              <div className="flex items-center justify-end gap-1.5 truncate max-w-[48%]">
+                <span
+                  style={{
+                    color: p1.proPick
+                      ? '#f59e0b'
+                      : isDark
+                      ? '#c084fc'
+                      : '#9333ea',
+                  }}
+                  className="text-xs font-black"
+                >
+                  {p1Rate}%
+                </span>
+                <span
+                  className={`truncate ${
+                    p1.proPick
+                      ? 'text-amber-400 font-black'
+                      : isDark
+                      ? 'text-slate-200'
+                      : 'text-slate-700'
+                  }`}
+                >
+                  {p1.name}
+                </span>
+                {p1.proPick && (
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0 animate-pulse" />
+                )}
+              </div>
+            </div>
+
+            {/* Semantic Accessible Progressbar Container */}
+            <div
+              role="progressbar"
+              aria-label={`${tierTitle}: ${p0.name} (${p0Rate}%) vs ${p1.name} (${p1Rate}%)`}
+              aria-valuenow={p0Rate}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="w-full h-2 rounded-full overflow-hidden flex gap-0.5 bg-slate-800/80 p-0.5"
+            >
+              <div
+                style={{ width: `${p0Rate}%` }}
+                className={`h-full rounded-l-full transition-all duration-500 ${
+                  p0.proPick
+                    ? 'bg-gradient-to-r from-amber-500 to-yellow-400 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                    : 'bg-gradient-to-r from-sky-500 to-cyan-400'
+                }`}
+              />
+              <div
+                style={{ width: `${p1Rate}%` }}
+                className={`h-full rounded-r-full transition-all duration-500 ${
+                  p1.proPick
+                    ? 'bg-gradient-to-r from-yellow-400 to-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                    : 'bg-gradient-to-r from-purple-500 to-indigo-400'
+                }`}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Perk Cards */}
+        <div className="space-y-3">
+          {perks.map((p, idx) => {
+            const isPro = !!p.proPick;
+            const rate = p.pickRate ?? (idx === 0 ? 55 : 45);
+            const isPopular = rate >= 50;
+
+            return (
+              <div
+                key={p.name}
+                className={`relative rounded-xl border p-3 sm:p-3.5 transition-all duration-300 ${
+                  isPro
+                    ? isDark
+                      ? 'bg-gradient-to-br from-amber-950/30 via-[#181d2c] to-[#141824] border-amber-500/60 shadow-[0_0_20px_rgba(245,158,11,0.15)] ring-1 ring-amber-400/40'
+                      : 'bg-gradient-to-br from-amber-50/90 via-white to-white border-amber-400 shadow-sm ring-1 ring-amber-400/50'
+                    : isDark
+                    ? 'bg-slate-900/60 border-slate-800/90 hover:border-slate-700'
+                    : 'bg-white/80 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                {/* Header Row: Pro Pick Badge & Pick Rate Pill */}
+                <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {isPro ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
+                        <Star className="w-3 h-3 fill-slate-950 text-slate-950" />
+                        {language === 'es' ? '★ ELECCIÓN PRO (OWCS / T500)' : '★ PRO PICK (OWCS / T500)'}
+                      </span>
+                    ) : isPopular ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-orange-500/15 text-orange-400 border border-orange-500/30">
+                        <Flame className="w-2.5 h-2.5" />
+                        {language === 'es' ? 'Más Popular en Ladder' : 'Most Popular in Ladder'}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-slate-500/15 text-slate-400 border border-slate-500/30">
+                        {language === 'es' ? 'Alternativa Táctica' : 'Tactical Alternative'}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Pick Rate Pill */}
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`text-[11px] font-mono font-black px-2 py-0.5 rounded-md ${
+                        isPro
+                          ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                          : isPopular
+                          ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
+                          : isDark
+                          ? 'bg-slate-800 text-slate-400 border border-slate-700'
+                          : 'bg-slate-100 text-slate-600 border border-slate-300'
+                      }`}
+                    >
+                      {rate}% {language === 'es' ? 'selección general' : 'pick rate'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Perk Content (Icon, Name, Description) */}
+                <div className="flex items-start gap-3">
+                  <KitIconBadge
+                    iconUrl={p.icon}
+                    fallbackType="perk"
+                    accent={isPro}
+                    heroColor={isPro ? '#f59e0b' : heroColor}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h4
+                      className={`text-xs sm:text-sm font-black uppercase tracking-wide leading-tight flex items-center gap-1.5 ${
+                        isPro
+                          ? 'text-amber-400'
+                          : isDark
+                          ? 'text-white'
+                          : 'text-slate-900'
+                      }`}
+                    >
+                      <span>{p.name}</span>
+                      {isPro && (
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 flex-shrink-0" />
+                      )}
+                    </h4>
+                    <p
+                      className={`text-[11px] sm:text-xs leading-snug mt-1 ${
+                        isDark ? 'text-slate-300' : 'text-slate-600'
+                      }`}
+                    >
+                      {p.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tactical Pro Rationale Pill (Highlighting WHY pros use this over the popular choice) */}
+                {isPro && p.proReason && (
+                  <div
+                    className={`mt-2.5 p-2 rounded-lg border text-[11px] leading-relaxed flex items-start gap-2 ${
+                      isDark
+                        ? 'bg-amber-950/35 border-amber-500/35 text-amber-200'
+                        : 'bg-amber-50 border-amber-300 text-amber-950'
+                    }`}
+                  >
+                    <Star className="w-3.5 h-3.5 flex-shrink-0 fill-amber-400 text-amber-400 mt-0.5" />
+                    <div>
+                      <strong className="font-bold uppercase tracking-wider text-[10px] block text-amber-400 dark:text-amber-300 mb-0.5">
+                        {language === 'es'
+                          ? '¿Por qué lo eligen los profesionales?'
+                          : 'Why do pros choose this?'}
+                      </strong>
+                      <span>{p.proReason}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -657,29 +926,19 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               </div>
 
               <div className="flex-1 p-3.5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                <div className="space-y-3 sm:space-y-3.5">
-                  <h3
-                    style={{ color: sectionTitleColor }}
-                    className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
-                  >
-                    {language === 'es' ? 'MENOR (NIVEL 2)' : 'MINOR (LEVEL 2)'}
-                  </h3>
-                  <div className="space-y-3.5 sm:space-y-4">
-                    {(kit?.perks.minor || []).map(p => renderKitItem(p, 'perk', false))}
-                  </div>
-                </div>
+                {renderPerkTier(
+                  language === 'es' ? 'MENOR (NIVEL 2)' : 'MINOR (LEVEL 2)',
+                  language === 'es' ? 'Elige 1 de 2 talentos en combate' : 'Choose 1 of 2 combat perks',
+                  enrichedPerks.minor,
+                  false
+                )}
 
-                <div className="space-y-3 sm:space-y-3.5">
-                  <h3
-                    style={{ color: sectionTitleColor }}
-                    className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
-                  >
-                    {language === 'es' ? 'MAYOR (NIVEL 3)' : 'MAJOR (LEVEL 3)'}
-                  </h3>
-                  <div className="space-y-3.5 sm:space-y-4">
-                    {(kit?.perks.major || []).map(p => renderKitItem(p, 'perk', true))}
-                  </div>
-                </div>
+                {renderPerkTier(
+                  language === 'es' ? 'MAYOR (NIVEL 3)' : 'MAJOR (LEVEL 3)',
+                  language === 'es' ? 'Elige 1 de 2 talentos avanzados' : 'Choose 1 of 2 advanced perks',
+                  enrichedPerks.major,
+                  true
+                )}
               </div>
             </section>
           </div>
