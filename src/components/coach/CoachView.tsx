@@ -642,20 +642,42 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <div className={`rounded-2xl p-4 border transition ${
               isDark ? 'bg-slate-900/60 border-rose-500/30' : 'bg-rose-50/70 border-rose-200'
             }`}>
-              <div className="flex items-center space-x-2 text-rose-500 font-bold text-xs mb-2.5">
-                <AlertOctagon className="w-4 h-4" />
-                <span>Counters rivales que te amenazan ({playerPickDiagnosis.directThreats.length})</span>
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center space-x-2 text-rose-500 font-bold text-xs">
+                  <AlertOctagon className="w-4 h-4" />
+                  <span>Counters rivales que te amenazan ({playerPickDiagnosis.directThreats.length})</span>
+                </div>
+                {playerPickDiagnosis.hardThreats.length > 0 && (
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40">
+                    {playerPickDiagnosis.hardThreats.length} crítico{playerPickDiagnosis.hardThreats.length > 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {playerPickDiagnosis.directThreats.length > 0 ? (
-                  playerPickDiagnosis.directThreats.map(threat => (
-                    <div key={threat.id} className={`flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border ${
-                      isDark ? 'bg-slate-800 border-rose-500/30 text-rose-300' : 'bg-white border-rose-300 text-rose-900 shadow-sm'
-                    }`}>
-                      <HeroAvatar hero={threat} size="xs" />
-                      <span className="text-xs font-semibold">{threat.name}</span>
-                    </div>
-                  ))
+                  playerPickDiagnosis.directThreats.map(threat => {
+                    const isHard = playerPickDiagnosis.hardThreats.some(h => h.id === threat.id);
+                    const motivo = playerHero.counters.weakDetails?.[threat.id]?.motivo || threat.counters.strongDetails?.[playerHero.id]?.motivo;
+                    return (
+                      <div
+                        key={threat.id}
+                        title={motivo ? `${threat.name}: ${motivo}` : undefined}
+                        className={`flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border transition ${
+                          isHard
+                            ? 'bg-rose-950/60 border-rose-500/70 text-rose-200 ring-1 ring-rose-500/40 shadow-sm'
+                            : isDark ? 'bg-slate-800 border-rose-500/30 text-rose-300' : 'bg-white border-rose-300 text-rose-900 shadow-sm'
+                        }`}
+                      >
+                        <HeroAvatar hero={threat} size="xs" />
+                        <span className="text-xs font-semibold">{threat.name}</span>
+                        {isHard && (
+                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-500 text-white font-black">
+                            ★ DURO
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })
                 ) : (
                   <span className="text-xs text-emerald-500 font-medium italic">
                     ¡Ningún héroe rival te hace counter directo en este momento!
@@ -668,20 +690,42 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <div className={`rounded-2xl p-4 border transition ${
               isDark ? 'bg-slate-900/60 border-emerald-500/30' : 'bg-emerald-50/70 border-emerald-200'
             }`}>
-              <div className="flex items-center space-x-2 text-emerald-500 font-bold text-xs mb-2.5">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Objetivos a los que dominas ({playerPickDiagnosis.favorableTargets.length})</span>
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center space-x-2 text-emerald-500 font-bold text-xs">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Objetivos a los que dominas ({playerPickDiagnosis.favorableTargets.length})</span>
+                </div>
+                {playerPickDiagnosis.hardTargets.length > 0 && (
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                    {playerPickDiagnosis.hardTargets.length} duro{playerPickDiagnosis.hardTargets.length > 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {playerPickDiagnosis.favorableTargets.length > 0 ? (
-                  playerPickDiagnosis.favorableTargets.map(target => (
-                    <div key={target.id} className={`flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border ${
-                      isDark ? 'bg-slate-800 border-emerald-500/30 text-emerald-300' : 'bg-white border-emerald-300 text-emerald-900 shadow-sm'
-                    }`}>
-                      <HeroAvatar hero={target} size="xs" />
-                      <span className="text-xs font-semibold">{target.name}</span>
-                    </div>
-                  ))
+                  playerPickDiagnosis.favorableTargets.map(target => {
+                    const isHard = playerPickDiagnosis.hardTargets.some(h => h.id === target.id);
+                    const motivo = playerHero.counters.strongDetails?.[target.id]?.motivo;
+                    return (
+                      <div
+                        key={target.id}
+                        title={motivo ? `${target.name}: ${motivo}` : undefined}
+                        className={`flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border transition ${
+                          isHard
+                            ? 'bg-emerald-950/60 border-emerald-500/70 text-emerald-200 ring-1 ring-emerald-500/40 shadow-sm'
+                            : isDark ? 'bg-slate-800 border-emerald-500/30 text-emerald-300' : 'bg-white border-emerald-300 text-emerald-900 shadow-sm'
+                        }`}
+                      >
+                        <HeroAvatar hero={target} size="xs" />
+                        <span className="text-xs font-semibold">{target.name}</span>
+                        {isHard && (
+                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500 text-slate-950 font-black">
+                            ★ DURO
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })
                 ) : (
                   <span className="text-xs text-slate-400 italic">
                     Enfócate en desgastar escudos o coordinar con tus tanques.

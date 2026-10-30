@@ -3,7 +3,7 @@ import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import type { Hero } from '../../types/game';
 import { HeroAvatar } from '../common/HeroAvatar';
 import { TRANSLATIONS, type Language } from '../../utils/i18n';
-import { Swords, Sparkles, CheckCircle2, AlertOctagon, Zap, Star } from 'lucide-react';
+import { Swords, Sparkles, CheckCircle2, AlertOctagon, Zap, Star, ShieldAlert, Award, MessageSquare } from 'lucide-react';
 
 interface CountersViewProps {
   language?: Language;
@@ -19,13 +19,36 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
 
   const selectedHero: Hero = OVERWATCH_HEROES.find(h => h.id === selectedHeroId) || OVERWATCH_HEROES[0];
 
+  // Divide strong against into Hard and Soft counters
   const strongAgainstHeroes = OVERWATCH_HEROES.filter(h => selectedHero.counters.strongAgainst.includes(h.id));
+  const hardStrongAgainstHeroes = OVERWATCH_HEROES.filter(h => selectedHero.counters.hardStrongAgainst?.includes(h.id));
+  const softStrongAgainstHeroes = strongAgainstHeroes.filter(h => !selectedHero.counters.hardStrongAgainst?.includes(h.id));
+
+  // Divide weak against into Hard and Soft counters
   const weakAgainstHeroes = OVERWATCH_HEROES.filter(h => selectedHero.counters.weakAgainst.includes(h.id));
+  const hardWeakAgainstHeroes = OVERWATCH_HEROES.filter(h => selectedHero.counters.hardWeakAgainst?.includes(h.id));
+  const softWeakAgainstHeroes = weakAgainstHeroes.filter(h => !selectedHero.counters.hardWeakAgainst?.includes(h.id));
+
   const synergyHeroes = OVERWATCH_HEROES.filter(h => selectedHero.synergies.includes(h.id));
 
   const filteredRoster = OVERWATCH_HEROES.filter(h =>
     h.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const getTierColor = (tier: string = 'B') => {
+    switch (tier) {
+      case 'S':
+        return 'bg-rose-500 text-white border-rose-400 shadow-rose-500/30';
+      case 'A':
+        return 'bg-orange-500 text-white border-orange-400 shadow-orange-500/30';
+      case 'B':
+        return 'bg-amber-500 text-slate-900 border-amber-400 font-black';
+      case 'C':
+        return 'bg-emerald-600 text-white border-emerald-500';
+      default:
+        return 'bg-slate-700 text-slate-300 border-slate-600';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -35,19 +58,19 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
       }`}>
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-2">
           <Swords className="w-4 h-4" />
-          <span>MATRIZ DE ENFRENTAMIENTOS & COUNTERS</span>
+          <span>MATRIZ DE ENFRENTAMIENTOS & COUNTERS OFICIALES</span>
         </div>
         <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
           {t.countersTitle}
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          {t.countersSubtitle}
+          {t.countersSubtitle} — Basado en las 201 reglas dictadas por semi-profesionales, con distinción de counters duros y consejos directos.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Quick Hero Picker List */}
-        <div className={`border rounded-3xl p-4 shadow-lg flex flex-col h-[650px] transition ${
+        <div className={`border rounded-3xl p-4 shadow-lg flex flex-col h-[700px] transition ${
           isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'
         }`}>
           <div className="mb-3">
@@ -75,15 +98,20 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                     : isDark ? 'bg-slate-800/60 hover:bg-slate-800 text-slate-300' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'
                 }`}
               >
-                <div className="flex items-center space-x-2.5">
+                <div className="flex items-center space-x-2.5 truncate">
                   <HeroAvatar hero={hero} size="xs" />
-                  <span className="text-xs">{hero.name}</span>
+                  <span className="text-xs truncate">{hero.name}</span>
                 </div>
-                <span className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded ${
-                  hero.id === selectedHeroId ? 'bg-black/20 text-white' : 'bg-slate-900 text-slate-400'
-                }`}>
-                  {hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
-                </span>
+                <div className="flex items-center space-x-1.5 flex-shrink-0">
+                  <span className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded ${
+                    hero.id === selectedHeroId ? 'bg-black/20 text-white' : 'bg-slate-900 text-slate-400'
+                  }`}>
+                    {hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
+                  </span>
+                  <span className={`text-[9px] font-mono font-black px-1.5 py-0.5 rounded ${getTierColor(hero.tier)}`}>
+                    {hero.tier || 'B'}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -106,9 +134,12 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                     <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono uppercase">
                       {selectedHero.role === 'damage' ? 'DPS' : selectedHero.role === 'tank' ? 'Tanque' : 'Apoyo'}
                     </span>
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-black border shadow-sm ${getTierColor(selectedHero.tier)}`}>
+                      Tier {selectedHero.tier || 'B'}
+                    </span>
                   </div>
                   <div className="text-xs text-slate-400 mt-1">
-                    Estilo: <span className="text-emerald-400 font-bold uppercase">{selectedHero.style}</span> • Alcance: {selectedHero.range} • {selectedHero.country}
+                    Subrol: <span className="text-orange-400 font-bold">{selectedHero.subrole}</span> • Estilo: <span className="text-emerald-400 font-bold uppercase">{selectedHero.style}</span> • {selectedHero.country}
                   </div>
                 </div>
               </div>
@@ -139,6 +170,23 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
               {selectedHero.description}
             </p>
 
+            {/* Tactical Advice Box (Cómo hacerle counter / Consejo semi-pro) */}
+            {selectedHero.counterAdvice && (
+              <div className={`mt-4 p-4 rounded-2xl border transition flex items-start space-x-3 ${
+                isDark ? 'bg-amber-500/10 border-amber-500/30 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'
+              }`}>
+                <MessageSquare className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs font-black uppercase tracking-wide text-amber-400 mb-1">
+                    Consejos del Coach: Cómo jugarle en contra a {selectedHero.name}
+                  </div>
+                  <p className="text-xs leading-relaxed opacity-95">
+                    "{selectedHero.counterAdvice}"
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Perks list */}
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="text-xs font-semibold text-slate-400 mr-1 flex items-center">
@@ -160,28 +208,64 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
             <div className={`border rounded-3xl p-5 shadow-lg transition ${
               isDark ? 'bg-slate-900/70 border-emerald-500/30' : 'bg-white border-emerald-200'
             }`}>
-              <div className="flex items-center space-x-2 text-emerald-400 font-bold text-sm mb-2">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{t.strongAgainst} ({strongAgainstHeroes.length})</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2 text-emerald-400 font-bold text-sm">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{t.strongAgainst} ({strongAgainstHeroes.length})</span>
+                </div>
+                {hardStrongAgainstHeroes.length > 0 && (
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                    {hardStrongAgainstHeroes.length} duro{hardStrongAgainstHeroes.length > 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
               <p className="text-[11px] text-slate-400 mb-3">
                 Tu kit ofrece ventajas tácticas directas para cazar o neutralizar a estos objetivos:
               </p>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
                 {strongAgainstHeroes.length > 0 ? (
-                  strongAgainstHeroes.map(h => (
-                    <div key={h.id} className="p-2 rounded-2xl bg-slate-800/80 border border-emerald-500/20 flex items-center space-x-2.5">
-                      <HeroAvatar hero={h} size="xs" />
-                      <div className="truncate">
-                        <div className="font-semibold text-xs text-white truncate">{h.name}</div>
-                        <div className="text-[10px] text-slate-400 uppercase font-mono">{h.role}</div>
+                  strongAgainstHeroes.map(h => {
+                    const detail = selectedHero.counters.strongDetails?.[h.id];
+                    const isHard = detail?.hard || selectedHero.counters.hardStrongAgainst?.includes(h.id);
+
+                    return (
+                      <div
+                        key={h.id}
+                        className={`p-2.5 rounded-2xl border transition flex flex-col justify-between ${
+                          isHard
+                            ? 'bg-emerald-950/40 border-emerald-500/50 shadow-sm shadow-emerald-500/20 ring-1 ring-emerald-500/30'
+                            : isDark ? 'bg-slate-800/80 border-emerald-500/20' : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2.5">
+                            <HeroAvatar hero={h} size="xs" />
+                            <div>
+                              <div className="font-bold text-xs text-white flex items-center space-x-1.5">
+                                <span>{h.name}</span>
+                                {isHard && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500 text-slate-950 font-black">
+                                    ★ HARD
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[10px] text-slate-400 uppercase font-mono">{h.role} • {h.subrole}</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {detail?.motivo && (
+                          <div className="mt-2 pt-1.5 border-t border-emerald-500/20 text-[11px] text-emerald-300 italic">
+                            "{detail.motivo}"
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
-                  <div className="col-span-2 text-xs text-slate-400 italic p-3 text-center bg-slate-800/40 rounded-xl">
-                    Héroe neutral / basado en utilidad situacional.
+                  <div className="text-xs text-slate-400 italic p-3 text-center bg-slate-800/40 rounded-xl">
+                    Héroe neutral / enfocado en utilidad situacional y sinergias.
                   </div>
                 )}
               </div>
@@ -191,28 +275,64 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
             <div className={`border rounded-3xl p-5 shadow-lg transition ${
               isDark ? 'bg-slate-900/70 border-rose-500/30' : 'bg-white border-rose-200'
             }`}>
-              <div className="flex items-center space-x-2 text-rose-400 font-bold text-sm mb-2">
-                <AlertOctagon className="w-4 h-4" />
-                <span>{t.weakAgainst} ({weakAgainstHeroes.length})</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2 text-rose-400 font-bold text-sm">
+                  <AlertOctagon className="w-4 h-4" />
+                  <span>{t.weakAgainst} ({weakAgainstHeroes.length})</span>
+                </div>
+                {hardWeakAgainstHeroes.length > 0 && (
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40">
+                    {hardWeakAgainstHeroes.length} duro{hardWeakAgainstHeroes.length > 1 ? 's' : ''}
+                  </span>
+                )}
               </div>
               <p className="text-[11px] text-slate-400 mb-3">
-                Si el equipo rival tiene 2 o más de estos picks, considera cambiar de personaje:
+                Si el equipo rival cuenta con estos personajes, tu efectividad caerá drásticamente:
               </p>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
                 {weakAgainstHeroes.length > 0 ? (
-                  weakAgainstHeroes.map(h => (
-                    <div key={h.id} className="p-2 rounded-2xl bg-slate-800/80 border border-rose-500/20 flex items-center space-x-2.5">
-                      <HeroAvatar hero={h} size="xs" />
-                      <div className="truncate">
-                        <div className="font-semibold text-xs text-white truncate">{h.name}</div>
-                        <div className="text-[10px] text-slate-400 uppercase font-mono">{h.role}</div>
+                  weakAgainstHeroes.map(h => {
+                    const detail = selectedHero.counters.weakDetails?.[h.id];
+                    const isHard = detail?.hard || selectedHero.counters.hardWeakAgainst?.includes(h.id);
+
+                    return (
+                      <div
+                        key={h.id}
+                        className={`p-2.5 rounded-2xl border transition flex flex-col justify-between ${
+                          isHard
+                            ? 'bg-rose-950/40 border-rose-500/50 shadow-sm shadow-rose-500/20 ring-1 ring-rose-500/30'
+                            : isDark ? 'bg-slate-800/80 border-rose-500/20' : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2.5">
+                            <HeroAvatar hero={h} size="xs" />
+                            <div>
+                              <div className="font-bold text-xs text-white flex items-center space-x-1.5">
+                                <span>{h.name}</span>
+                                {isHard && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-500 text-white font-black">
+                                    ★ HARD
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[10px] text-slate-400 uppercase font-mono">{h.role} • {h.subrole}</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {detail?.motivo && (
+                          <div className="mt-2 pt-1.5 border-t border-rose-500/20 text-[11px] text-rose-300 italic">
+                            "{detail.motivo}"
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
-                  <div className="col-span-2 text-xs text-slate-400 italic p-3 text-center bg-slate-800/40 rounded-xl">
-                    Sin counters duros directos en el meta actual.
+                  <div className="text-xs text-slate-400 italic p-3 text-center bg-slate-800/40 rounded-xl">
+                    ¡Sin counters directos en el meta actual!
                   </div>
                 )}
               </div>

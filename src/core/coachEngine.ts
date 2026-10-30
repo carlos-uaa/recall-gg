@@ -9,6 +9,27 @@ interface CoachOptions {
   rankTier: RankTier;
 }
 
+// Special pairs verified from Toniki / competitive meta
+const PERFECT_PAIRS: Array<{ a: string; b: string; bonus: number; reason: string }> = [
+  { a: 'zarya', b: 'reaper', bonus: 22, reason: 'Zarya le pone burbujas a Reaper y hacen un combo devastador' },
+  { a: 'zarya', b: 'vendetta', bonus: 22, reason: 'Zarya le pone burbujas a Vendetta y hacen un combo muy bueno' },
+  { a: 'pharah', b: 'mercy', bonus: 20, reason: 'Pocket aéreo permanente con amplificación de daño' },
+  { a: 'echo', b: 'mercy', bonus: 18, reason: 'Pocket aéreo letal con resurrección y amplificación de daño' },
+  { a: 'freja', b: 'mercy', bonus: 18, reason: 'Pocket aéreo para virote automático constante' },
+  { a: 'genji', b: 'ana', bonus: 18, reason: 'Combo Nano-Blade con el potencial más alto de exterminio' },
+  { a: 'reinhardt', b: 'lucio', bonus: 18, reason: 'Speed boost vital para cerrar distancias con el martillo' },
+  { a: 'wuyang', b: 'jetpack-cat', bonus: 16, reason: 'Doble soporte hidro-aéreo con rotación constante de recursos' },
+  { a: 'doctrine', b: 'genji', bonus: 16, reason: 'Drones vigorizantes e Infuse potencian los dashes de Genji' },
+  { a: 'doctrine', b: 'vendetta', bonus: 16, reason: 'Infuse potencia los tajos constantes de Vendetta' },
+  { a: 'sombra', b: 'tracer', bonus: 16, reason: 'Coordinación de dive letal contra soportes enemigos' },
+  { a: 'kiriko', b: 'roadhog', bonus: 16, reason: 'Suzu de protección le limpia la anticuración a Roadhog' },
+  { a: 'kiriko', b: 'mauga', bonus: 16, reason: 'Suzu de protección le limpia la anticuración a Mauga' },
+];
+
+const ANTI_SYNERGIES: Array<{ a: string; b: string; penalty: number; reason: string }> = [
+  { a: 'lucio', b: 'juno', penalty: 16, reason: 'No combinan bien: dos aceleradores de velocidad desaprovechan recursos' },
+];
+
 export function calculateRecommendations(options: CoachOptions): RecommendationResult[] {
   const { role = 'all', gameMap, allyHeroIds, enemyHeroIds, rankTier } = options;
 
@@ -38,42 +59,89 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
     const pros: string[] = [];
     const cons: string[] = [];
 
-    // 1. Counter Matchups vs Enemy Team (Base: 50% weight)
+    // 0. Base Meta Tier Points (PESOS.tier from Toniki: S=7, A=6, B=5, C=4, D=3)
+    let tierBaseScore = 0;
+    const tier = hero.tier || 'B';
+    if (tier === 'S') {
+      tierBaseScore = 14;
+      pros.push(`Héroe Tier S en el meta actual (máxima prioridad competitiva)`);
+    } else if (tier === 'A') {
+      tierBaseScore = 10;
+      pros.push(`Tier A: Pick muy sólido y consistente en el parche actual`);
+    } else if (tier === 'B') {
+      tierBaseScore = 6;
+    } else if (tier === 'C') {
+      tierBaseScore = 2;
+      cons.push(`Tier C: Rendimiento situacional en este meta`);
+    } else {
+      tierBaseScore = -4;
+      cons.push(`Tier D: Requiere condiciones muy favorables para brillar`);
+    }
+
+    // 1. Counter Matchups vs Enemy Team (Toniki counter / counterHard weights)
     let rawCounterScore = 0;
     enemyHeroes.forEach(enemy => {
-      const weCounterEnemy = hero.counters.strongAgainst.includes(enemy.id);
-      const enemyCountersUs = hero.counters.weakAgainst.includes(enemy.id) || enemy.counters.strongAgainst.includes(hero.id);
+      const isHardStrong = hero.counters.hardStrongAgainst?.includes(enemy.id);
+      const isSoftStrong = hero.counters.strongAgainst.includes(enemy.id);
+      const strongMotivo = hero.counters.strongDetails?.[enemy.id]?.motivo;
 
-      if (weCounterEnemy) {
-        rawCounterScore += 22;
-        pros.push(`Excelente counter contra ${enemy.name}`);
+      const isHardWeak = hero.counters.hardWeakAgainst?.includes(enemy.id) || enemy.counters.hardStrongAgainst?.includes(hero.id);
+      const isSoftWeak = hero.counters.weakAgainst.includes(enemy.id) || enemy.counters.strongAgainst.includes(hero.id);
+      const weakMotivo = hero.counters.weakDetails?.[enemy.id]?.motivo || enemy.counters.strongDetails?.[hero.id]?.motivo;
+
+      if (isHardStrong) {
+        rawCounterScore += 26;
+        pros.push(strongMotivo ? `★ Counter duro de ${enemy.name}: "${strongMotivo}"` : `★ Counter duro directo contra ${enemy.name}`);
+      } else if (isSoftStrong) {
+        rawCounterScore += 16;
+        pros.push(strongMotivo ? `Favorable contra ${enemy.name}: ${strongMotivo}` : `Favorable contra el kit de ${enemy.name}`);
       }
-      if (enemyCountersUs) {
-        rawCounterScore -= 24;
-        cons.push(`Sufre fuertemente contra el kit de ${enemy.name}`);
+
+      if (isHardWeak) {
+        rawCounterScore -= 26;
+        cons.push(weakMotivo ? `★ ${enemy.name} es tu counter duro: "${weakMotivo}"` : `★ ${enemy.name} es counter duro directo y anula tu kit`);
+      } else if (isSoftWeak) {
+        rawCounterScore -= 16;
+        cons.push(weakMotivo ? `Desfavorable contra ${enemy.name}: ${weakMotivo}` : `Desfavorable frente a ${enemy.name}`);
       }
     });
 
     // 2. Synergy with Ally Team
     let rawSynergyScore = 0;
     allyHeroes.forEach(ally => {
-      if (hero.synergies.includes(ally.id)) {
+      // Check for Anti-Synergies
+      const anti = ANTI_SYNERGIES.find(
+        p => (p.a === hero.id && p.b === ally.id) || (p.b === hero.id && p.a === ally.id)
+      );
+      if (anti) {
+        rawSynergyScore -= anti.penalty;
+        cons.push(anti.reason);
+      }
+
+      // Check for Perfect Pairs
+      const perfect = PERFECT_PAIRS.find(
+        p => (p.a === hero.id && p.b === ally.id) || (p.b === hero.id && p.a === ally.id)
+      );
+      if (perfect) {
+        rawSynergyScore += perfect.bonus;
+        pros.push(`Sinergia perfecta con ${ally.name}: ${perfect.reason}`);
+      } else if (hero.synergies.includes(ally.id)) {
         rawSynergyScore += 12;
         pros.push(`Gran sinergia con ${ally.name}`);
       }
     });
 
     if (dominantAllyStyle && hero.style === dominantAllyStyle && maxStyleCount >= 2) {
-      rawSynergyScore += 10;
-      pros.push(`Encaja con el arquetipo de equipo (${hero.style.toUpperCase()})`);
+      rawSynergyScore += 8;
+      pros.push(`Encaja con el estilo del equipo (${hero.style.toUpperCase()})`);
     }
 
     // 3. Map & Mode Fit
     let rawMapScore = 0;
     if (gameMap) {
       if (gameMap.favoredStyles.includes(hero.style)) {
-        rawMapScore += 15;
-        pros.push(`Favorable en ${gameMap.name} por su estilo ${hero.style}`);
+        rawMapScore += 12;
+        pros.push(`Favorable en ${gameMap.name} por su estilo ${hero.style.toUpperCase()}`);
       }
 
       if (gameMap.longSightlines && (hero.range === 'Largo' || hero.range === 'Medio')) {
@@ -107,19 +175,19 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
       }
     }
 
-    // Normalized Total Score (Target 0 - 100)
-    let totalScore = 50 + rawCounterScore + rawSynergyScore + rawMapScore + rankModifier;
-    totalScore = Math.max(12, Math.min(99, Math.round(totalScore)));
+    // Normalized Total Score (Target 10 - 99)
+    let totalScore = 48 + tierBaseScore + rawCounterScore + rawSynergyScore + rawMapScore + rankModifier;
+    totalScore = Math.max(10, Math.min(99, Math.round(totalScore)));
 
     let tacticalVerdict = '';
-    if (totalScore >= 80) {
-      tacticalVerdict = `Pick dominante: Castiga la alineación enemiga y potencia la composición de tu equipo.`;
-    } else if (totalScore >= 65) {
-      tacticalVerdict = `Sólida elección: Tiene ventajas tácticas claras si juegas coordinado con tus aliados.`;
-    } else if (totalScore >= 45) {
+    if (totalScore >= 82) {
+      tacticalVerdict = `Pick dominante: Destruye la composición enemiga y maximiza las sinergias de tu equipo.`;
+    } else if (totalScore >= 68) {
+      tacticalVerdict = `Sólida elección: Tiene ventajas tácticas claras y buena presencia en el mapa.`;
+    } else if (totalScore >= 48) {
       tacticalVerdict = `Elección neutral: Viable, pero dependerá fuertemente de tu ejecución individual.`;
     } else {
-      tacticalVerdict = `Riesgo alto: La composición rival o el mapa tienen herramientas directas para anularte.`;
+      tacticalVerdict = `Riesgo alto: La composición rival o el mapa tienen counters directos para anularte.`;
     }
 
     return {
@@ -145,11 +213,14 @@ export interface PlayerHeroDiagnosis {
   score: number;
   verdict: string;
   directThreats: Hero[];
+  hardThreats: Hero[];
   favorableTargets: Hero[];
+  hardTargets: Hero[];
   recommendedSwitches: Array<{
     hero: Hero;
     score: number;
     reason: string;
+    hardCounteredThreats: string[];
   }>;
 }
 
@@ -177,21 +248,28 @@ export function analyzePlayerPick(
   const currentPickData = allRoleRecommendations.find(r => r.hero.id === playerHeroId);
   const currentScore = currentPickData ? currentPickData.totalScore : 50;
 
-  // Identify direct enemy threats and favorable targets
+  // Identify direct and hard enemy threats
   const directThreats = enemyHeroes.filter(
     enemy => playerHero.counters.weakAgainst.includes(enemy.id) || enemy.counters.strongAgainst.includes(playerHero.id)
   );
+  const hardThreats = enemyHeroes.filter(
+    enemy => playerHero.counters.hardWeakAgainst?.includes(enemy.id) || enemy.counters.hardStrongAgainst?.includes(playerHero.id)
+  );
 
+  // Identify favorable and hard targets
   const favorableTargets = enemyHeroes.filter(
     enemy => playerHero.counters.strongAgainst.includes(enemy.id)
   );
+  const hardTargets = enemyHeroes.filter(
+    enemy => playerHero.counters.hardStrongAgainst?.includes(enemy.id)
+  );
 
   let verdict = '';
-  if (currentScore >= 78) {
+  if (currentScore >= 80) {
     verdict = `¡Excelente elección! Tu ${playerHero.name} tiene ventaja táctica directa frente a la composición enemiga.`;
-  } else if (currentScore >= 60) {
+  } else if (currentScore >= 62) {
     verdict = `Elección viable. Puedes sacar buen valor si te mantienes coordinado y juegas con tu equipo.`;
-  } else if (currentScore >= 45) {
+  } else if (currentScore >= 46) {
     verdict = `Situación neutral/compleja. Si el equipo rival presiona con sus picks clave, empezarás a sufrir desgaste.`;
   } else {
     verdict = `⚠️ Elección de alto riesgo. La alineación enemiga cuenta con counters directos que anulan tu impacto. Se sugiere cambio urgente.`;
@@ -203,17 +281,24 @@ export function analyzePlayerPick(
     .slice(0, 3)
     .map(alt => {
       let reason = `Ofrece mayor impacto táctico (+${alt.totalScore - currentScore} pts)`;
-      // Check which enemy threat this alternative counter-attacks
-      const counteredThreats = directThreats.filter(threat => alt.hero.counters.strongAgainst.includes(threat.id));
-      if (counteredThreats.length > 0) {
-        reason = `Destruye a ${counteredThreats.map(t => t.name).join(' y ')}, que actualmente te anulan`;
+      
+      // Check which enemy threat this alternative counter-attacks (prioritizing hard counters)
+      const hardCounteredThreats = hardThreats.filter(threat => alt.hero.counters.strongAgainst.includes(threat.id)).map(t => t.name);
+      const softCounteredThreats = directThreats.filter(threat => alt.hero.counters.strongAgainst.includes(threat.id)).map(t => t.name);
+
+      if (hardCounteredThreats.length > 0) {
+        reason = `Destruye a ${hardCounteredThreats.join(' y ')}, que actualmente te hacen counter duro`;
+      } else if (softCounteredThreats.length > 0) {
+        reason = `Gana ventaja sobre ${softCounteredThreats.join(' y ')}, frenando la presión enemiga`;
       } else if (alt.pros.length > 0) {
         reason = alt.pros[0];
       }
+
       return {
         hero: alt.hero,
         score: alt.totalScore,
         reason,
+        hardCounteredThreats
       };
     });
 
@@ -222,7 +307,9 @@ export function analyzePlayerPick(
     score: currentScore,
     verdict,
     directThreats,
+    hardThreats,
     favorableTargets,
+    hardTargets,
     recommendedSwitches: alternativePicks,
   };
 }

@@ -6,6 +6,11 @@ export type GameId = 'overwatch' | 'valorant' | 'marvel-rivals';
 
 export type RankTier = 'bronze_gold' | 'plat_diamond' | 'master_top500';
 
+export interface CounterDetail {
+  hard: boolean;
+  motivo?: string;
+}
+
 export interface Hero {
   id: string;
   name: string;
@@ -21,10 +26,16 @@ export interface Hero {
   icon?: string;
   difficulty: 1 | 2 | 3; // 1: Fácil/Baja, 2: Media, 3: Alta (Widow, Tracer, Genji)
   description: string;
+  tier?: 'S' | 'A' | 'B' | 'C' | 'D';
+  counterAdvice?: string; // Consejo táctico de cómo hacerle counter
   perks: string[];
   counters: {
     strongAgainst: string[]; // Heroes this hero counters
     weakAgainst: string[];   // Heroes that counter this hero
+    hardStrongAgainst?: string[]; // Hard counters against targets
+    hardWeakAgainst?: string[];   // Hard countered by
+    strongDetails?: Record<string, CounterDetail>;
+    weakDetails?: Record<string, CounterDetail>;
   };
   synergies: string[];       // Heroes that work exceptionally well together
 }
