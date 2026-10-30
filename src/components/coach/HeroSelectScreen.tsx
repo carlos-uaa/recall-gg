@@ -3,6 +3,7 @@ import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import type { Hero, Role } from '../../types/game';
 import { Shield, Swords, Heart, Lock, Star, Zap, Flame, Crosshair } from 'lucide-react';
+import { useFavoriteHeroes } from '../../utils/favorites';
 
 interface HeroSelectScreenProps {
   selectedHeroId: string | null;
@@ -15,6 +16,8 @@ interface HeroSelectScreenProps {
   hideRoleLock?: boolean;
   preloadFullKits?: boolean;
   accentColor?: string;
+  favoriteHeroIds?: string[];
+  onToggleFavorite?: (heroId: string) => void;
 }
 
 const preloadedHeroIds = new Set<string>();
@@ -52,9 +55,16 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
   hideRoleLock = false,
   preloadFullKits = false,
   accentColor,
+  favoriteHeroIds: propFavs,
+  onToggleFavorite: propToggle,
 }) => {
   const isDark = theme === 'dark';
-  const [activeTab, setActiveTab] = useState<Role | 'all'>('all');
+  const hookFavs = useFavoriteHeroes();
+  const favoriteHeroIds = propFavs ?? hookFavs.favoriteHeroIds;
+  const toggleFavorite = propToggle ?? hookFavs.toggleFavorite;
+  const isFavorite = (id: string) => favoriteHeroIds.includes(id);
+
+  const [activeTab, setActiveTab] = useState<Role | 'all' | 'mains'>('all');
   const [roleQueueLocked, setRoleQueueLocked] = useState(false);
 
   // Group heroes by role for the authentic Overwatch select screen look
@@ -79,6 +89,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
     const isTakenByAlly = allyHeroIds.includes(hero.id) && !isSelected;
     const isLockedOut = roleQueueLocked && playerRole && playerRole !== hero.role;
     const isDisabled = isTakenByAlly || isLockedOut;
+    const isMain = isFavorite(hero.id);
     const heroHex = accentColor && isSelected ? accentColor : undefined;
 
     return (
@@ -104,9 +115,14 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                 borderColor: heroHex,
                 boxShadow: `0 0 0 2px ${heroHex}, 0 6px 16px color-mix(in oklab, ${heroHex} 45%, transparent)`,
               }
+            : isMain
+            ? {
+                borderColor: '#f59e0b',
+                boxShadow: '0 0 10px rgba(245, 158, 11, 0.45)',
+              }
             : undefined
         }
-        title={`${hero.name} • ${hero.subrole} • Composición ${hero.style.toUpperCase()}`}
+        title={`${hero.name} • ${hero.subrole} • ${isMain ? '★ TU MAIN • ' : ''}Composición ${hero.style.toUpperCase()}`}
         className={`group relative flex-shrink-0 w-11 sm:w-13 md:w-14 h-15 sm:h-17 md:h-18 rounded-md overflow-hidden border transition-all duration-150 select-none ${
           isSelected
             ? heroHex
@@ -114,6 +130,8 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
               : 'border-orange-500 ring-2 ring-orange-500 shadow-md shadow-orange-500/50 scale-110 z-20'
             : isDisabled
             ? 'opacity-30 grayscale border-slate-700/60 bg-slate-900 cursor-not-allowed'
+            : isMain
+            ? 'border-amber-400 bg-amber-950/20 shadow-md'
             : isDark
             ? 'border-slate-700/70 bg-slate-800/90 hover:border-orange-400 hover:scale-105 hover:z-10 shadow-sm'
             : 'border-slate-300 bg-slate-100 hover:border-orange-400 hover:scale-105 hover:z-10 shadow-sm'
@@ -127,7 +145,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
           className="w-full h-full object-cover object-top transition duration-200 group-hover:scale-105"
         />
 
-        {/* Top-Left Corner Flush Composition Badge (Symmetric with Top-Right Stars) */}
+        {/* Top-Left Corner Flush Composition & Difficulty Badge */}
         <span
           className={`absolute top-0 left-0 z-10 h-3.5 sm:h-4 px-1 rounded-br-md flex items-center justify-center gap-0.5 font-mono font-black text-[7.5px] sm:text-[8.5px] leading-none border-b border-r shadow-sm ${
             hero.style === 'dive'
@@ -139,13 +157,36 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
         >
           {renderStyleIcon(hero.style)}
           <span>{hero.style[0].toUpperCase()}</span>
+          <span className="text-amber-400 flex items-center ml-0.5">
+            {Array.from({ length: hero.difficulty }).map((_, i) => (
+              <Star key={i} className="w-1 h-1 fill-current" />
+            ))}
+          </span>
         </span>
 
-        {/* Top-Right Corner Flush Difficulty Stars */}
-        <span className="absolute top-0 right-0 z-10 h-3.5 sm:h-4 px-1 rounded-bl-md flex items-center justify-center gap-0.2 bg-black/75 border-b border-l border-white/15 text-amber-400 leading-none">
-          {Array.from({ length: hero.difficulty }).map((_, i) => (
-            <Star key={i} className="w-1.5 h-1.5 fill-current" />
-          ))}
+        {/* Top-Right Touch-Friendly Main/Favorite Star Button */}
+        <span
+          role="button"
+          tabIndex={0}
+          aria-label={isMain ? `Quitar ${hero.name} de tus Mains` : `Marcar ${hero.name} como Main`}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleFavorite(hero.id);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation();
+              toggleFavorite(hero.id);
+            }
+          }}
+          title={isMain ? '★ Es tu Main (Toca para desmarcar)' : '☆ Toca para marcar como Main'}
+          className={`absolute top-0 right-0 z-30 w-4.5 h-4.5 rounded-bl-md flex items-center justify-center cursor-pointer transition active:scale-125 ${
+            isMain
+              ? 'bg-amber-500 text-slate-950 shadow-md ring-1 ring-amber-300'
+              : 'bg-black/75 text-slate-400 hover:text-amber-400 border-b border-l border-white/15'
+          }`}
+        >
+          <Star className={`w-2.5 h-2.5 ${isMain ? 'fill-current text-slate-950' : 'fill-none'}`} />
         </span>
 
         {/* Lock Overlay if Disabled */}
@@ -158,12 +199,16 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
           </div>
         )}
 
-        {/* Bottom Footer: Gradient + Hero Name */}
+        {/* Bottom Footer: Gradient + Hero Name + Main Indicator */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent pt-2.5 pb-0.5 px-0.5 text-center z-10">
           <span
             style={heroHex ? { color: heroHex } : undefined}
             className={`block text-[8px] sm:text-[9px] font-black uppercase tracking-tight truncate leading-none transition ${
-              isSelected && !heroHex ? 'text-orange-400' : 'text-white'
+              isMain
+                ? 'text-amber-400'
+                : isSelected && !heroHex
+                ? 'text-orange-400'
+                : 'text-white'
             }`}
           >
             {hero.name}
@@ -201,6 +246,25 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
             </span>
           </h2>
 
+          {/* Touch-Friendly Favorite / Main Toggle for currently selected hero */}
+          {selectedHeroId && (
+            <button
+              type="button"
+              onClick={() => toggleFavorite(selectedHeroId)}
+              className={`flex items-center space-x-1 px-2 py-0.5 rounded-lg text-[11px] font-bold border transition active:scale-95 shadow-sm ${
+                isFavorite(selectedHeroId)
+                  ? 'bg-amber-500 text-slate-950 border-amber-300 ring-1 ring-amber-400/50'
+                  : isDark
+                  ? 'bg-slate-800/90 text-amber-400 border-slate-700 hover:border-amber-400'
+                  : 'bg-slate-100 text-amber-600 border-slate-300 hover:border-amber-400'
+              }`}
+              title="Toca para marcar o desmarcar el héroe seleccionado como tu Main"
+            >
+              <Star className={`w-3 h-3 ${isFavorite(selectedHeroId) ? 'fill-current text-slate-950' : 'text-amber-400'}`} />
+              <span>{isFavorite(selectedHeroId) ? '★ Tu Main' : '☆ Marcar como Main'}</span>
+            </button>
+          )}
+
           {/* Mini Composition Badge Legend */}
           <div className="hidden sm:flex items-center gap-1.5 ml-2 text-[9px] font-mono">
             <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-200 border border-purple-500/40 font-bold">
@@ -215,8 +279,8 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
           </div>
         </div>
 
-        {/* Role Filter Tabs */}
-        <div className="flex items-center space-x-2">
+        {/* Role & Mains Filter Tabs */}
+        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
           <div
             className={`p-0.5 rounded-lg flex items-center border ${
               isDark ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-300'
@@ -234,6 +298,25 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
               }`}
             >
               Todos
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('mains')}
+              className={`flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold transition ${
+                activeTab === 'mains'
+                  ? 'bg-amber-500 text-slate-950 shadow-sm font-black'
+                  : favoriteHeroIds.length > 0
+                  ? isDark
+                    ? 'text-amber-400 hover:text-amber-300'
+                    : 'text-amber-600 hover:text-amber-800'
+                  : isDark
+                  ? 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              title="Filtrar solo los héroes que tienes marcados como Mains"
+            >
+              <Star className={`w-3 h-3 ${favoriteHeroIds.length > 0 ? 'fill-current text-amber-400' : ''}`} />
+              <span>Mains ({favoriteHeroIds.length})</span>
             </button>
             {roleCategories.map(cat => (
               <button
@@ -275,10 +358,31 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
         </div>
       </div>
 
+      {/* Empty State for Mains tab */}
+      {activeTab === 'mains' && favoriteHeroIds.length === 0 && (
+        <div className={`p-6 text-center rounded-xl border border-dashed my-3 ${
+          isDark ? 'border-slate-700 bg-slate-800/30' : 'border-slate-300 bg-slate-50'
+        }`}>
+          <Star className="w-8 h-8 text-amber-400 mx-auto mb-2 opacity-80" />
+          <h4 className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            No has marcado ningún Main todavía
+          </h4>
+          <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+            Toca la estrella <strong>⭐</strong> en la esquina superior de cualquier héroe para añadirlo a tus Mains. Así el Coach evaluará cómo rendirían tus personajes preferidos en esta partida.
+          </p>
+        </div>
+      )}
+
       {/* Hero Rosters with Subrole Clusters & Small Spacers */}
       <div className="space-y-3">
         {roleCategories
-          .filter(cat => activeTab === 'all' || activeTab === cat.role)
+          .map(cat => {
+            const filteredHeroes = cat.heroes.filter(
+              h => activeTab !== 'mains' || isFavorite(h.id)
+            );
+            return { ...cat, heroes: filteredHeroes };
+          })
+          .filter(cat => (activeTab === 'all' || activeTab === 'mains' || activeTab === cat.role) && cat.heroes.length > 0)
           .map(cat => {
             const subroleMap: Record<string, Hero[]> = {};
             cat.heroes.forEach(h => {

@@ -4,6 +4,7 @@ import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import { getHeroMapBreakdown } from '../../games/overwatch/mapSynergies';
 import type { Hero, HeroAbilityItem, HeroPerkItem } from '../../types/game';
 import { HeroSelectScreen } from '../coach/HeroSelectScreen';
+import { useFavoriteHeroes } from '../../utils/favorites';
 import type { Language } from '../../utils/i18n';
 import {
   Shield,
@@ -107,6 +108,7 @@ const KitIconBadge: React.FC<{
 
 export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme = 'dark' }) => {
   const isDark = theme === 'dark';
+  const { favoriteHeroIds, isFavorite, toggleFavorite } = useFavoriteHeroes();
 
   const [selectedHeroId, setSelectedHeroId] = useState<string>('freja');
   const [portraitLoaded, setPortraitLoaded] = useState<boolean>(false);
@@ -233,6 +235,8 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
         hideRoleLock={true}
         preloadFullKits={true}
         accentColor={heroColor}
+        favoriteHeroIds={favoriteHeroIds}
+        onToggleFavorite={toggleFavorite}
       />
 
       {/* 2. OFFICIAL OVERWATCH 2 INFOGRAPHIC HERO CARD WITH DYNAMIC HERO SIGNATURE COLOR */}
@@ -289,32 +293,50 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                   </span>
                 </div>
 
-                {/* Quick Prev / Next Hero Stepper */}
-                <div className="flex items-center gap-1">
+                {/* Main/Favorito Touch Toggle & Quick Prev / Next Stepper */}
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <button
                     type="button"
-                    onClick={() => stepHero(-1)}
-                    title="Héroe anterior"
-                    className={`p-1.5 rounded-lg border transition ${
-                      isDark
-                        ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
-                        : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                    onClick={() => toggleFavorite(selectedHero.id)}
+                    className={`px-2.5 py-1 rounded-lg border text-xs font-black uppercase tracking-wider transition flex items-center space-x-1.5 shadow-sm active:scale-95 cursor-pointer ${
+                      isFavorite(selectedHero.id)
+                        ? 'bg-amber-500 text-slate-950 border-amber-300 ring-2 ring-amber-400/40 shadow-amber-500/20'
+                        : isDark
+                        ? 'bg-slate-900/80 border-slate-700 text-amber-400 hover:border-amber-400'
+                        : 'bg-white border-slate-300 text-amber-600 hover:border-amber-400'
                     }`}
+                    title={isFavorite(selectedHero.id) ? '★ Es tu Main (Toca para desmarcar)' : '☆ Toca para marcar como tu Main'}
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <Star className={`w-3.5 h-3.5 ${isFavorite(selectedHero.id) ? 'fill-current text-slate-950' : 'text-amber-400'}`} />
+                    <span>{isFavorite(selectedHero.id) ? '★ Tu Main' : '☆ Marcar Main'}</span>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => stepHero(1)}
-                    title="Siguiente héroe"
-                    className={`p-1.5 rounded-lg border transition ${
-                      isDark
-                        ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
-                        : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => stepHero(-1)}
+                      title="Héroe anterior"
+                      className={`p-1.5 rounded-lg border transition ${
+                        isDark
+                          ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
+                          : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => stepHero(1)}
+                      title="Siguiente héroe"
+                      className={`p-1.5 rounded-lg border transition ${
+                        isDark
+                          ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
+                          : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
 

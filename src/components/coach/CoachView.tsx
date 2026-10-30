@@ -7,6 +7,7 @@ import type { GameMap, RankTier, Role } from '../../types/game';
 import { calculateRecommendations, analyzePlayerPick } from '../../core/coachEngine';
 import { HeroAvatar } from '../common/HeroAvatar';
 import { HeroSelectScreen } from './HeroSelectScreen';
+import { useFavoriteHeroes } from '../../utils/favorites';
 import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import { 
   Shield, 
@@ -45,6 +46,7 @@ interface RoleSlot {
 export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = 'dark' }) => {
   const t = TRANSLATIONS[language];
   const isDark = theme === 'dark';
+  const { favoriteHeroIds, isFavorite, toggleFavorite } = useFavoriteHeroes();
 
   const [selectedMapId, setSelectedMapId] = useState<string>('kings-row');
   const [rankTier, setRankTier] = useState<RankTier>('diamond');
@@ -152,8 +154,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
   // Player pick diagnosis
   const playerPickDiagnosis = useMemo(() => {
-    return analyzePlayerPick(playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier);
-  }, [playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier]);
+    return analyzePlayerPick(playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds);
+  }, [playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds]);
 
   // General recommendations for the player's role
   const recommendations = useMemo(() => {
@@ -448,6 +450,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         allyHeroIds={allyHeroIds}
         theme={theme}
         playerRole={playerHero.role}
+        favoriteHeroIds={favoriteHeroIds}
+        onToggleFavorite={toggleFavorite}
       />
 
       {/* 3. TEAM COMPOSITIONS (CASILLAS DE EQUIPO ALIADO Y RIVAL) */}
@@ -684,6 +688,23 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               </span>
             </div>
 
+            {/* Touch-Friendly Main / Favorito Toggle Button */}
+            <button
+              type="button"
+              onClick={() => toggleFavorite(playerPickDiagnosis.hero.id)}
+              className={`mt-2.5 inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border transition shadow-sm active:scale-95 cursor-pointer ${
+                isFavorite(playerPickDiagnosis.hero.id)
+                  ? 'bg-amber-500 text-slate-950 border-amber-300 ring-2 ring-amber-400/40 shadow-amber-500/20'
+                  : isDark
+                  ? 'bg-slate-800/90 text-amber-400 border-slate-700 hover:border-amber-500/60'
+                  : 'bg-white text-amber-600 border-slate-300 hover:border-amber-500'
+              }`}
+              title="Toca para marcar o desmarcar este héroe como tu Main"
+            >
+              <Star className={`w-3.5 h-3.5 ${isFavorite(playerPickDiagnosis.hero.id) ? 'fill-current text-slate-950' : 'text-amber-400'}`} />
+              <span>{isFavorite(playerPickDiagnosis.hero.id) ? '★ Es tu Main (Toca para desmarcar)' : '☆ Marcar como tu Main'}</span>
+            </button>
+
             {/* Prominent Score Metric + Map & Rank Breakdown */}
             <div className={`my-5 p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full max-w-2xl mx-auto backdrop-blur ${
               isDark ? 'bg-slate-900/55 border-slate-700/50' : 'bg-slate-900/5 border-slate-300/80'
@@ -884,6 +905,120 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
           {/* BEST RECOMMENDATIONS & COUNTER-SWITCHES */}
           <div className="pt-5">
+            {/* 1. SECCIÓN DE MAINS: SI EL JUGADOR TIENE HÉROES FAVORITOS EN ESTE ROL */}
+            {playerPickDiagnosis.mainSwitches && playerPickDiagnosis.mainSwitches.length > 0 ? (
+              <div className="mb-6 p-4 rounded-2xl border-2 border-amber-500/40 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <div className="flex items-center space-x-2">
+                    <Star className="w-4 h-4 text-amber-400 fill-current" />
+                    <span className={`text-sm font-black uppercase tracking-tight ${
+                      isDark ? 'text-white' : 'text-slate-900'
+                    }`}>
+                      Alternativas entre tus Mains ({playerPickDiagnosis.mainSwitches.length})
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
+                      Héroes que juegas
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-400">
+                    Calculados vs la composición rival y {selectedMap.name}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {playerPickDiagnosis.mainSwitches.map(mainAlt => {
+                    const isIdeal = mainAlt.verdict === 'ideal';
+                    const isRisky = mainAlt.verdict === 'risky';
+
+                    return (
+                      <div
+                        key={mainAlt.hero.id}
+                        onClick={() => handleSelectMyHero(mainAlt.hero.id)}
+                        className={`border-2 rounded-2xl p-3.5 flex flex-col justify-between cursor-pointer transition shadow-lg group relative overflow-hidden ${
+                          isIdeal
+                            ? isDark
+                              ? 'bg-amber-950/40 border-amber-400 ring-1 ring-amber-400/50 hover:bg-amber-950/60'
+                              : 'bg-amber-50 border-amber-400 ring-1 ring-amber-400/40 hover:bg-amber-100/80'
+                            : isRisky
+                            ? isDark
+                              ? 'bg-slate-800/80 border-rose-500/40 hover:border-rose-400'
+                              : 'bg-white border-rose-200 hover:border-rose-400'
+                            : isDark
+                            ? 'bg-slate-800/90 border-amber-500/30 hover:border-amber-400'
+                            : 'bg-white border-amber-200 hover:border-amber-400'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-center space-x-2.5">
+                            <div className="relative">
+                              <HeroAvatar hero={mainAlt.hero} size="md" />
+                              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[9px] font-black shadow">
+                                ★
+                              </span>
+                            </div>
+                            <div>
+                              <div className="flex items-center space-x-1.5">
+                                <span className={`font-black text-sm group-hover:text-amber-400 transition ${
+                                  isDark ? 'text-white' : 'text-slate-900'
+                                }`}>
+                                  {mainAlt.hero.name}
+                                </span>
+                                <span className="text-[8.5px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-black">
+                                  TU MAIN
+                                </span>
+                              </div>
+                              <span className={`text-[10px] font-mono font-black ${
+                                mainAlt.score >= 70 ? 'text-emerald-400' : mainAlt.score >= 50 ? 'text-amber-400' : 'text-rose-400'
+                              }`}>
+                                {mainAlt.score} pts ({mainAlt.scoreDiff >= 0 ? `+${mainAlt.scoreDiff}` : mainAlt.scoreDiff} vs actual)
+                              </span>
+                            </div>
+                          </div>
+
+                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                            isIdeal
+                              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                              : isRisky
+                              ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+                              : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                          }`}>
+                            {isIdeal ? '¡Recomendado!' : isRisky ? 'Riesgoso' : 'Viable'}
+                          </span>
+                        </div>
+
+                        <p className={`text-[11px] leading-tight mb-2.5 ${
+                          isDark ? 'text-slate-300' : 'text-slate-600'
+                        }`}>
+                          {mainAlt.reason}
+                        </p>
+
+                        <div className="pt-2 border-t border-slate-700/30 flex items-center justify-between">
+                          <span className="text-[10px] font-mono text-slate-400 uppercase">
+                            {mainAlt.hero.style} · {mainAlt.hero.subrole}
+                          </span>
+                          <span className="text-[11px] font-black uppercase text-amber-500 group-hover:underline flex items-center">
+                            Cambiar a mi Main →
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className={`mb-5 p-3 rounded-2xl border flex items-center justify-between flex-wrap gap-2 text-xs ${
+                isDark ? 'bg-slate-800/40 border-slate-700/60 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+              }`}>
+                <div className="flex items-center space-x-2">
+                  <Star className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>
+                    ¿Juegas pocos personajes? <strong>Toca la estrella ⭐ en cualquier héroe</strong> para marcarlo como tu Main y verás aquí su viabilidad exacta en cada partida.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* 2. RECOMENDACIONES GENERALES DE CAMBIO */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Sparkles className="w-4 h-4 text-orange-500" />
@@ -904,20 +1039,36 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   key={alt.hero.id}
                   onClick={() => handleSelectMyHero(alt.hero.id)}
                   className={`border rounded-2xl p-3.5 flex items-center justify-between cursor-pointer transition shadow-lg group ${
-                    isDark
+                    alt.isMain
+                      ? isDark
+                        ? 'bg-amber-950/30 border-amber-400/70 hover:border-amber-400'
+                        : 'bg-amber-50/80 border-amber-300 hover:border-amber-500'
+                      : isDark
                       ? 'bg-slate-800/90 border-orange-500/30 hover:border-orange-500'
                       : 'bg-white border-orange-200 hover:border-orange-500'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <HeroAvatar hero={alt.hero} size="md" />
+                    <div className="relative">
+                      <HeroAvatar hero={alt.hero} size="md" />
+                      {alt.isMain && (
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[8px] font-black shadow">
+                          ★
+                        </span>
+                      )}
+                    </div>
                     <div>
-                      <div className="flex items-center space-x-1.5">
+                      <div className="flex items-center space-x-1.5 flex-wrap">
                         <span className={`font-black text-sm group-hover:text-orange-500 transition ${
                           isDark ? 'text-white' : 'text-slate-900'
                         }`}>
                           {alt.hero.name}
                         </span>
+                        {alt.isMain && (
+                          <span className="text-[8.5px] px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 font-black tracking-wider shadow-sm">
+                            ★ TU MAIN
+                          </span>
+                        )}
                         <span className="text-[10px] font-mono text-emerald-500 font-black">
                           {alt.score} pts
                         </span>

@@ -261,6 +261,15 @@ export interface PlayerHeroDiagnosis {
     score: number;
     reason: string;
     hardCounteredThreats: string[];
+    isMain?: boolean;
+  }>;
+  mainSwitches?: Array<{
+    hero: Hero;
+    score: number;
+    scoreDiff: number;
+    reason: string;
+    verdict: 'ideal' | 'viable' | 'risky';
+    hardCounteredThreats: string[];
   }>;
 }
 
@@ -269,7 +278,8 @@ export function analyzePlayerPick(
   allyHeroIds: string[],
   enemyHeroIds: string[],
   gameMap: GameMap | null,
-  rankTier: RankTier
+  rankTier: RankTier,
+  favoriteHeroIds: string[] = []
 ): PlayerHeroDiagnosis | null {
   const playerHero = OVERWATCH_HEROES.find(h => h.id === playerHeroId);
   if (!playerHero) return null;
@@ -332,44 +342,110 @@ export function analyzePlayerPick(
         : `⚠️ Elección de alto riesgo por counters rivales y geometría de ${mapName}. Se sugiere cambio urgente.`;
   }
 
-  // Find recommended switches within the EXACT SAME ROLE
-  const alternativePicks = allRoleRecommendations
-    .filter(r => r.hero.id !== playerHeroId && r.totalScore > currentScore)
-    .slice(0, 3)
-    .map(alt => {
-      let reason = `Ofrece mayor impacto táctico (+${alt.totalScore - currentScore} pts)`;
+  // 1. Evaluate player's Mains/Favorites in the same role (for one-trick / small hero pool players)
+  const mainsInRole = allRoleRecommendations.filter(
+    r => favoriteHeroIds.includes(r.hero.id) && r.hero.id !== playerHeroId
+  );
 
-      const hardCounteredThreats = hardThreats
-        .filter(threat => alt.hero.counters.strongAgainst.includes(threat.id))
-        .map(t => t.name);
-      const softCounteredThreats = directThreats
-        .filter(threat => alt.hero.counters.strongAgainst.includes(threat.id))
-        .map(t => t.name);
+  const mainSwitches = mainsInRole.map(alt => {
+    const scoreDiff = alt.totalScore - currentScore;
+    const hardCounteredThreats = hardThreats
+      .filter(threat => alt.hero.counters.strongAgainst.includes(threat.id))
+      .map(t => t.name);
+    const softCounteredThreats = directThreats
+      .filter(threat => alt.hero.counters.strongAgainst.includes(threat.id))
+      .map(t => t.name);
+    const altMapEval = gameMap ? evaluateHeroMapSynergy(alt.hero, gameMap) : null;
 
-      const altMapEval = gameMap ? evaluateHeroMapSynergy(alt.hero, gameMap) : null;
+    let reason = '';
+    let verdictType: 'ideal' | 'viable' | 'risky' = 'viable';
 
+    if (scoreDiff >= 8 || (scoreDiff > 0 && alt.totalScore >= 74)) {
+      verdictType = 'ideal';
       if (hardCounteredThreats.length > 0) {
-        reason = `Destruye a ${hardCounteredThreats.join(' y ')}, que actualmente te hacen counter duro`;
-      } else if (softCounteredThreats.length > 0) {
-        reason = `Gana ventaja sobre ${softCounteredThreats.join(' y ')}, frenando la presión enemiga`;
-      } else if (
-        gameMap &&
-        altMapEval &&
-        altMapEval.score >= 10 &&
-        (!mapEvaluation || altMapEval.score - mapEvaluation.score >= 12)
-      ) {
-        reason = `Domina ${gameMap.name} (+${altMapEval.score} pts): ${altMapEval.reason}`;
-      } else if (alt.pros.length > 0) {
-        reason = alt.pros[0];
+        reason = `¡Cambio ideal con tu Main! Destruye a ${hardCounteredThreats.join(' y ')} (+${scoreDiff} pts)`;
+      } else if (altMapEval && altMapEval.score >= 8) {
+        reason = `¡Tu Main domina ${gameMap?.name}! (+${altMapEval.score} pts en mapa, +${scoreDiff} pts total)`;
+      } else {
+        reason = `Supera a tu pick actual (+${scoreDiff} pts) con mejor rendimiento contra la composición rival`;
       }
+    } else if (scoreDiff >= -3) {
+      verdictType = 'viable';
+      if (softCounteredThreats.length > 0) {
+        reason = `Alternativa viable de tu pool: neutraliza a ${softCounteredThreats.join(' y ')} (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`;
+      } else {
+        reason = `Rendimiento equilibrado frente al equipo rival (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`;
+      }
+    } else {
+      verdictType = 'risky';
+      const enemyCountersToMain = enemyHeroes
+        .filter(enemy => alt.hero.counters.weakAgainst.includes(enemy.id))
+        .map(t => t.name);
+      if (enemyCountersToMain.length > 0) {
+        reason = `Riesgoso para tu Main: el rival tiene counters activos (${enemyCountersToMain.slice(0, 2).join(', ')}) (${scoreDiff} pts)`;
+      } else {
+        reason = `Menor efectividad en esta partida (${scoreDiff} pts frente a tu pick actual)`;
+      }
+    }
 
-      return {
-        hero: alt.hero,
-        score: alt.totalScore,
-        reason,
-        hardCounteredThreats,
-      };
-    });
+    return {
+      hero: alt.hero,
+      score: alt.totalScore,
+      scoreDiff,
+      reason,
+      verdict: verdictType,
+      hardCounteredThreats,
+    };
+  }).sort((a, b) => b.score - a.score);
+
+  // 2. Find recommended switches within the EXACT SAME ROLE (prioritizing mains when viable)
+  const candidateSwitches = allRoleRecommendations
+    .filter(r => r.hero.id !== playerHeroId && r.totalScore > currentScore);
+
+  // Put better-scoring mains right at the front
+  candidateSwitches.sort((a, b) => {
+    const aMain = favoriteHeroIds.includes(a.hero.id) ? 1 : 0;
+    const bMain = favoriteHeroIds.includes(b.hero.id) ? 1 : 0;
+    if (aMain !== bMain) return bMain - aMain;
+    return b.totalScore - a.totalScore;
+  });
+
+  const alternativePicks = candidateSwitches.slice(0, 3).map(alt => {
+    let reason = `Ofrece mayor impacto táctico (+${alt.totalScore - currentScore} pts)`;
+    const isMain = favoriteHeroIds.includes(alt.hero.id);
+
+    const hardCounteredThreats = hardThreats
+      .filter(threat => alt.hero.counters.strongAgainst.includes(threat.id))
+      .map(t => t.name);
+    const softCounteredThreats = directThreats
+      .filter(threat => alt.hero.counters.strongAgainst.includes(threat.id))
+      .map(t => t.name);
+
+    const altMapEval = gameMap ? evaluateHeroMapSynergy(alt.hero, gameMap) : null;
+
+    if (hardCounteredThreats.length > 0) {
+      reason = `Destruye a ${hardCounteredThreats.join(' y ')}, que actualmente te hacen counter duro`;
+    } else if (softCounteredThreats.length > 0) {
+      reason = `Gana ventaja sobre ${softCounteredThreats.join(' y ')}, frenando la presión enemiga`;
+    } else if (
+      gameMap &&
+      altMapEval &&
+      altMapEval.score >= 10 &&
+      (!mapEvaluation || altMapEval.score - mapEvaluation.score >= 12)
+    ) {
+      reason = `Domina ${gameMap.name} (+${altMapEval.score} pts): ${altMapEval.reason}`;
+    } else if (alt.pros.length > 0) {
+      reason = alt.pros[0];
+    }
+
+    return {
+      hero: alt.hero,
+      score: alt.totalScore,
+      reason,
+      hardCounteredThreats,
+      isMain,
+    };
+  });
 
   return {
     hero: playerHero,
@@ -382,5 +458,6 @@ export function analyzePlayerPick(
     favorableTargets,
     hardTargets,
     recommendedSwitches: alternativePicks,
+    mainSwitches,
   };
 }
