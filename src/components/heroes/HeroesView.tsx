@@ -80,7 +80,7 @@ const KitIconBadge: React.FC<{
               background: `linear-gradient(135deg, color-mix(in oklab, ${heroColor} 45%, #cbd5e1), color-mix(in oklab, ${heroColor} 25%, #475569))`,
             }
       }
-      className="relative flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full p-0.5 flex items-center justify-center shadow-md transition-all duration-300 group-hover/item:scale-105"
+      className="relative flex-shrink-0 w-10 h-10 sm:w-13 sm:h-13 rounded-full p-0.5 flex items-center justify-center shadow-md transition-all duration-300 group-hover/item:scale-105"
     >
       <div
         style={
@@ -95,7 +95,7 @@ const KitIconBadge: React.FC<{
             src={iconUrl}
             alt=""
             decoding="async"
-            className="w-7 h-7 sm:w-8 sm:h-8 object-contain brightness-110"
+            className="w-5 h-5 sm:w-7 sm:h-7 object-contain brightness-110"
             onError={() => setImgErr(true)}
           />
         ) : (
@@ -271,15 +271,15 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           className="pointer-events-none absolute -left-24 top-24 w-[430px] h-[520px] rounded-full border-[26px] opacity-60 transition-colors duration-500"
         />
 
-        <div className="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-6 p-5 sm:p-7 lg:p-8 items-stretch">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 p-3.5 sm:p-6 lg:p-8 items-stretch">
           {/* LEFT SHOWCASE COLUMN */}
-          <div className="xl:col-span-4 flex flex-col justify-between relative">
+          <div className="lg:col-span-5 xl:col-span-4 flex flex-col justify-between relative">
             <header className="space-y-2.5 z-10">
               {/* Top Row: OVERWATCH 2 + Prev/Next Hero Switcher */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="inline-flex items-center space-x-1.5 select-none">
                   <span
-                    className={`text-sm sm:text-base font-black uppercase tracking-[0.22em] ${
+                    className={`text-xs sm:text-base font-black uppercase tracking-[0.22em] ${
                       isDark ? 'text-slate-100' : 'text-slate-800'
                     }`}
                   >
@@ -341,10 +341,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               </div>
 
               {/* Giant Italic Hero Name in Hero Signature Gradient + Role Emblem */}
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
                 <h1
                   style={{
-                    fontSize: 'clamp(2.35rem, 1.5rem + 3.6vw, 4.1rem)',
+                    fontSize: 'clamp(1.9rem, 1.3rem + 2.8vw, 4.1rem)',
                     backgroundImage: isDark
                       ? `linear-gradient(180deg, #ffffff 10%, color-mix(in oklab, ${heroColor} 55%, white) 55%, ${heroColor} 100%)`
                       : `linear-gradient(180deg, #0f172a 5%, color-mix(in oklab, ${heroColor} 75%, #0f172a) 100%)`,
@@ -352,7 +352,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                       ? `drop-shadow(0 6px 20px color-mix(in oklab, ${heroColor} 32%, transparent))`
                       : undefined,
                   }}
-                  className="font-black italic uppercase leading-[0.92] tracking-tight bg-clip-text text-transparent transition-all duration-300"
+                  className="font-black italic uppercase leading-[0.92] tracking-tight bg-clip-text text-transparent transition-all duration-300 truncate max-w-full"
                 >
                   {selectedHero.name}
                 </h1>
@@ -473,7 +473,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
             </header>
 
             {/* Full-Body Hero Render with High Fetch Priority & Instant Shimmer Fallback */}
-            <div className="relative my-3 flex-1 min-h-[290px] sm:min-h-[370px] flex items-end justify-center overflow-hidden">
+            <div className="relative my-2 sm:my-3 flex-1 min-h-[220px] sm:min-h-[350px] flex items-end justify-center overflow-hidden">
               {!portraitLoaded && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <div
@@ -481,7 +481,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                       borderColor: heroColor,
                       boxShadow: `0 0 40px color-mix(in oklab, ${heroColor} 45%, transparent)`,
                     }}
-                    className="w-24 h-24 rounded-full border-2 overflow-hidden animate-pulse bg-slate-900/60"
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 overflow-hidden animate-pulse bg-slate-900/60"
                   >
                     <img
                       src={selectedHero.icon}
@@ -509,7 +509,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     e.currentTarget.src = selectedHero.icon;
                   }
                 }}
-                className={`max-h-[430px] w-auto object-contain object-bottom transition-all duration-300 hover:scale-[1.03] ${
+                className={`max-h-[280px] sm:max-h-[380px] md:max-h-[440px] w-auto object-contain object-bottom transition-all duration-300 hover:scale-[1.03] ${
                   portraitLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
               />
@@ -542,7 +542,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           </div>
 
           {/* RIGHT DUAL INFOGRAPHIC PANELS: ABILITY KIT + PERKS */}
-          <div className="xl:col-span-8 flex flex-col gap-5 justify-between">
+          <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-5 justify-between">
             {/* PANEL 1: ABILITY KIT */}
             <section
               style={{ borderColor: panelBorderColor }}
@@ -550,68 +550,78 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 isDark ? 'bg-[#171c28]/90' : 'bg-slate-50/90'
               }`}
             >
-              {/* Left Vertical Dynamic Hero Color Strip ("KIT DE HABILIDADES") */}
+              {/* Mobile Top Header Banner */}
               <div
                 style={{ background: stripGradient }}
-                className="text-slate-950 px-3 py-2 sm:py-6 flex items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
+                className="text-slate-950 px-3 py-1.5 flex items-center justify-center sm:hidden transition-all duration-300"
               >
-                <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm sm:[writing-mode:vertical-rl] sm:rotate-180 select-none">
+                <span className="font-black uppercase tracking-[0.2em] text-xs select-none">
                   {language === 'es' ? 'KIT DE HABILIDADES' : 'ABILITY KIT'}
                 </span>
               </div>
 
-              <div className="flex-1 p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Desktop Left Vertical Strip */}
+              <div
+                style={{ background: stripGradient }}
+                className="hidden sm:flex text-slate-950 px-3 py-6 items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
+              >
+                <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm [writing-mode:vertical-rl] rotate-180 select-none">
+                  {language === 'es' ? 'KIT DE HABILIDADES' : 'ABILITY KIT'}
+                </span>
+              </div>
+
+              <div className="flex-1 p-3.5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                 {/* Sub-column Left: WEAPON + ULTIMATE */}
-                <div className="space-y-6">
-                  <div className="space-y-3.5">
+                <div className="space-y-5 sm:space-y-6">
+                  <div className="space-y-3 sm:space-y-3.5">
                     <h3
                       style={{ color: sectionTitleColor }}
                       className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
                       {language === 'es' ? 'ARMA' : 'WEAPON'}
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3.5 sm:space-y-4">
                       {(kit?.weapons || []).map(w => renderKitItem(w, 'weapon', false))}
                     </div>
                   </div>
 
-                  <div className="space-y-3.5 pt-3 border-t border-slate-700/30">
+                  <div className="space-y-3 sm:space-y-3.5 pt-3 border-t border-slate-700/30">
                     <h3
                       style={{ color: sectionTitleColor }}
                       className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
                       {language === 'es' ? 'DEFINITIVA' : 'ULTIMATE'}
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3.5 sm:space-y-4">
                       {(kit?.ultimate || []).map(u => renderKitItem(u, 'ult', true))}
                     </div>
                   </div>
                 </div>
 
                 {/* Sub-column Right: ABILITIES + PASSIVES */}
-                <div className="space-y-6">
+                <div className="space-y-5 sm:space-y-6">
                   {kit?.abilities && kit.abilities.length > 0 && (
-                    <div className="space-y-3.5">
+                    <div className="space-y-3 sm:space-y-3.5">
                       <h3
                         style={{ color: sectionTitleColor }}
                         className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                       >
                         {language === 'es' ? 'HABILIDADES' : 'ABILITIES'}
                       </h3>
-                      <div className="space-y-4">
+                      <div className="space-y-3.5 sm:space-y-4">
                         {kit.abilities.map(ab => renderKitItem(ab, 'ability', false))}
                       </div>
                     </div>
                   )}
 
-                  <div className="space-y-3.5 pt-3 border-t border-slate-700/30">
+                  <div className="space-y-3 sm:space-y-3.5 pt-3 border-t border-slate-700/30">
                     <h3
                       style={{ color: sectionTitleColor }}
                       className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
                       {language === 'es' ? 'PASIVAS' : 'PASSIVES'}
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3.5 sm:space-y-4">
                       {(kit?.passives || []).map(pa => renderKitItem(pa, 'passive', false))}
                     </div>
                   </div>
@@ -626,37 +636,47 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 isDark ? 'bg-[#171c28]/90' : 'bg-slate-50/90'
               }`}
             >
-              {/* Left Vertical Dynamic Hero Color Strip ("PERKS") */}
+              {/* Mobile Top Header Banner */}
               <div
                 style={{ background: stripGradient }}
-                className="text-slate-950 px-3 py-2 sm:py-6 flex items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
+                className="text-slate-950 px-3 py-1.5 flex items-center justify-center sm:hidden transition-all duration-300"
               >
-                <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm sm:[writing-mode:vertical-rl] sm:rotate-180 select-none">
+                <span className="font-black uppercase tracking-[0.2em] text-xs select-none">
                   PERKS
                 </span>
               </div>
 
-              <div className="flex-1 p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3.5">
+              {/* Desktop Left Vertical Strip */}
+              <div
+                style={{ background: stripGradient }}
+                className="hidden sm:flex text-slate-950 px-3 py-6 items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
+              >
+                <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm [writing-mode:vertical-rl] rotate-180 select-none">
+                  PERKS
+                </span>
+              </div>
+
+              <div className="flex-1 p-3.5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                <div className="space-y-3 sm:space-y-3.5">
                   <h3
                     style={{ color: sectionTitleColor }}
                     className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                   >
                     {language === 'es' ? 'MENOR (NIVEL 2)' : 'MINOR (LEVEL 2)'}
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-3.5 sm:space-y-4">
                     {(kit?.perks.minor || []).map(p => renderKitItem(p, 'perk', false))}
                   </div>
                 </div>
 
-                <div className="space-y-3.5">
+                <div className="space-y-3 sm:space-y-3.5">
                   <h3
                     style={{ color: sectionTitleColor }}
                     className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                   >
                     {language === 'es' ? 'MAYOR (NIVEL 3)' : 'MAJOR (LEVEL 3)'}
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-3.5 sm:space-y-4">
                     {(kit?.perks.major || []).map(p => renderKitItem(p, 'perk', true))}
                   </div>
                 </div>

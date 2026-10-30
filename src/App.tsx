@@ -33,7 +33,7 @@ export function App() {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-200 selection:bg-orange-500 selection:text-white ${
+    <div className={`min-h-screen flex flex-col transition-colors duration-200 selection:bg-orange-500 selection:text-white overflow-x-hidden ${
       isDark ? 'bg-[#070a12] text-slate-100' : 'bg-slate-50 text-slate-800'
     }`}>
       {/* Top Navbar */}
@@ -49,7 +49,7 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-2.5 sm:px-6 lg:px-8 py-3.5 sm:py-8 overflow-x-hidden">
         {currentGame === 'overwatch' ? (
           <>
             {activeTab === 'coach' && <CoachView language={language} theme={theme} />}

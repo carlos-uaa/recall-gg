@@ -338,20 +338,20 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             {/* Clickable Map Hero Banner */}
             <div
               onClick={() => setMapPickerOpen(true)}
-              className="group relative h-28 sm:h-32 rounded-2xl overflow-hidden border border-slate-700/80 cursor-pointer shadow-lg transition hover:border-orange-500 hover:scale-[1.01]"
+              className="group relative h-24 sm:h-32 rounded-2xl overflow-hidden border border-slate-700/80 cursor-pointer shadow-lg transition hover:border-orange-500 hover:scale-[1.01]"
             >
               <img
                 src={selectedMap.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
                 alt={selectedMap.name}
                 className="w-full h-full object-cover object-center transition duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-3">
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-2.5 sm:p-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-orange-400">
+                    <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-orange-400">
                       {selectedMap.mode}
                     </span>
-                    <h3 className="text-lg font-black text-white leading-tight">
+                    <h3 className="text-base sm:text-lg font-black text-white leading-tight">
                       {selectedMap.name}
                     </h3>
                   </div>
@@ -359,7 +359,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     {selectedMap.favoredStyles.map(st => (
                       <span
                         key={st}
-                        className={`text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded shadow backdrop-blur-sm border ${
+                        className={`text-[8.5px] sm:text-[9px] font-mono font-black uppercase px-1.5 sm:px-2 py-0.5 rounded shadow backdrop-blur-sm border ${
                           st === 'dive'
                             ? 'bg-purple-950/80 text-purple-300 border-purple-500/40'
                             : st === 'brawl'
@@ -401,15 +401,15 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   ? `linear-gradient(95deg, color-mix(in oklab, ${selectedRank.accentColor} 20%, #0f172a) 0%, #0f172a 65%)`
                   : `linear-gradient(95deg, color-mix(in oklab, ${selectedRank.accentColor} 18%, white) 0%, #ffffff 70%)`,
               }}
-              className="group relative h-28 sm:h-32 rounded-2xl border p-4 flex items-center justify-between cursor-pointer shadow-lg transition hover:scale-[1.01]"
+              className="group relative h-24 sm:h-32 rounded-2xl border p-2.5 sm:p-4 flex items-center justify-between cursor-pointer shadow-lg transition hover:scale-[1.01]"
             >
-              <div className="flex items-center space-x-4 min-w-0">
+              <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
                 <div
                   style={{
                     borderColor: `color-mix(in oklab, ${selectedRank.accentColor} 65%, white)`,
                     boxShadow: `0 8px 22px color-mix(in oklab, ${selectedRank.accentColor} 32%, transparent)`,
                   }}
-                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-2 flex items-center justify-center border flex-shrink-0 transition group-hover:scale-105 ${
+                  className={`w-13 h-13 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl p-1.5 sm:p-2 flex items-center justify-center border flex-shrink-0 transition group-hover:scale-105 ${
                     isDark ? 'bg-slate-950/80' : 'bg-slate-900/90'
                   }`}
                 >
@@ -426,14 +426,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         ? `color-mix(in oklab, ${selectedRank.accentColor} 80%, white)`
                         : `color-mix(in oklab, ${selectedRank.accentColor} 78%, #0f172a)`,
                     }}
-                    className="text-[10px] font-mono uppercase font-black tracking-wider"
+                    className="text-[9px] sm:text-[10px] font-mono uppercase font-black tracking-wider block"
                   >
                     RANGO {selectedRank.englishName.toUpperCase()}
                   </span>
-                  <h3 className={`text-lg sm:text-xl font-black leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <h3 className={`text-base sm:text-xl font-black leading-tight truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {selectedRank.name}
                   </h3>
-                  <p className={`text-xs mt-0.5 line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <p className={`text-[11px] sm:text-xs mt-0.5 line-clamp-1 sm:line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     {selectedRank.summary}
                   </p>
                 </div>
@@ -474,14 +474,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
             {allySlots.map(slot => {
               const hero = slot.heroId ? OVERWATCH_HEROES.find(h => h.id === slot.heroId) : null;
 
               return (
                 <div
                   key={slot.id}
-                  className={`relative p-2.5 rounded-2xl border flex flex-col items-center justify-between transition group ${
+                  className={`relative p-2 sm:p-2.5 rounded-2xl border flex flex-col items-center justify-between transition group ${
                     slot.isMyPick
                       ? 'border-amber-400 bg-amber-500/10 ring-2 ring-amber-400/40 shadow-lg'
                       : hero
@@ -489,8 +489,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       : isDark ? 'border-dashed border-slate-700 bg-slate-800/40' : 'border-dashed border-slate-300 bg-slate-50'
                   }`}
                 >
-                  <div className="w-full flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
+                  <div className="w-full flex items-center justify-between mb-1">
+                    <span className="text-[9.5px] sm:text-[10px] font-mono font-bold text-slate-400 uppercase truncate">
                       {slot.label}
                     </span>
                     {slot.isMyPick && (
@@ -505,23 +505,23 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       onClick={() => setActiveSlotTarget({ team: 'ally', slotId: slot.id, role: slot.role })}
                       className="cursor-pointer flex flex-col items-center w-full"
                     >
-                      <HeroAvatar hero={hero} size="lg" />
-                      <span className={`text-xs font-bold truncate w-full text-center mt-1.5 ${
+                      <HeroAvatar hero={hero} size="md" />
+                      <span className={`text-xs font-bold truncate w-full text-center mt-1 sm:mt-1.5 ${
                         isDark ? 'text-slate-200' : 'text-slate-800'
                       }`}>
                         {hero.name}
                       </span>
-                      <span className="text-[10px] text-slate-400 uppercase font-mono">
+                      <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
                         {hero.style}
                       </span>
                     </div>
                   ) : (
                     <button
                       onClick={() => setActiveSlotTarget({ team: 'ally', slotId: slot.id, role: slot.role })}
-                      className="w-full py-4 flex flex-col items-center justify-center text-slate-400 hover:text-blue-400 transition"
+                      className="w-full py-2.5 sm:py-4 flex flex-col items-center justify-center text-slate-400 hover:text-blue-400 transition"
                     >
-                      <Plus className="w-6 h-6 mb-1" />
-                      <span className="text-[11px] font-semibold">Elegir {slot.label}</span>
+                      <Plus className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" />
+                      <span className="text-[10.5px] sm:text-[11px] font-semibold">{slot.label}</span>
                     </button>
                   )}
 
@@ -532,7 +532,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         clearSlot('ally', slot.id);
                       }}
                       title="Eliminar del equipo"
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-md z-20 cursor-pointer"
+                      className="absolute -top-2 -right-2 w-6.5 h-6.5 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-md z-20 cursor-pointer active:scale-90"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -579,21 +579,21 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
             {enemySlots.map(slot => {
               const hero = slot.heroId ? OVERWATCH_HEROES.find(h => h.id === slot.heroId) : null;
 
               return (
                 <div
                   key={slot.id}
-                  className={`relative p-2.5 rounded-2xl border flex flex-col items-center justify-between transition group ${
+                  className={`relative p-2 sm:p-2.5 rounded-2xl border flex flex-col items-center justify-between transition group ${
                     hero
                       ? isDark ? 'border-rose-500/40 bg-slate-800/80' : 'border-rose-200 bg-rose-50/50'
                       : isDark ? 'border-dashed border-slate-700 bg-slate-800/40' : 'border-dashed border-slate-300 bg-slate-50'
                   }`}
                 >
-                  <div className="w-full text-center mb-1.5">
-                    <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
+                  <div className="w-full text-center mb-1">
+                    <span className="text-[9.5px] sm:text-[10px] font-mono font-bold text-slate-400 uppercase truncate block">
                       {slot.label}
                     </span>
                   </div>
@@ -603,23 +603,23 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       onClick={() => setActiveSlotTarget({ team: 'enemy', slotId: slot.id, role: slot.role })}
                       className="cursor-pointer flex flex-col items-center w-full"
                     >
-                      <HeroAvatar hero={hero} size="lg" />
-                      <span className={`text-xs font-bold truncate w-full text-center mt-1.5 ${
+                      <HeroAvatar hero={hero} size="md" />
+                      <span className={`text-xs font-bold truncate w-full text-center mt-1 sm:mt-1.5 ${
                         isDark ? 'text-slate-200' : 'text-slate-800'
                       }`}>
                         {hero.name}
                       </span>
-                      <span className="text-[10px] text-slate-400 uppercase font-mono">
+                      <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono">
                         {hero.style}
                       </span>
                     </div>
                   ) : (
                     <button
                       onClick={() => setActiveSlotTarget({ team: 'enemy', slotId: slot.id, role: slot.role })}
-                      className="w-full py-4 flex flex-col items-center justify-center text-slate-400 hover:text-rose-400 transition"
+                      className="w-full py-2.5 sm:py-4 flex flex-col items-center justify-center text-slate-400 hover:text-rose-400 transition"
                     >
-                      <Plus className="w-6 h-6 mb-1" />
-                      <span className="text-[11px] font-semibold">Elegir {slot.label}</span>
+                      <Plus className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" />
+                      <span className="text-[10.5px] sm:text-[11px] font-semibold">{slot.label}</span>
                     </button>
                   )}
 
@@ -630,7 +630,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         clearSlot('enemy', slot.id);
                       }}
                       title="Eliminar del equipo"
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-md z-20 cursor-pointer"
+                      className="absolute -top-2 -right-2 w-6.5 h-6.5 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-md z-20 cursor-pointer active:scale-90"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -644,40 +644,40 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
       {/* 4. CARD CENTRAL DE TU PERSONAJE SELECCIONADO (CON CALIFICACIÓN FINAL Y MEJORES RECOMENDACIONES) */}
       {playerPickDiagnosis && (
-        <div className={`border-2 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden transition ${getDiagnosisCardStyles(playerPickDiagnosis.score)}`}>
+        <div className={`border-2 rounded-3xl p-3.5 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden transition ${getDiagnosisCardStyles(playerPickDiagnosis.score)}`}>
           {/* Central Hero Showcase Header */}
-          <div className="flex flex-col items-center text-center max-w-3xl mx-auto pb-6 border-b border-slate-700/30">
+          <div className="flex flex-col items-center text-center max-w-3xl mx-auto pb-4 sm:pb-6 border-b border-slate-700/30">
             {/* Hero Large Avatar with Glowing Accent */}
-            <div className="relative mb-3">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-4 border-orange-500 shadow-2xl shadow-orange-500/40 ring-4 ring-orange-500/20">
+            <div className="relative mb-2.5 sm:mb-3">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl sm:rounded-3xl overflow-hidden border-3 sm:border-4 border-orange-500 shadow-2xl shadow-orange-500/40 ring-4 ring-orange-500/20">
                 <img
                   src={playerPickDiagnosis.hero.icon}
                   alt={playerPickDiagnosis.hero.name}
                   className="w-full h-full object-cover object-top"
                 />
               </div>
-              <div className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-orange-600 text-white text-[10px] font-black uppercase tracking-wider shadow">
+              <div className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full bg-orange-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow">
                 TU ELECCIÓN
               </div>
             </div>
 
             {/* Hero Name & Identity Badges */}
-            <h2 className={`text-3xl sm:text-4xl font-black uppercase tracking-tight ${
+            <h2 className={`text-2xl sm:text-4xl font-black uppercase tracking-tight ${
               isDark ? 'text-white' : 'text-slate-900'
             }`}>
               {playerPickDiagnosis.hero.name}
             </h2>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-              <span className="px-2.5 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-orange-500 border border-orange-500/30">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-orange-500 border border-orange-500/30">
                 {playerPickDiagnosis.hero.role === 'damage' ? 'DPS' : playerPickDiagnosis.hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
               </span>
-              <span className={`px-2.5 py-1 rounded-xl text-xs font-mono font-semibold border ${
+              <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-[11px] sm:text-xs font-mono font-semibold border ${
                 isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-300'
               }`}>
                 {playerPickDiagnosis.hero.subrole}
               </span>
-              <span className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold uppercase border ${
+              <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-[11px] sm:text-xs font-mono font-bold uppercase border ${
                 playerPickDiagnosis.hero.style === 'dive'
                   ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
                   : playerPickDiagnosis.hero.style === 'brawl'
@@ -706,21 +706,21 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             </button>
 
             {/* Prominent Score Metric + Map & Rank Breakdown */}
-            <div className={`my-5 p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full max-w-2xl mx-auto backdrop-blur ${
+            <div className={`my-4 sm:my-5 p-3 sm:p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 w-full max-w-2xl mx-auto backdrop-blur ${
               isDark ? 'bg-slate-900/55 border-slate-700/50' : 'bg-slate-900/5 border-slate-300/80'
             }`}>
-              <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-4 sm:space-x-6">
                 <div className="text-center">
-                  <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  <span className="block text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-slate-400">
                     Calificación Final
                   </span>
-                  <span className={`text-4xl sm:text-5xl font-black font-mono leading-none ${
+                  <span className={`text-3xl sm:text-5xl font-black font-mono leading-none ${
                     playerPickDiagnosis.score >= 70 ? 'text-emerald-500' : playerPickDiagnosis.score >= 50 ? 'text-amber-500' : 'text-rose-500'
                   }`}>
-                    {playerPickDiagnosis.score}<span className="text-xl text-slate-400">/100</span>
+                    {playerPickDiagnosis.score}<span className="text-base sm:text-xl text-slate-400">/100</span>
                   </span>
                 </div>
-                <div className="h-10 w-[1px] bg-slate-500/30"></div>
+                <div className="h-8 sm:h-10 w-[1px] bg-slate-500/30"></div>
                 <div className="text-left">
                   <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
                     Estado del Pick
@@ -1090,8 +1090,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
       {/* 5. MODAL CON VALIDACIÓN DE NO-REPETICIÓN */}
       {activeSlotTarget && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className={`border rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden ${
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+          <div className={`border rounded-3xl w-full max-w-2xl max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden ${
             isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
           }`}>
             <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
@@ -1325,8 +1325,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
       {/* 5. MODAL SELECTOR VISUAL DE MAPAS (CON SINERGIA DE TU HÉROE EN TIEMPO REAL) */}
       {mapPickerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className={`w-full max-w-4xl max-h-[85vh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4">
+          <div className={`w-full max-w-4xl max-h-[92dvh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
             isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
           }`}>
             {/* Modal Header */}
@@ -1440,8 +1440,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
       {/* 6. MODAL SELECTOR INDIVIDUAL DE RANGOS (CON ÍCONOS OFICIALES DE OVERWATCH 2) */}
       {rankPickerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className={`w-full max-w-3xl max-h-[88vh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4">
+          <div className={`w-full max-w-3xl max-h-[92dvh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
             isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
           }`}>
             {/* Modal Header */}

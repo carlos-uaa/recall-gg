@@ -53,7 +53,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className={`border rounded-3xl p-6 shadow-xl transition ${
+      <div className={`border rounded-3xl p-4 sm:p-6 shadow-xl transition ${
         isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
       }`}>
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-2">
@@ -68,9 +68,9 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
         {/* Left: Quick Hero Picker List */}
-        <div className={`border rounded-3xl p-4 shadow-lg flex flex-col h-[700px] transition ${
+        <div className={`border rounded-3xl p-3.5 sm:p-4 shadow-lg flex flex-col max-h-60 lg:max-h-none lg:h-[700px] transition ${
           isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'
         }`}>
           <div className="mb-3">

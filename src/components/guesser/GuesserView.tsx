@@ -532,9 +532,9 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
   const currentOffsetY = silFinished ? 0 : Math.round(silChallenge.offsetY * (1 - progressFactor));
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-5 sm:space-y-6">
       {/* 1. ARCADE GAME SELECTOR CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
         {arcadeModes.map(mode => {
           const isSelected = activeGame === mode.id;
           return (
@@ -542,7 +542,7 @@ export const GuesserView: React.FC<GuesserViewProps> = ({ language = 'es', theme
               key={mode.id}
               type="button"
               onClick={() => setActiveGame(mode.id)}
-              className={`text-left p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between ${
+              className={`text-left p-3 sm:p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between ${
                 isSelected
                   ? `bg-gradient-to-br ${mode.accentCls} text-white shadow-xl scale-[1.02]`
                   : isDark

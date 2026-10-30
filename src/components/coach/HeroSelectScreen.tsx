@@ -123,7 +123,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
             : undefined
         }
         title={`${hero.name} • ${hero.subrole} • ${isMain ? '★ TU MAIN • ' : ''}Composición ${hero.style.toUpperCase()}`}
-        className={`group relative flex-shrink-0 w-11 sm:w-13 md:w-14 h-15 sm:h-17 md:h-18 rounded-md overflow-hidden border transition-all duration-150 select-none ${
+        className={`group relative flex-shrink-0 w-9.5 sm:w-12 md:w-14 h-13 sm:h-16 md:h-18 rounded-md overflow-hidden border transition-all duration-150 select-none ${
           isSelected
             ? heroHex
               ? 'scale-110 z-20'
@@ -220,7 +220,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
 
   return (
     <div
-      className={`border rounded-2xl p-3 sm:p-4 shadow-xl relative transition ${
+      className={`border rounded-2xl p-2.5 sm:p-4 shadow-xl relative transition overflow-x-hidden max-w-full ${
         isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200'
       }`}
     >
@@ -410,16 +410,16 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   </span>
                 </div>
 
-                <div className="flex flex-wrap items-end justify-center gap-y-1.5 gap-x-1 sm:gap-x-1.5">
+                <div className="flex flex-wrap items-end justify-center gap-y-2 gap-x-1 sm:gap-x-2 max-w-full">
                   {subroleKeys.map((sub, index) => {
                     const heroesInSub = subroleMap[sub];
                     const subLabel = sub.split('/')[0].trim();
 
                     return (
                       <React.Fragment key={sub}>
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center max-w-full">
                           <span
-                            className={`text-[7.5px] font-mono uppercase tracking-wider font-bold mb-0.5 px-1 py-0.2 rounded border truncate max-w-[100px] ${
+                            className={`text-[7.5px] font-mono uppercase tracking-wider font-bold mb-0.5 px-1 py-0.2 rounded border truncate max-w-[110px] ${
                               isDark
                                 ? 'text-slate-400 bg-slate-800/40 border-slate-700/40'
                                 : 'text-slate-600 bg-slate-100 border-slate-200'
@@ -428,13 +428,13 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                             {subLabel} ({heroesInSub.length})
                           </span>
 
-                          <div className="flex items-center space-x-0.5 sm:space-x-1">
+                          <div className="flex flex-wrap items-center justify-center gap-0.5 sm:gap-1 max-w-full">
                             {heroesInSub.map(hero => renderHeroPortrait(hero))}
                           </div>
                         </div>
 
                         {index < subroleKeys.length - 1 && (
-                          <div className="h-10 w-px bg-slate-700/40 mx-1 sm:mx-1.5 self-end mb-1 hidden sm:block" />
+                          <div className="h-10 w-px bg-slate-700/40 mx-1 sm:mx-1.5 self-end mb-1 hidden md:block" />
                         )}
                       </React.Fragment>
                     );

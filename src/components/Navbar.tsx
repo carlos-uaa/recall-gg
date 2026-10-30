@@ -43,28 +43,32 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className={`sticky top-0 z-50 backdrop-blur-md border-b transition-colors duration-200 ${
-      isDark ? 'bg-[#090d16]/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-sm'
+      isDark ? 'bg-[#090d16]/95 border-slate-800' : 'bg-white/95 border-slate-200 shadow-sm'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        {/* Top Bar on Desktop or Row 1 on Mobile */}
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo & Branding */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onSelectTab('coach')}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20 text-white font-black text-xl tracking-wider">
+          <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
+            <div
+              className="flex items-center space-x-2 sm:space-x-3 cursor-pointer select-none flex-shrink-0"
+              onClick={() => onSelectTab('coach')}
+            >
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/20 text-white font-black text-lg sm:text-xl tracking-wider">
                 R
               </div>
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className={`text-xl font-extrabold tracking-tight font-mono ${
+              <div className="min-w-0">
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <span className={`text-base sm:text-xl font-extrabold tracking-tight font-mono truncate ${
                     isDark ? 'text-white' : 'text-slate-900'
                   }`}>
                     RECALL<span className="text-orange-500">.GG</span>
                   </span>
-                  <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                  <span className="hidden sm:inline-flex items-center px-1.5 py-0.2 rounded text-[10px] sm:text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                     {t.freeBadge}
                   </span>
                 </div>
-                <p className={`text-[10px] font-medium tracking-wide ${
+                <p className={`hidden sm:block text-[10px] font-medium tracking-wide truncate ${
                   isDark ? 'text-slate-400' : 'text-slate-500'
                 }`}>
                   {t.tagline}
@@ -75,16 +79,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Game Selector Dropdown */}
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-semibold border transition ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-semibold border transition ${
                   isDark
                     ? 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border-slate-700/60'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block animate-pulse"></span>
-                <span>{activeGameMeta.name}</span>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500 inline-block animate-pulse"></span>
+                <span className="truncate max-w-[85px] sm:max-w-none">{activeGameMeta.name}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {dropdownOpen && (
@@ -99,6 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {SUPPORTED_GAMES.map(game => (
                     <button
                       key={game.id}
+                      type="button"
                       onClick={() => {
                         if (game.active) {
                           onSelectGame(game.id);
@@ -130,11 +136,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <nav className="flex items-center space-x-1 sm:space-x-1.5 overflow-x-auto">
+          {/* Desktop Navigation Tabs (Hidden on Mobile) */}
+          <nav className="hidden md:flex items-center space-x-1 sm:space-x-1.5">
             <button
+              type="button"
               onClick={() => onSelectTab('coach')}
-              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
                 activeTab === 'coach'
                   ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
                   : isDark
@@ -143,13 +150,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Crosshair className="w-4 h-4" />
-              <span className="hidden md:inline">{t.coachTab}</span>
-              <span className="md:hidden">Coach</span>
+              <span>{t.coachTab}</span>
             </button>
 
             <button
+              type="button"
               onClick={() => onSelectTab('heroes')}
-              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
                 activeTab === 'heroes'
                   ? 'bg-cyan-500 text-slate-950 font-bold shadow-lg shadow-cyan-500/25'
                   : isDark
@@ -162,8 +169,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
+              type="button"
               onClick={() => onSelectTab('counters')}
-              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
                 activeTab === 'counters'
                   ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
                   : isDark
@@ -176,8 +184,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
+              type="button"
               onClick={() => onSelectTab('meta')}
-              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
                 activeTab === 'meta'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
                   : isDark
@@ -186,13 +195,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden md:inline">{t.metaTab}</span>
-              <span className="md:hidden">Meta</span>
+              <span>{t.metaTab}</span>
             </button>
 
             <button
+              type="button"
               onClick={() => onSelectTab('guesser')}
-              className={`flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
                 activeTab === 'guesser'
                   ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
                   : isDark
@@ -206,11 +215,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Theme & Language Controls */}
-          <div className="flex items-center space-x-2 pl-2 border-l border-slate-700/50">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 pl-1.5 sm:pl-2 border-l border-slate-700/50 flex-shrink-0">
             {/* Language Switch */}
             <button
+              type="button"
               onClick={() => onToggleLanguage(language === 'es' ? 'en' : 'es')}
-              className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${
+              className={`flex items-center space-x-1 px-2 sm:px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${
                 isDark
                   ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
@@ -218,23 +228,102 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Cambiar Idioma / Switch Language"
             >
               <Globe className="w-3.5 h-3.5 text-orange-500" />
-              <span className="uppercase">{language}</span>
+              <span className="uppercase text-[11px] sm:text-xs">{language}</span>
             </button>
 
             {/* Theme Switch */}
             <button
+              type="button"
               onClick={onToggleTheme}
-              className={`p-2 rounded-lg border transition ${
+              className={`p-1.5 sm:p-2 rounded-lg border transition ${
                 isDark
                   ? 'bg-slate-800 text-amber-400 border-slate-700 hover:bg-slate-700'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
               }`}
               title={isDark ? t.lightMode : t.darkMode}
             >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {isDark ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             </button>
           </div>
         </div>
+
+        {/* Mobile & Tablet Tab Scroll Bar (Row 2, only visible on < md screens) */}
+        <nav className="flex md:hidden items-center space-x-1.5 overflow-x-auto py-2 -mx-3 px-3 border-t border-slate-800/40 overscroll-contain no-scrollbar">
+          <button
+            type="button"
+            onClick={() => onSelectTab('coach')}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-bold transition flex-shrink-0 whitespace-nowrap active:scale-95 ${
+              activeTab === 'coach'
+                ? 'bg-orange-500 text-white shadow-md'
+                : isDark
+                ? 'bg-slate-800/90 text-slate-300 border border-slate-700'
+                : 'bg-slate-100 text-slate-700 border border-slate-300'
+            }`}
+          >
+            <Crosshair className="w-3.5 h-3.5" />
+            <span>Coach</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectTab('heroes')}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-bold transition flex-shrink-0 whitespace-nowrap active:scale-95 ${
+              activeTab === 'heroes'
+                ? 'bg-cyan-500 text-slate-950 font-black shadow-md'
+                : isDark
+                ? 'bg-slate-800/90 text-slate-300 border border-slate-700'
+                : 'bg-slate-100 text-slate-700 border border-slate-300'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>Héroes</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectTab('counters')}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-bold transition flex-shrink-0 whitespace-nowrap active:scale-95 ${
+              activeTab === 'counters'
+                ? 'bg-emerald-600 text-white shadow-md'
+                : isDark
+                ? 'bg-slate-800/90 text-slate-300 border border-slate-700'
+                : 'bg-slate-100 text-slate-700 border border-slate-300'
+            }`}
+          >
+            <Swords className="w-3.5 h-3.5" />
+            <span>Counters</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectTab('meta')}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-bold transition flex-shrink-0 whitespace-nowrap active:scale-95 ${
+              activeTab === 'meta'
+                ? 'bg-blue-600 text-white shadow-md'
+                : isDark
+                ? 'bg-slate-800/90 text-slate-300 border border-slate-700'
+                : 'bg-slate-100 text-slate-700 border border-slate-300'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Meta</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectTab('guesser')}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-bold transition flex-shrink-0 whitespace-nowrap active:scale-95 ${
+              activeTab === 'guesser'
+                ? 'bg-purple-600 text-white shadow-md'
+                : isDark
+                ? 'bg-slate-800/90 text-slate-300 border border-slate-700'
+                : 'bg-slate-100 text-slate-700 border border-slate-300'
+            }`}
+          >
+            <Gamepad2 className="w-3.5 h-3.5" />
+            <span>Arcade</span>
+          </button>
+        </nav>
       </div>
     </header>
   );
