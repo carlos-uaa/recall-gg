@@ -51,23 +51,27 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
   // Player's selected hero (The Hero Select Screen at the top)
   const [playerHeroId, setPlayerHeroId] = useState<string>('tracer');
+  const [mapPickerOpen, setMapPickerOpen] = useState(false);
+  const [mapFilterMode, setMapFilterMode] = useState<string>('all');
+  const [rankPickerOpen, setRankPickerOpen] = useState(false);
+
 
   // Ally Slots (Structure by role)
   const [allySlots, setAllySlots] = useState<RoleSlot[]>([
-    { id: 'a-tank-1', role: 'tank', label: 'Tanque', heroId: 'winston' },
+    { id: 'a-tank-1', role: 'tank', label: 'Tanque', heroId: null },
     { id: 'a-dps-1', role: 'damage', label: 'DPS 1', heroId: 'tracer', isMyPick: true },
-    { id: 'a-dps-2', role: 'damage', label: 'DPS 2', heroId: 'genji' },
-    { id: 'a-sup-1', role: 'support', label: 'Apoyo 1', heroId: 'ana' },
-    { id: 'a-sup-2', role: 'support', label: 'Apoyo 2', heroId: 'kiriko' },
+    { id: 'a-dps-2', role: 'damage', label: 'DPS 2', heroId: null },
+    { id: 'a-sup-1', role: 'support', label: 'Apoyo 1', heroId: null },
+    { id: 'a-sup-2', role: 'support', label: 'Apoyo 2', heroId: null },
   ]);
 
   // Enemy Slots (Structure by role)
   const [enemySlots, setEnemySlots] = useState<RoleSlot[]>([
-    { id: 'e-tank-1', role: 'tank', label: 'Tanque Rival', heroId: 'reinhardt' },
-    { id: 'e-dps-1', role: 'damage', label: 'DPS Rival 1', heroId: 'cassidy' },
-    { id: 'e-dps-2', role: 'damage', label: 'DPS Rival 2', heroId: 'reaper' },
-    { id: 'e-sup-1', role: 'support', label: 'Apoyo Rival 1', heroId: 'lucio' },
-    { id: 'e-sup-2', role: 'support', label: 'Apoyo Rival 2', heroId: 'baptiste' },
+    { id: 'e-tank-1', role: 'tank', label: 'Tanque Rival', heroId: null },
+    { id: 'e-dps-1', role: 'damage', label: 'DPS Rival 1', heroId: null },
+    { id: 'e-dps-2', role: 'damage', label: 'DPS Rival 2', heroId: null },
+    { id: 'e-sup-1', role: 'support', label: 'Apoyo Rival 1', heroId: null },
+    { id: 'e-sup-2', role: 'support', label: 'Apoyo Rival 2', heroId: null },
   ]);
 
   // Player's hero object
@@ -308,59 +312,123 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
           </div>
         </div>
 
-        {/* Global Match Selectors (Map & Rank) */}
+        {/* Visual Selectors with Images (Map Card & Rank Card) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-5">
-          {/* Map Selector */}
+          {/* Map Visual Card Picker */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1.5">
-              <MapPin className="w-3.5 h-3.5 text-orange-400" />
-              <span>{t.mapLabel}</span>
-            </label>
-            <select
-              value={selectedMapId}
-              onChange={(e) => setSelectedMapId(e.target.value)}
-              className={`w-full text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 border ${
-                isDark
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-slate-50 border-slate-300 text-slate-900'
-              }`}
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
+                <MapPin className="w-3.5 h-3.5 text-orange-400" />
+                <span>MAPA DE LA PARTIDA</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setMapPickerOpen(true)}
+                className="text-xs font-bold text-orange-400 hover:text-orange-300 transition"
+              >
+                Cambiar Mapa →
+              </button>
+            </div>
+
+            {/* Clickable Map Hero Banner */}
+            <div
+              onClick={() => setMapPickerOpen(true)}
+              className="group relative h-28 sm:h-32 rounded-2xl overflow-hidden border border-slate-700/80 cursor-pointer shadow-lg transition hover:border-orange-500 hover:scale-[1.01]"
             >
-              {OVERWATCH_MAPS.map((map) => (
-                <option key={map.id} value={map.id}>
-                  {map.name} ({map.mode})
-                </option>
-              ))}
-            </select>
-            <div className="flex items-center space-x-2 mt-2 text-xs text-slate-400">
-              <span className="font-semibold text-slate-300">Estilo:</span>
-              <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20 font-mono text-[11px] uppercase">
-                {selectedMap.favoredStyles.join(' / ')}
-              </span>
+              <img
+                src={selectedMap.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
+                alt={selectedMap.name}
+                className="w-full h-full object-cover object-center transition duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent flex flex-col justify-end p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-orange-400">
+                      {selectedMap.mode}
+                    </span>
+                    <h3 className="text-lg font-black text-white leading-tight">
+                      {selectedMap.name}
+                    </h3>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    {selectedMap.favoredStyles.map(st => (
+                      <span
+                        key={st}
+                        className={`text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded shadow backdrop-blur-sm border ${
+                          st === 'dive'
+                            ? 'bg-purple-950/80 text-purple-300 border-purple-500/40'
+                            : st === 'brawl'
+                            ? 'bg-amber-950/80 text-amber-300 border-amber-500/40'
+                            : 'bg-cyan-950/80 text-cyan-300 border-cyan-500/40'
+                        }`}
+                      >
+                        {st}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Rank Selector */}
+          {/* Rank Visual Card Picker */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1.5">
-              <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span>{t.rankLabel}</span>
-            </label>
-            <select
-              value={rankTier}
-              onChange={(e) => setRankTier(e.target.value as RankTier)}
-              className={`w-full text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 border ${
-                isDark
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-slate-50 border-slate-300 text-slate-900'
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>RANGO COMPETITIVO</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setRankPickerOpen(true)}
+                className="text-xs font-bold text-amber-400 hover:text-amber-300 transition"
+              >
+                Cambiar Rango →
+              </button>
+            </div>
+
+            {/* Clickable Rank Banner */}
+            <div
+              onClick={() => setRankPickerOpen(true)}
+              className={`group relative h-28 sm:h-32 rounded-2xl border p-4 flex items-center justify-between cursor-pointer shadow-lg transition hover:border-amber-400 hover:scale-[1.01] ${
+                rankTier === 'master_top500'
+                  ? 'border-purple-500/50 bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-900'
+                  : rankTier === 'plat_diamond'
+                  ? 'border-cyan-500/50 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900'
+                  : 'border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900'
               }`}
             >
-              <option value="bronze_gold">{t.rankBronzeGold}</option>
-              <option value="plat_diamond">{t.rankPlatDiamond}</option>
-              <option value="master_top500">{t.rankMasterTop500}</option>
-            </select>
-            <p className="text-[11px] text-slate-400 mt-2">
-              Pondera la consistencia vs el techo de habilidad mecánica.
-            </p>
+              <div className="flex items-center space-x-4">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl border shadow-lg ${
+                  rankTier === 'master_top500'
+                    ? 'bg-purple-900/60 border-purple-400 text-purple-300 shadow-purple-500/30'
+                    : rankTier === 'plat_diamond'
+                    ? 'bg-cyan-900/60 border-cyan-400 text-cyan-300 shadow-cyan-500/30'
+                    : 'bg-amber-900/60 border-amber-400 text-amber-300 shadow-amber-500/30'
+                }`}>
+                  {rankTier === 'master_top500' ? 'GM' : rankTier === 'plat_diamond' ? 'DIA' : 'ORO'}
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono uppercase font-bold text-slate-400">
+                    Modificador de Habilidad
+                  </span>
+                  <h3 className="text-lg font-black text-white">
+                    {rankTier === 'bronze_gold'
+                      ? 'Bronce — Oro'
+                      : rankTier === 'plat_diamond'
+                      ? 'Platino — Diamante'
+                      : 'Master — Top 500'}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {rankTier === 'bronze_gold'
+                      ? 'Premia consistencia y castiga exigencia mecánica'
+                      : rankTier === 'plat_diamond'
+                      ? 'Ponderación equilibrada entre meta y utilidad'
+                      : 'Prioriza techo mecánico y sinergias coordinadas'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -451,9 +519,10 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         e.stopPropagation();
                         clearSlot('ally', slot.id);
                       }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow"
+                      title="Eliminar del equipo"
+                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-md z-20 cursor-pointer"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
@@ -548,9 +617,10 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         e.stopPropagation();
                         clearSlot('enemy', slot.id);
                       }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow"
+                      title="Eliminar del equipo"
+                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition shadow-md z-20 cursor-pointer"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
@@ -1008,6 +1078,173 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
           })}
         </div>
       </div>
+
+      {/* 5. MODAL SELECTOR VISUAL DE MAPAS */}
+      {mapPickerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className={`w-full max-w-4xl max-h-[85vh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
+            isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+          }`}>
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <MapPin className="w-5 h-5 text-orange-400" />
+                <h3 className="text-lg font-black text-white">SELECCIONA EL MAPA</h3>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
+                  {OVERWATCH_MAPS.length} MAPAS
+                </span>
+              </div>
+              <button
+                onClick={() => setMapPickerOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Mode Filters */}
+            <div className="p-3 border-b border-slate-800 flex flex-wrap gap-1.5 bg-slate-950/40">
+              {['all', 'Híbrido', 'Escolta', 'Control', 'Avance', 'Punto Caliente', 'Invasión / Clash'].map(m => (
+                <button
+                  key={m}
+                  onClick={() => setMapFilterMode(m)}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
+                    mapFilterMode === m
+                      ? 'bg-orange-500 text-white shadow'
+                      : 'text-slate-400 hover:text-white bg-slate-800/60'
+                  }`}
+                >
+                  {m === 'all' ? 'Todos los modos' : m}
+                </button>
+              ))}
+            </div>
+
+            {/* Maps Grid with Large Images */}
+            <div className="p-4 overflow-y-auto flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {OVERWATCH_MAPS
+                .filter(m => mapFilterMode === 'all' || m.mode === mapFilterMode)
+                .map(m => (
+                  <button
+                    key={m.id}
+                    onClick={() => {
+                      setSelectedMapId(m.id);
+                      setMapPickerOpen(false);
+                    }}
+                    className={`group relative h-28 rounded-2xl overflow-hidden border-2 text-left transition ${
+                      m.id === selectedMapId
+                        ? 'border-orange-500 ring-2 ring-orange-500 scale-[1.02]'
+                        : 'border-slate-800 hover:border-slate-600'
+                    }`}
+                  >
+                    <img
+                      src={m.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
+                      alt={m.name}
+                      className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-2.5">
+                      <span className="text-[9px] font-mono text-orange-400 font-bold uppercase leading-none">
+                        {m.mode}
+                      </span>
+                      <span className="text-xs font-black text-white truncate mt-0.5">
+                        {m.name}
+                      </span>
+                      <div className="flex items-center space-x-1 mt-1">
+                        {m.favoredStyles.map(st => (
+                          <span key={st} className="text-[8px] uppercase font-mono px-1 py-0.2 rounded bg-black/60 text-slate-300">
+                            {st}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. MODAL SELECTOR VISUAL DE RANGO */}
+      {rankPickerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className={`w-full max-w-xl rounded-3xl border shadow-2xl overflow-hidden transition ${
+            isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+          }`}>
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Trophy className="w-5 h-5 text-amber-400" />
+                <h3 className="text-lg font-black text-white">SELECCIONA TU RANGO COMPETITIVO</h3>
+              </div>
+              <button
+                onClick={() => setRankPickerOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Ranks Cards */}
+            <div className="p-4 space-y-3">
+              {[
+                {
+                  id: 'bronze_gold' as RankTier,
+                  title: 'Bronce — Oro',
+                  tag: 'BRONZE / SILVER / GOLD',
+                  badge: 'ORO',
+                  desc: 'Pondera héroes con alta consistencia de impacto y castiga selecciones muy exigentes mecánicamente.',
+                  color: 'border-amber-500/40 bg-amber-950/20 text-amber-300 hover:border-amber-400'
+                },
+                {
+                  id: 'plat_diamond' as RankTier,
+                  title: 'Platino — Diamante',
+                  tag: 'PLATINUM / DIAMOND',
+                  badge: 'DIA',
+                  desc: 'Ponderación estándar competitiva. Buen equilibrio entre mecánicas, counters directos y posicionamiento.',
+                  color: 'border-cyan-500/40 bg-cyan-950/20 text-cyan-300 hover:border-cyan-400'
+                },
+                {
+                  id: 'master_top500' as RankTier,
+                  title: 'Master — Top 500',
+                  tag: 'MASTER / GRANDMASTER / CHAMPION',
+                  badge: 'GM',
+                  desc: 'Premia héroes con alto techo de habilidad (Genji, Tracer, Doomfist) y sinergias altamente coordinadas.',
+                  color: 'border-purple-500/40 bg-purple-950/20 text-purple-300 hover:border-purple-400'
+                }
+              ].map(r => (
+                <div
+                  key={r.id}
+                  onClick={() => {
+                    setRankTier(r.id);
+                    setRankPickerOpen(false);
+                  }}
+                  className={`border-2 rounded-2xl p-4 flex items-center justify-between cursor-pointer transition shadow-md ${
+                    rankTier === r.id ? 'ring-2 ring-orange-500 border-orange-500' : r.color
+                  }`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-14 h-14 rounded-2xl bg-black/40 border border-current flex items-center justify-center font-black text-xl shadow">
+                      {r.badge}
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-mono uppercase font-bold text-slate-400">
+                        {r.tag}
+                      </span>
+                      <h4 className="text-base font-black text-white">{r.title}</h4>
+                      <p className="text-xs text-slate-400 mt-0.5 max-w-sm">{r.desc}</p>
+                    </div>
+                  </div>
+                  {rankTier === r.id && (
+                    <span className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-[10px] font-black uppercase shadow">
+                      Activo
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
