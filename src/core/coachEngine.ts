@@ -1,4 +1,5 @@
 import type { GameMap, Hero, HeroMapEvaluation, RankTier, RecommendationResult, Role } from '../types/game';
+import type { UserProfileData } from '../types/userProfile';
 import { OVERWATCH_HEROES } from '../games/overwatch/heroes';
 import { evaluateHeroMapSynergy } from '../games/overwatch/mapSynergies';
 import { getRankInfo } from '../games/overwatch/ranks';
@@ -9,6 +10,7 @@ interface CoachOptions {
   allyHeroIds: string[];
   enemyHeroIds: string[];
   rankTier: RankTier;
+  userProfile?: UserProfileData | null;
 }
 
 // Special pairs verified from Toniki / competitive meta
@@ -208,8 +210,26 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
       cons.push('Tier C: Rendimiento más situacional en el meta actual');
     }
 
+    // 5. User Profile Personal Mastery & Comfort
+    let profileModifier = 0;
+    if (options.userProfile?.allHeroStats?.[hero.id]) {
+      const pStats = options.userProfile.allHeroStats[hero.id];
+      if (pStats.gamesPlayed >= 3) {
+        if (pStats.winrate >= 56) {
+          profileModifier = 5;
+          pros.unshift(`★ Tu Main de Confort: ${pStats.winrate.toFixed(0)}% Win Rate personal (${pStats.timePlayedHours}h)`);
+        } else if (pStats.winrate >= 51) {
+          profileModifier = 2;
+          pros.push(`Experiencia positiva en tu perfil: ${pStats.winrate.toFixed(0)}% Win Rate personal`);
+        } else if (pStats.winrate <= 42 && pStats.gamesPlayed >= 8) {
+          profileModifier = -4;
+          cons.push(`Rendimiento bajo en tu historial (${pStats.winrate.toFixed(0)}% Win Rate en ${pStats.gamesPlayed} partidas)`);
+        }
+      }
+    }
+
     // Normalized Total Score (Target 5 - 99)
-    let totalScore = 50 + tierBaseScore + rawCounterScore + rawSynergyScore + rawMapScore + rankModifier;
+    let totalScore = 50 + tierBaseScore + rawCounterScore + rawSynergyScore + rawMapScore + rankModifier + profileModifier;
     totalScore = Math.max(5, Math.min(99, Math.round(totalScore)));
 
     let tacticalVerdict = '';
@@ -279,7 +299,8 @@ export function analyzePlayerPick(
   enemyHeroIds: string[],
   gameMap: GameMap | null,
   rankTier: RankTier,
-  favoriteHeroIds: string[] = []
+  favoriteHeroIds: string[] = [],
+  userProfile?: UserProfileData | null
 ): PlayerHeroDiagnosis | null {
   const playerHero = OVERWATCH_HEROES.find(h => h.id === playerHeroId);
   if (!playerHero) return null;
@@ -287,12 +308,17 @@ export function analyzePlayerPick(
   const enemyHeroes = OVERWATCH_HEROES.filter(h => enemyHeroIds.includes(h.id));
   const mapEvaluation = gameMap ? evaluateHeroMapSynergy(playerHero, gameMap) : null;
 
+  // Combine manual favorites with user profile's top heroes
+  const profileMainIds = userProfile?.topHeroes.slice(0, 3).map(h => h.heroId) || [];
+  const combinedMains = Array.from(new Set([...favoriteHeroIds, ...profileMainIds]));
+
   const allRoleRecommendations = calculateRecommendations({
     role: playerHero.role,
     gameMap,
     allyHeroIds,
     enemyHeroIds,
     rankTier,
+    userProfile,
   });
 
   const currentPickData = allRoleRecommendations.find(r => r.hero.id === playerHeroId);
@@ -344,7 +370,7 @@ export function analyzePlayerPick(
 
   // 1. Evaluate player's Mains/Favorites in the same role (for one-trick / small hero pool players)
   const mainsInRole = allRoleRecommendations.filter(
-    r => favoriteHeroIds.includes(r.hero.id) && r.hero.id !== playerHeroId
+    r => combinedMains.includes(r.hero.id) && r.hero.id !== playerHeroId
   );
 
   const mainSwitches = mainsInRole.map(alt => {

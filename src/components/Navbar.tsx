@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { AppTab, GameId } from '../types/game';
 import { SUPPORTED_GAMES } from '../games/registry';
 import { TRANSLATIONS, type Language } from '../utils/i18n';
+import { useUserProfile } from '../utils/userProfileStorage';
 import { 
   Crosshair, 
   Users,
@@ -11,7 +12,8 @@ import {
   ChevronDown, 
   Sun, 
   Moon, 
-  Globe 
+  Globe,
+  User
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -36,6 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleLanguage,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { profile } = useUserProfile();
   const t = TRANSLATIONS[language];
   const activeGameMeta = SUPPORTED_GAMES.find(g => g.id === currentGame) || SUPPORTED_GAMES[0];
 
@@ -155,6 +158,24 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               type="button"
+              onClick={() => onSelectTab('profile')}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+                activeTab === 'profile'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/25'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              <span>{t.profileTab}</span>
+              {profile && (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+              )}
+            </button>
+
+            <button
+              type="button"
               onClick={() => onSelectTab('heroes')}
               className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
                 activeTab === 'heroes'
@@ -262,6 +283,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Crosshair className="w-3.5 h-3.5" />
             <span>Coach</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectTab('profile')}
+            className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-bold transition flex-shrink-0 whitespace-nowrap active:scale-95 ${
+              activeTab === 'profile'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                : isDark
+                ? 'bg-slate-800/90 text-slate-300 border border-slate-700'
+                : 'bg-slate-100 text-slate-700 border border-slate-300'
+            }`}
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Perfil</span>
+            {profile && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
           </button>
 
           <button

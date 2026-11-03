@@ -3,6 +3,7 @@ import type { AppTab, GameId } from './types/game';
 import type { Language } from './utils/i18n';
 import { Navbar } from './components/Navbar';
 import { CoachView } from './components/coach/CoachView';
+import { ProfileView } from './components/profile/ProfileView';
 import { HeroesView } from './components/heroes/HeroesView';
 import { GuesserView } from './components/guesser/GuesserView';
 import { MetaView } from './components/meta/MetaView';
@@ -53,6 +54,7 @@ export function App() {
         {currentGame === 'overwatch' ? (
           <>
             {activeTab === 'coach' && <CoachView language={language} theme={theme} />}
+            {activeTab === 'profile' && <ProfileView language={language} theme={theme} />}
             {activeTab === 'heroes' && <HeroesView language={language} theme={theme} />}
             {activeTab === 'guesser' && <GuesserView language={language} theme={theme} />}
             {activeTab === 'meta' && <MetaView language={language} theme={theme} />}

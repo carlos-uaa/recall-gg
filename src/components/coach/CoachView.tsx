@@ -8,6 +8,7 @@ import { calculateRecommendations, analyzePlayerPick } from '../../core/coachEng
 import { HeroAvatar } from '../common/HeroAvatar';
 import { HeroSelectScreen } from './HeroSelectScreen';
 import { useFavoriteHeroes } from '../../utils/favorites';
+import { useUserProfile } from '../../utils/userProfileStorage';
 import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import { 
   Shield, 
@@ -47,6 +48,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
   const t = TRANSLATIONS[language];
   const isDark = theme === 'dark';
   const { favoriteHeroIds, isFavorite, toggleFavorite } = useFavoriteHeroes();
+  const { profile } = useUserProfile();
 
   const [selectedMapId, setSelectedMapId] = useState<string>('kings-row');
   const [rankTier, setRankTier] = useState<RankTier>('diamond');
@@ -152,12 +154,12 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
     return enemySlots.map(s => s.heroId).filter((id): id is string => Boolean(id));
   }, [enemySlots]);
 
-  // Player pick diagnosis
+  // Player pick diagnosis (incorporates user profile mastery if present)
   const playerPickDiagnosis = useMemo(() => {
-    return analyzePlayerPick(playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds);
-  }, [playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds]);
+    return analyzePlayerPick(playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds, profile);
+  }, [playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds, profile]);
 
-  // General recommendations for the player's role
+  // General recommendations for the player's role (boosts comfort mains if user profile active)
   const recommendations = useMemo(() => {
     return calculateRecommendations({
       role: playerHero.role,
@@ -165,8 +167,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
       allyHeroIds,
       enemyHeroIds,
       rankTier,
+      userProfile: profile,
     });
-  }, [playerHero.role, selectedMap, allyHeroIds, enemyHeroIds, rankTier]);
+  }, [playerHero.role, selectedMap, allyHeroIds, enemyHeroIds, rankTier, profile]);
 
   // Assign hero to a slot with DUPLICATE PREVENTION
   const assignHeroToSlot = (heroId: string) => {
@@ -264,6 +267,24 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
               {t.coachSubtitle}
             </p>
+
+            {/* User Profile Sync Status Pill */}
+            {profile ? (
+              <div className="mt-2.5 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                <span className="truncate">
+                  Perfil activo: <strong className="font-bold text-white">{profile.username}</strong>
+                  {profile.ranks[playerHero.role]?.rankName ? ` (${profile.ranks[playerHero.role]?.rankName})` : ''} · Estadísticas y Mains sincronizados
+                </span>
+              </div>
+            ) : (
+              <div className="mt-2.5 inline-flex items-center gap-2 px-3 py-1.2 rounded-xl border text-[11px] text-slate-400 bg-slate-800/40 border-slate-700/50">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-500 flex-shrink-0" />
+                <span>
+                  Modo manual activo. También puedes vincular tu BattleTag en <strong>Perfil & Stats</strong> para afinar el análisis con tu Win Rate.
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
