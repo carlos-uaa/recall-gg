@@ -8,9 +8,34 @@ export interface PlayerSearchResult {
   playerId: string;
   name: string;
   avatar?: string;
+  namecard?: string;
   title?: string;
   isPublic: boolean;
   careerUrl?: string;
+  lastUpdatedAt?: number;
+}
+
+export const RANK_NAMES_ES: Record<RankTier, string> = {
+  bronze: 'Bronce',
+  silver: 'Plata',
+  gold: 'Oro',
+  platinum: 'Platino',
+  diamond: 'Diamante',
+  master: 'Maestro',
+  grandmaster: 'Gran Maestro',
+  champion: 'Campeón',
+  top500: 'Top 500',
+};
+
+export function formatRankName(tier: RankTier, divisionNumber?: number): string {
+  const baseName = RANK_NAMES_ES[tier] || tier.charAt(0).toUpperCase() + tier.slice(1);
+  if (tier === 'top500') {
+    return divisionNumber && divisionNumber > 0 ? `Top 500 (#${divisionNumber})` : 'Top 500';
+  }
+  if (divisionNumber && divisionNumber >= 1 && divisionNumber <= 5) {
+    return `${baseName} ${divisionNumber}`;
+  }
+  return baseName;
 }
 
 /**
@@ -35,7 +60,17 @@ function normalizeRankTier(tierName?: string): RankTier {
  * Busca jugadores públicos por nombre o BattleTag en la API de OverFast
  */
 export async function searchPlayers(query: string): Promise<PlayerSearchResult[]> {
-  const cleanQuery = encodeURIComponent(query.trim().replace('#', '-'));
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  // Extraer el nombre base si el usuario escribió con '#' o '-'
+  const baseName = trimmed.includes('#')
+    ? trimmed.split('#')[0]
+    : trimmed.includes('-') && !trimmed.startsWith('-')
+    ? trimmed.split('-')[0]
+    : trimmed;
+
+  const cleanQuery = encodeURIComponent(baseName.trim());
   if (!cleanQuery) return [];
 
   const response = await fetch(`${OVERFAST_API_BASE}/players?name=${cleanQuery}`, {
@@ -53,9 +88,11 @@ export async function searchPlayers(query: string): Promise<PlayerSearchResult[]
     playerId: r.player_id,
     name: r.name,
     avatar: r.avatar,
+    namecard: r.namecard,
     title: r.title,
     isPublic: r.is_public !== false,
     careerUrl: r.career_url,
+    lastUpdatedAt: r.last_updated_at,
   }));
 
   return results;
@@ -109,13 +146,14 @@ export async function fetchPlayerProfile(
 
   ['tank', 'damage', 'support'].forEach(roleKey => {
     const roleData = competitive[roleKey];
-    if (roleData) {
+    if (roleData && (roleData.division || roleData.tier)) {
       const tier = normalizeRankTier(roleData.division || roleData.tier);
+      const divisionNum = typeof roleData.tier === 'number' ? roleData.tier : 1;
       ranks[roleKey as Role] = {
         role: roleKey as Role,
         tier,
-        division: roleData.tier || 1,
-        rankName: `${roleData.division || tier.toUpperCase()} ${roleData.tier || ''}`.trim(),
+        division: divisionNum,
+        rankName: formatRankName(tier, divisionNum),
         iconUrl: roleData.icon_url,
       };
     }

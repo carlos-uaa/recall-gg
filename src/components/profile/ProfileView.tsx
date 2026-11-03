@@ -3,10 +3,15 @@ import type { Language } from '../../utils/i18n';
 import type { Role, RankTier } from '../../types/game';
 import type { UserProfileData, HeroPlayerStats } from '../../types/userProfile';
 import { useUserProfile, DEMO_PROFILES } from '../../utils/userProfileStorage';
-import { searchPlayers, fetchPlayerProfile } from '../../utils/playerStatsApi';
+import {
+  searchPlayers,
+  fetchPlayerProfile,
+  formatRankName,
+  RANK_NAMES_ES,
+  type PlayerSearchResult
+} from '../../utils/playerStatsApi';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
-import { getRankInfo } from '../../games/overwatch/ranks';
 import {
   Search,
   User,
@@ -26,7 +31,10 @@ import {
   X,
   Target,
   Zap,
-  Info
+  Info,
+  SlidersHorizontal,
+  Check,
+  ChevronRight
 } from 'lucide-react';
 
 interface ProfileViewProps {
@@ -43,9 +51,23 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<PlayerSearchResult[] | null>(null);
+  const [loadingPlayerId, setLoadingPlayerId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedRoleFilter, setSelectedRoleFilter] = useState<Role | 'all'>('all');
   const [selectedHeroId, setSelectedHeroId] = useState<string>('ana');
+
+  // Manual configuration modal state
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [manualTag, setManualTag] = useState('Nano#13824');
+  const [manualTitle, setManualTitle] = useState('Jugador Competitivo');
+  const [manualTankTier, setManualTankTier] = useState<RankTier | 'none'>('none');
+  const [manualTankDiv, setManualTankDiv] = useState(3);
+  const [manualDamageTier, setManualDamageTier] = useState<RankTier | 'none'>('diamond');
+  const [manualDamageDiv, setManualDamageDiv] = useState(4);
+  const [manualSupportTier, setManualSupportTier] = useState<RankTier | 'none'>('platinum');
+  const [manualSupportDiv, setManualSupportDiv] = useState(1);
+  const [manualMains, setManualMains] = useState<string[]>(['ana', 'kiriko', 'tracer']);
 
   // Handle Search Submission
   const handleSearch = async (e?: React.FormEvent) => {
@@ -55,26 +77,146 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
     setIsSearching(true);
     setErrorMessage(null);
+    setSearchResults(null);
 
     try {
-      // 1. Search for matching players
       const results = await searchPlayers(query);
       if (!results || results.length === 0) {
-        throw new Error(
-          `No se encontró ningún jugador con el nombre o BattleTag "${query}". Verifica la ortografía (ej: Jugador#1234) o prueba uno de los perfiles demo.`
+        setErrorMessage(
+          `No se encontró ningún registro público en Blizzard para "${query}". Si tu cuenta es reciente o juegas en consola, puedes configurarla manualmente.`
         );
+        return;
       }
 
-      // Pick the first public result, or the first result
-      const target = results.find(r => r.isPublic) || results[0];
-      const fullProfile = await fetchPlayerProfile(target.playerId, target.name);
-      setProfile(fullProfile);
-      setSearchQuery('');
+      if (results.length === 1) {
+        const target = results[0];
+        setLoadingPlayerId(target.playerId);
+        const fullProfile = await fetchPlayerProfile(target.playerId, query);
+        setProfile(fullProfile);
+        setSearchResults(null);
+        setSearchQuery('');
+      } else {
+        // Multiple matching accounts found! Display list for user to select
+        setSearchResults(results);
+      }
     } catch (err: any) {
       setErrorMessage(err.message || 'Error al consultar las estadísticas');
     } finally {
       setIsSearching(false);
+      setLoadingPlayerId(null);
     }
+  };
+
+  // Select a specific candidate from multiple search results
+  const handleSelectCandidate = async (candidate: PlayerSearchResult) => {
+    setLoadingPlayerId(candidate.playerId);
+    setErrorMessage(null);
+    try {
+      const fullProfile = await fetchPlayerProfile(candidate.playerId, searchQuery || candidate.name);
+      setProfile(fullProfile);
+      setSearchResults(null);
+      setSearchQuery('');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'No se pudo cargar este perfil.');
+    } finally {
+      setLoadingPlayerId(null);
+    }
+  };
+
+  // Save manual profile configuration
+  const handleSaveManualProfile = () => {
+    const cleanTag = manualTag.trim() || 'Jugador#1234';
+    const username = cleanTag.includes('#') ? cleanTag.split('#')[0] : cleanTag;
+    const ranks: UserProfileData['ranks'] = {};
+
+    if (manualTankTier !== 'none') {
+      ranks.tank = {
+        role: 'tank',
+        tier: manualTankTier,
+        division: manualTankDiv,
+        rankName: formatRankName(manualTankTier, manualTankDiv),
+      };
+    }
+
+    if (manualDamageTier !== 'none') {
+      ranks.damage = {
+        role: 'damage',
+        tier: manualDamageTier,
+        division: manualDamageDiv,
+        rankName: formatRankName(manualDamageTier, manualDamageDiv),
+      };
+    }
+
+    if (manualSupportTier !== 'none') {
+      ranks.support = {
+        role: 'support',
+        tier: manualSupportTier,
+        division: manualSupportDiv,
+        rankName: formatRankName(manualSupportTier, manualSupportDiv),
+      };
+    }
+
+    const topHeroes: HeroPlayerStats[] = manualMains.map((heroId, idx) => {
+      const h = OVERWATCH_HEROES.find(item => item.id === heroId);
+      const heroName = h?.name || heroId;
+      const role = h?.role || 'damage';
+      const hours = [85, 52, 34][idx] || 25;
+      const wr = [59.4, 56.1, 53.8][idx] || 52;
+      return {
+        heroId,
+        heroName,
+        role,
+        gamesPlayed: Math.round(hours * 4.2),
+        gamesWon: Math.round(hours * 4.2 * (wr / 100)),
+        gamesLost: Math.round(hours * 4.2 * ((100 - wr) / 100)),
+        timePlayedHours: hours,
+        winrate: wr,
+        kda: 3.5,
+        avgElimsPer10: 16.5,
+        avgDeathsPer10: 4.8,
+        avgDamagePer10: 7800,
+        avgHealingPer10: role === 'support' ? 8900 : 0,
+        weaponAccuracy: 48,
+        criticalHitAccuracy: 16,
+      };
+    });
+
+    const allHeroStats: Record<string, HeroPlayerStats> = {};
+    topHeroes.forEach(h => {
+      allHeroStats[h.heroId] = h;
+    });
+
+    const customProfile: UserProfileData = {
+      username,
+      tag: cleanTag,
+      title: manualTitle.trim() || undefined,
+      avatarUrl:
+        'https://d15f34w2p8l1cc.cloudfront.net/overwatch/76516371683932b558b1f58df3134e34f72b3d0c97077d8364cd73a7f313da92.png',
+      endorsementLevel: 3,
+      isPublic: true,
+      lastUpdated: 'Personalizado',
+      source: 'custom',
+      ranks,
+      general: {
+        totalGames: topHeroes.reduce((acc, h) => acc + h.gamesPlayed, 0),
+        totalWins: topHeroes.reduce((acc, h) => acc + h.gamesWon, 0),
+        totalLosses: topHeroes.reduce((acc, h) => acc + h.gamesLost, 0),
+        winrate: 56.5,
+        totalTimeHours: topHeroes.reduce((acc, h) => acc + h.timePlayedHours, 0),
+        kda: 3.6,
+        avgElimsPer10: 17.2,
+        avgDeathsPer10: 4.7,
+        avgDamagePer10: 8200,
+        avgHealingPer10: 6400,
+      },
+      topHeroes,
+      allHeroStats,
+    };
+
+    setProfile(customProfile);
+    setShowManualModal(false);
+    setSearchResults(null);
+    setErrorMessage(null);
   };
 
   // Active or Fallback Profile (if none is loaded, we can preview KarQ as a soft demo)
@@ -269,7 +411,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <button
             type="submit"
             disabled={isSearching || !searchQuery.trim()}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-orange-600/25 flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-orange-600/25 flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
           >
             {isSearching ? (
               <>
@@ -279,30 +421,152 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             ) : (
               <>
                 <Search className="w-4 h-4" />
-                <span>Consultar Perfil</span>
+                <span>Consultar</span>
               </>
             )}
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (searchQuery.trim()) {
+                setManualTag(searchQuery.trim());
+              }
+              setShowManualModal(true);
+            }}
+            className={`w-full sm:w-auto px-4 py-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0 ${
+              isDark
+                ? 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+            }`}
+            title="Configurar manualmente tu BattleTag, rangos y mains sin depender de los servidores web de Blizzard"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-orange-400" />
+            <span>Configurar Manual</span>
+          </button>
         </form>
+
+        {/* MULTIPLE MATCHING RESULTS PICKER */}
+        {searchResults && searchResults.length > 0 && (
+          <div
+            className={`mt-5 p-4 sm:p-5 rounded-2xl border space-y-3.5 transition-all animate-in fade-in duration-200 ${
+              isDark ? 'bg-slate-950/90 border-slate-700' : 'bg-slate-100 border-slate-300'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
+                  <User className="w-4 h-4" />
+                  <span>Cuentas coincidentes en Blizzard ({searchResults.length})</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Varios jugadores comparten este nombre. Elige tu cuenta verificando tu Título o Avatar para cargar tus datos:
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSearchResults(null)}
+                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+              {searchResults.map((r, idx) => (
+                <div
+                  key={r.playerId || idx}
+                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition ${
+                    isDark
+                      ? 'bg-slate-900/90 border-slate-800 hover:border-orange-500/60'
+                      : 'bg-white border-slate-200 hover:border-orange-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <img
+                      src={
+                        r.avatar ||
+                        'https://d15f34w2p8l1cc.cloudfront.net/overwatch/76516371683932b558b1f58df3134e34f72b3d0c97077d8364cd73a7f313da92.png'
+                      }
+                      alt=""
+                      className="w-10 h-10 rounded-xl object-cover bg-slate-950 flex-shrink-0 border border-white/10"
+                    />
+                    <div className="min-w-0">
+                      <span className="text-xs font-black truncate block text-white">{r.name}</span>
+                      <span className="text-[11px] font-bold text-orange-400 truncate block">
+                        {r.title || 'Sin título'}
+                      </span>
+                      <span
+                        className={`text-[10px] font-mono ${
+                          r.isPublic ? 'text-emerald-400' : 'text-slate-500'
+                        }`}
+                      >
+                        {r.isPublic ? '● Perfil Público' : '○ Perfil Privado'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={loadingPlayerId === r.playerId}
+                    onClick={() => handleSelectCandidate(r)}
+                    className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition flex-shrink-0 active:scale-95 shadow"
+                  >
+                    {loadingPlayerId === r.playerId ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      'Elegir'
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 border-t border-slate-800 flex items-center justify-between flex-wrap gap-2 text-xs">
+              <span className="text-slate-400">¿No encuentras tu cuenta exacta o juegas en consola?</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setManualTag(searchQuery || 'Nano#13824');
+                  setShowManualModal(true);
+                }}
+                className="text-xs font-bold text-orange-400 hover:underline flex items-center gap-1"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>Configurar "{searchQuery || 'mi cuenta'}" manualmente</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Error message alert */}
         {errorMessage && (
           <div className="mt-4 p-3.5 rounded-xl border text-xs flex items-start gap-3 bg-rose-500/10 border-rose-500/40 text-rose-300">
             <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
-            <div className="space-y-1">
+            <div className="space-y-1.5 flex-1">
               <strong className="font-bold block">No pudimos conectar con ese perfil</strong>
               <p>{errorMessage}</p>
-              <div className="pt-1 flex items-center gap-2">
-                <span className="text-[11px] text-slate-400">¿No tienes perfil público? Puedes</span>
+              <div className="pt-1 flex items-center gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setManualTag(searchQuery || 'Nano#13824');
+                    setShowManualModal(true);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow flex items-center gap-1.5"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>Configurar "{searchQuery || 'Nano#13824'}" manualmente</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => {
                     loadDemoProfile('karq');
                     setErrorMessage(null);
                   }}
-                  className="underline text-orange-400 hover:text-orange-300 font-bold"
+                  className="underline text-orange-400 hover:text-orange-300 font-bold text-xs"
                 >
-                  probar el perfil demo de KarQ
+                  Probar el perfil demo de KarQ
                 </button>
               </div>
             </div>
@@ -396,9 +660,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
               <div className="min-w-0">
                 <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Tanque</span>
-                <span className="text-xs font-black truncate block text-slate-200">
-                  {activeProfile.ranks.tank?.rankName || 'Diamante 3'}
-                </span>
+                {activeProfile.ranks.tank?.rankName ? (
+                  <span className="text-xs font-black truncate block text-slate-200">
+                    {activeProfile.ranks.tank.rankName}
+                  </span>
+                ) : (
+                  <span className="text-xs font-medium text-slate-500 italic block">
+                    Sin rango
+                  </span>
+                )}
               </div>
             </div>
 
@@ -413,9 +683,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
               <div className="min-w-0">
                 <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Daño</span>
-                <span className="text-xs font-black truncate block text-slate-200">
-                  {activeProfile.ranks.damage?.rankName || 'Maestro 4'}
-                </span>
+                {activeProfile.ranks.damage?.rankName ? (
+                  <span className="text-xs font-black truncate block text-slate-200">
+                    {activeProfile.ranks.damage.rankName}
+                  </span>
+                ) : (
+                  <span className="text-xs font-medium text-slate-500 italic block">
+                    Sin rango
+                  </span>
+                )}
               </div>
             </div>
 
@@ -430,9 +706,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
               <div className="min-w-0">
                 <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Apoyo</span>
-                <span className="text-xs font-black truncate block text-slate-200">
-                  {activeProfile.ranks.support?.rankName || 'Gran Maestro 2'}
-                </span>
+                {activeProfile.ranks.support?.rankName ? (
+                  <span className="text-xs font-black truncate block text-slate-200">
+                    {activeProfile.ranks.support.rankName}
+                  </span>
+                ) : (
+                  <span className="text-xs font-medium text-slate-500 italic block">
+                    Sin rango
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -904,6 +1186,265 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         </div>
       </section>
+
+      {/* 6. MODAL DE CONFIGURACIÓN MANUAL DEL PERFIL */}
+      {showManualModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
+        >
+          <div
+            className={`rounded-3xl border w-full max-w-xl p-5 sm:p-7 space-y-5 my-8 shadow-2xl relative ${
+              isDark ? 'bg-[#0f1422] border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+            }`}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-700/40 pb-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-black uppercase tracking-tight flex items-center gap-2 text-orange-400">
+                  <SlidersHorizontal className="w-5 h-5 text-orange-400" />
+                  <span>Configuración Manual de tu Perfil</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Personaliza tu BattleTag, rangos competitivos y 3 Mains para que el Tactical Coach se adapte a ti.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowManualModal(false)}
+                className="p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Inputs: BattleTag & Title */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="space-y-1">
+                <label className="text-[11px] font-mono font-bold uppercase text-slate-400">
+                  Tu BattleTag
+                </label>
+                <input
+                  type="text"
+                  value={manualTag}
+                  onChange={e => setManualTag(e.target.value)}
+                  placeholder="Ej: Nano#13824"
+                  className={`w-full px-3.5 py-2 rounded-xl border text-xs font-mono font-bold ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-orange-500'
+                      : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-orange-500'
+                  }`}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-mono font-bold uppercase text-slate-400">
+                  Título de Jugador (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={manualTitle}
+                  onChange={e => setManualTitle(e.target.value)}
+                  placeholder="Ej: Nomad, MVP, Francotirador"
+                  className={`w-full px-3.5 py-2 rounded-xl border text-xs ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-orange-500'
+                      : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-orange-500'
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Role Ranks Configuration */}
+            <div className="space-y-3 pt-1">
+              <span className="text-[11px] font-mono font-bold uppercase text-slate-400 block">
+                Rangos Competitivos por Rol
+              </span>
+
+              {/* Tank Rank */}
+              <div className="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-400" />
+                  <span className="text-xs font-bold">Tanque</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={manualTankTier}
+                    onChange={e => setManualTankTier(e.target.value as any)}
+                    className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
+                  >
+                    <option value="none">Sin rango</option>
+                    <option value="bronze">Bronce</option>
+                    <option value="silver">Plata</option>
+                    <option value="gold">Oro</option>
+                    <option value="platinum">Platino</option>
+                    <option value="diamond">Diamante</option>
+                    <option value="master">Maestro</option>
+                    <option value="grandmaster">Gran Maestro</option>
+                    <option value="champion">Campeón</option>
+                    <option value="top500">Top 500</option>
+                  </select>
+
+                  {manualTankTier !== 'none' && manualTankTier !== 'top500' && (
+                    <select
+                      value={manualTankDiv}
+                      onChange={e => setManualTankDiv(Number(e.target.value))}
+                      className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
+                    >
+                      {[1, 2, 3, 4, 5].map(d => (
+                        <option key={d} value={d}>
+                          Div {d}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+
+              {/* Damage Rank */}
+              <div className="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Crosshair className="w-4 h-4 text-red-400" />
+                  <span className="text-xs font-bold">Daño (DPS)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={manualDamageTier}
+                    onChange={e => setManualDamageTier(e.target.value as any)}
+                    className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
+                  >
+                    <option value="none">Sin rango</option>
+                    <option value="bronze">Bronce</option>
+                    <option value="silver">Plata</option>
+                    <option value="gold">Oro</option>
+                    <option value="platinum">Platino</option>
+                    <option value="diamond">Diamante</option>
+                    <option value="master">Maestro</option>
+                    <option value="grandmaster">Gran Maestro</option>
+                    <option value="champion">Campeón</option>
+                    <option value="top500">Top 500</option>
+                  </select>
+
+                  {manualDamageTier !== 'none' && manualDamageTier !== 'top500' && (
+                    <select
+                      value={manualDamageDiv}
+                      onChange={e => setManualDamageDiv(Number(e.target.value))}
+                      className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
+                    >
+                      {[1, 2, 3, 4, 5].map(d => (
+                        <option key={d} value={d}>
+                          Div {d}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+
+              {/* Support Rank */}
+              <div className="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-emerald-400" />
+                  <span className="text-xs font-bold">Apoyo</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={manualSupportTier}
+                    onChange={e => setManualSupportTier(e.target.value as any)}
+                    className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
+                  >
+                    <option value="none">Sin rango</option>
+                    <option value="bronze">Bronce</option>
+                    <option value="silver">Plata</option>
+                    <option value="gold">Oro</option>
+                    <option value="platinum">Platino</option>
+                    <option value="diamond">Diamante</option>
+                    <option value="master">Maestro</option>
+                    <option value="grandmaster">Gran Maestro</option>
+                    <option value="champion">Campeón</option>
+                    <option value="top500">Top 500</option>
+                  </select>
+
+                  {manualSupportTier !== 'none' && manualSupportTier !== 'top500' && (
+                    <select
+                      value={manualSupportDiv}
+                      onChange={e => setManualSupportDiv(Number(e.target.value))}
+                      className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
+                    >
+                      {[1, 2, 3, 4, 5].map(d => (
+                        <option key={d} value={d}>
+                          Div {d}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Mains Selector */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase text-slate-400">
+                  Tus 3 Mains principales ({manualMains.length}/3)
+                </span>
+                <span className="text-[10px] text-orange-400">Toca para añadir o cambiar</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap max-h-36 overflow-y-auto p-2 rounded-2xl border border-slate-800 bg-slate-950/60">
+                {OVERWATCH_HEROES.map(h => {
+                  const isSelected = manualMains.includes(h.id);
+                  return (
+                    <button
+                      key={h.id}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setManualMains(prev => prev.filter(id => id !== h.id));
+                        } else {
+                          if (manualMains.length >= 3) {
+                            setManualMains([manualMains[1], manualMains[2], h.id]);
+                          } else {
+                            setManualMains([...manualMains, h.id]);
+                          }
+                        }
+                      }}
+                      className={`px-2.5 py-1 rounded-xl border text-[11px] font-bold transition flex items-center gap-1.5 active:scale-95 ${
+                        isSelected
+                          ? 'bg-orange-500 text-white border-orange-400 shadow'
+                          : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <img src={h.icon} alt="" className="w-4 h-4 rounded-full object-cover" />
+                      <span>{h.name}</span>
+                      {isSelected && <Check className="w-3 h-3" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowManualModal(false)}
+                className="px-4 py-2 rounded-xl border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-800"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveManualProfile}
+                className="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-orange-600/30 active:scale-95 transition"
+              >
+                Guardar y Vincular al Coach
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
