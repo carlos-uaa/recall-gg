@@ -52,6 +52,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<PlayerSearchResult[] | null>(null);
+  const [candidateFilter, setCandidateFilter] = useState('');
   const [loadingPlayerId, setLoadingPlayerId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedRoleFilter, setSelectedRoleFilter] = useState<Role | 'all'>('all');
@@ -453,77 +454,106 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               isDark ? 'bg-slate-950/90 border-slate-700' : 'bg-slate-100 border-slate-300'
             }`}
           >
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
                   <User className="w-4 h-4" />
-                  <span>Cuentas coincidentes en Blizzard ({searchResults.length})</span>
+                  <span>Cuentas coincidentes en Blizzard ({searchResults.length} encontradas)</span>
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Varios jugadores comparten este nombre. Elige tu cuenta verificando tu Título o Avatar para cargar tus datos:
+                  Varios jugadores comparten este nombre. Elige tu cuenta verificando tu Título o Avatar:
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setSearchResults(null)}
-                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={candidateFilter}
+                  onChange={e => setCandidateFilter(e.target.value)}
+                  placeholder="Filtrar por título..."
+                  className={`px-3 py-1.5 rounded-xl border text-xs ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setSearchResults(null)}
+                  className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Privacy notice banner */}
+            <div className="p-3 rounded-xl border border-sky-500/30 bg-sky-500/10 text-sky-300 text-xs flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-sky-400 flex-shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                <strong>¿No reconoces tu cuenta entre las opciones?</strong> Si tu perfil en Overwatch 2 está en <em>Privado</em> o <em>Solo amigos</em>, Blizzard no lo incluye en su buscador web público. Puedes cambiarlo en el juego (<em>Ajustes &gt; Social &gt; Privacidad &gt; Visibilidad: Público</em>) o pulsar <strong>"Configurar Manual"</strong> para vincular <span className="font-bold underline text-white">{searchQuery || 'Nano#13824'}</span> directamente con tus rangos y mains.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[380px] overflow-y-auto pr-1">
-              {searchResults.map((r, idx) => (
-                <div
-                  key={r.playerId || idx}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition ${
-                    isDark
-                      ? 'bg-slate-900/90 border-slate-800 hover:border-orange-500/60'
-                      : 'bg-white border-slate-200 hover:border-orange-400'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <img
-                      src={
-                        r.avatar ||
-                        'https://d15f34w2p8l1cc.cloudfront.net/overwatch/76516371683932b558b1f58df3134e34f72b3d0c97077d8364cd73a7f313da92.png'
-                      }
-                      alt=""
-                      className="w-10 h-10 rounded-xl object-cover bg-slate-950 flex-shrink-0 border border-white/10"
-                    />
-                    <div className="min-w-0">
-                      <span className="text-xs font-black truncate block text-white">{r.name}</span>
-                      <span className="text-[11px] font-bold text-orange-400 truncate block">
-                        {r.title || 'Sin título'}
-                      </span>
-                      <span
-                        className={`text-[10px] font-mono ${
-                          r.isPublic ? 'text-emerald-400' : 'text-slate-500'
-                        }`}
-                      >
-                        {r.isPublic ? '● Perfil Público' : '○ Perfil Privado'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={loadingPlayerId === r.playerId}
-                    onClick={() => handleSelectCandidate(r)}
-                    className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition flex-shrink-0 active:scale-95 shadow"
+              {searchResults
+                .filter(r => {
+                  if (!candidateFilter.trim()) return true;
+                  const f = candidateFilter.toLowerCase();
+                  return (
+                    (r.title && r.title.toLowerCase().includes(f)) ||
+                    r.name.toLowerCase().includes(f)
+                  );
+                })
+                .map((r, idx) => (
+                  <div
+                    key={r.playerId || idx}
+                    className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition ${
+                      isDark
+                        ? 'bg-slate-900/90 border-slate-800 hover:border-orange-500/60'
+                        : 'bg-white border-slate-200 hover:border-orange-400'
+                    }`}
                   >
-                    {loadingPlayerId === r.playerId ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      'Elegir'
-                    )}
-                  </button>
-                </div>
-              ))}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <img
+                        src={
+                          r.avatar ||
+                          'https://d15f34w2p8l1cc.cloudfront.net/overwatch/76516371683932b558b1f58df3134e34f72b3d0c97077d8364cd73a7f313da92.png'
+                        }
+                        alt=""
+                        className="w-10 h-10 rounded-xl object-cover bg-slate-950 flex-shrink-0 border border-white/10"
+                      />
+                      <div className="min-w-0">
+                        <span className="text-xs font-black truncate block text-white">{r.name}</span>
+                        <span className="text-[11px] font-bold text-orange-400 truncate block">
+                          {r.title || 'Sin título'}
+                        </span>
+                        <span
+                          className={`text-[10px] font-mono ${
+                            r.isPublic ? 'text-emerald-400' : 'text-slate-500'
+                          }`}
+                        >
+                          {r.isPublic ? '● Perfil Público' : '○ Perfil Privado'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={loadingPlayerId === r.playerId}
+                      onClick={() => handleSelectCandidate(r)}
+                      className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition flex-shrink-0 active:scale-95 shadow"
+                    >
+                      {loadingPlayerId === r.playerId ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        'Elegir'
+                      )}
+                    </button>
+                  </div>
+                ))}
             </div>
 
             <div className="pt-2 border-t border-slate-800 flex items-center justify-between flex-wrap gap-2 text-xs">
-              <span className="text-slate-400">¿No encuentras tu cuenta exacta o juegas en consola?</span>
+              <span className="text-slate-400">¿Prefieres guardar tus datos exactos de inmediato?</span>
               <button
                 type="button"
                 onClick={() => {
@@ -533,7 +563,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 className="text-xs font-bold text-orange-400 hover:underline flex items-center gap-1"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span>Configurar "{searchQuery || 'mi cuenta'}" manualmente</span>
+                <span>Configurar "{searchQuery || 'Nano#13824'}" manualmente</span>
               </button>
             </div>
           </div>

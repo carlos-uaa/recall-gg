@@ -73,7 +73,7 @@ export async function searchPlayers(query: string): Promise<PlayerSearchResult[]
   const cleanQuery = encodeURIComponent(baseName.trim());
   if (!cleanQuery) return [];
 
-  const response = await fetch(`${OVERFAST_API_BASE}/players?name=${cleanQuery}`, {
+  const response = await fetch(`${OVERFAST_API_BASE}/players?name=${cleanQuery}&limit=100`, {
     headers: {
       Accept: 'application/json',
     },
