@@ -7,6 +7,7 @@ import {
   searchPlayers,
   fetchPlayerProfile,
   formatRankName,
+  extractPlayerIdFromInput,
   RANK_NAMES_ES,
   type PlayerSearchResult
 } from '../../utils/playerStatsApi';
@@ -81,10 +82,22 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     setSearchResults(null);
 
     try {
+      // 1. Detectar si el usuario pegó un enlace directo de Blizzard (overwatch.blizzard.com/career/...) o un ID cifrado
+      const extracted = extractPlayerIdFromInput(query);
+      if (extracted.type === 'id') {
+        setLoadingPlayerId(extracted.value);
+        const fullProfile = await fetchPlayerProfile(extracted.value, 'Mi Perfil');
+        setProfile(fullProfile);
+        setSearchResults(null);
+        setSearchQuery('');
+        return;
+      }
+
+      // 2. Búsqueda por nombre o BattleTag
       const results = await searchPlayers(query);
       if (!results || results.length === 0) {
         setErrorMessage(
-          `No se encontró ningún registro público en Blizzard para "${query}". Si tu cuenta es reciente o juegas en consola, puedes configurarla manualmente.`
+          `No se encontró ningún registro público en Blizzard para "${query}". Si acabas de poner tu perfil en público, Blizzard puede tardar un tiempo en indexarlo. Puedes pegar tu enlace directo de Blizzard o usar el botón "Configurar Manual".`
         );
         return;
       }
@@ -400,7 +413,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Escribe tu BattleTag (ej: KarQ#1234, ML7#21855 o tu nombre público)..."
+              placeholder="BattleTag (ej: KarQ#1234), nombre, o enlace directo (overwatch.blizzard.com/career/...)..."
               className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                 isDark
                   ? 'bg-slate-950/80 border-slate-800 text-white placeholder-slate-500'
@@ -446,6 +459,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             <span>Configurar Manual</span>
           </button>
         </form>
+
+        <p className="mt-2 text-[11px] text-slate-400 flex items-center gap-1.5 flex-wrap">
+          <Info className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
+          <span>
+            {language === 'es'
+              ? 'Consejo: Si acabas de poner tu perfil en público, puedes pegar directamente el enlace de tu trayectoria de Blizzard o pulsar "Configurar Manual".'
+              : 'Tip: If you just set your profile to public, you can paste your direct Blizzard career link or click "Configurar Manual".'}
+          </span>
+        </p>
 
         {/* MULTIPLE MATCHING RESULTS PICKER */}
         {searchResults && searchResults.length > 0 && (

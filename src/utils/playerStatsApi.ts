@@ -57,6 +57,25 @@ function normalizeRankTier(tierName?: string): RankTier {
 }
 
 /**
+ * Detecta si el texto ingresado es una URL directa de perfil de Blizzard o un ID cifrado de OW2
+ */
+export function extractPlayerIdFromInput(input: string): { type: 'id' | 'name'; value: string } {
+  const trimmed = input.trim();
+  // Formato URL: https://overwatch.blizzard.com/es-es/career/dc5fa285fe...%7C.../ o similar
+  const urlMatch = trimmed.match(/career\/([^/?#\s]+)/i);
+  if (urlMatch && urlMatch[1]) {
+    // Si viene con barra final, limpiarla
+    const cleanId = urlMatch[1].replace(/\/$/, '');
+    return { type: 'id', value: cleanId };
+  }
+  // Formato ID cifrado con separador %7C o |
+  if (trimmed.includes('%7C') || (trimmed.includes('|') && trimmed.length > 20)) {
+    return { type: 'id', value: trimmed.replace('|', '%7C') };
+  }
+  return { type: 'name', value: trimmed };
+}
+
+/**
  * Busca jugadores públicos por nombre o BattleTag en la API de OverFast
  */
 export async function searchPlayers(query: string): Promise<PlayerSearchResult[]> {
