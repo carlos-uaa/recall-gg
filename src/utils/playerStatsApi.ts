@@ -15,6 +15,8 @@ export interface PlayerSearchResult {
   lastUpdatedAt?: number;
 }
 
+import type { Language } from './i18n';
+
 export const RANK_NAMES_ES: Record<RankTier, string> = {
   bronze: 'Bronce',
   silver: 'Plata',
@@ -27,8 +29,21 @@ export const RANK_NAMES_ES: Record<RankTier, string> = {
   top500: 'Top 500',
 };
 
-export function formatRankName(tier: RankTier, divisionNumber?: number): string {
-  const baseName = RANK_NAMES_ES[tier] || tier.charAt(0).toUpperCase() + tier.slice(1);
+export const RANK_NAMES_EN: Record<RankTier, string> = {
+  bronze: 'Bronze',
+  silver: 'Silver',
+  gold: 'Gold',
+  platinum: 'Platinum',
+  diamond: 'Diamond',
+  master: 'Master',
+  grandmaster: 'Grandmaster',
+  champion: 'Champion',
+  top500: 'Top 500',
+};
+
+export function formatRankName(tier: RankTier, divisionNumber?: number, lang: Language = 'es'): string {
+  const dictionary = lang === 'en' ? RANK_NAMES_EN : RANK_NAMES_ES;
+  const baseName = dictionary[tier] || tier.charAt(0).toUpperCase() + tier.slice(1);
   if (tier === 'top500') {
     return divisionNumber && divisionNumber > 0 ? `Top 500 (#${divisionNumber})` : 'Top 500';
   }

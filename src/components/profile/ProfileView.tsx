@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { Language } from '../../utils/i18n';
+import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import type { Role, RankTier } from '../../types/game';
 import type { UserProfileData, HeroPlayerStats } from '../../types/userProfile';
 import { useUserProfile, DEMO_PROFILES } from '../../utils/userProfileStorage';
@@ -48,6 +48,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
+  const t = TRANSLATIONS[language];
   const { profile, setProfile, loadDemoProfile, clearProfile } = useUserProfile();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -152,7 +153,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         role: 'tank',
         tier: manualTankTier,
         division: manualTankDiv,
-        rankName: formatRankName(manualTankTier, manualTankDiv),
+        rankName: formatRankName(manualTankTier, manualTankDiv, language),
       };
     }
 
@@ -161,7 +162,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         role: 'damage',
         tier: manualDamageTier,
         division: manualDamageDiv,
-        rankName: formatRankName(manualDamageTier, manualDamageDiv),
+        rankName: formatRankName(manualDamageTier, manualDamageDiv, language),
       };
     }
 
@@ -170,7 +171,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         role: 'support',
         tier: manualSupportTier,
         division: manualSupportDiv,
-        rankName: formatRankName(manualSupportTier, manualSupportDiv),
+        rankName: formatRankName(manualSupportTier, manualSupportDiv, language),
       };
     }
 
@@ -734,14 +735,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <Shield className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Tanque</span>
+                <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">{t.tank}</span>
                 {activeProfile.ranks.tank?.rankName ? (
                   <span className="text-xs font-black truncate block text-slate-200">
                     {activeProfile.ranks.tank.rankName}
                   </span>
                 ) : (
                   <span className="text-xs font-medium text-slate-500 italic block">
-                    Sin rango
+                    {language === 'en' ? 'Unranked' : 'Sin rango'}
                   </span>
                 )}
               </div>
@@ -757,14 +758,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <Crosshair className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Daño</span>
+                <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">{t.damage}</span>
                 {activeProfile.ranks.damage?.rankName ? (
                   <span className="text-xs font-black truncate block text-slate-200">
                     {activeProfile.ranks.damage.rankName}
                   </span>
                 ) : (
                   <span className="text-xs font-medium text-slate-500 italic block">
-                    Sin rango
+                    {language === 'en' ? 'Unranked' : 'Sin rango'}
                   </span>
                 )}
               </div>
@@ -780,14 +781,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <Heart className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Apoyo</span>
+                <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">{t.support}</span>
                 {activeProfile.ranks.support?.rankName ? (
                   <span className="text-xs font-black truncate block text-slate-200">
                     {activeProfile.ranks.support.rankName}
                   </span>
                 ) : (
                   <span className="text-xs font-medium text-slate-500 italic block">
-                    Sin rango
+                    {language === 'en' ? 'Unranked' : 'Sin rango'}
                   </span>
                 )}
               </div>
@@ -1353,14 +1354,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             {/* Role Ranks Configuration */}
             <div className="space-y-3 pt-1">
               <span className="text-[11px] font-mono font-bold uppercase text-slate-400 block">
-                Rangos Competitivos por Rol
+                {language === 'en' ? 'Competitive Ranks by Role' : 'Rangos Competitivos por Rol'}
               </span>
 
               {/* Tank Rank */}
               <div className="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-blue-400" />
-                  <span className="text-xs font-bold">Tanque</span>
+                  <span className="text-xs font-bold">{t.tank}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <select
@@ -1368,15 +1369,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     onChange={e => setManualTankTier(e.target.value as any)}
                     className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
                   >
-                    <option value="none">Sin rango</option>
-                    <option value="bronze">Bronce</option>
-                    <option value="silver">Plata</option>
-                    <option value="gold">Oro</option>
-                    <option value="platinum">Platino</option>
-                    <option value="diamond">Diamante</option>
-                    <option value="master">Maestro</option>
-                    <option value="grandmaster">Gran Maestro</option>
-                    <option value="champion">Campeón</option>
+                    <option value="none">{language === 'en' ? 'Unranked' : 'Sin rango'}</option>
+                    <option value="bronze">{language === 'en' ? 'Bronze' : 'Bronce'}</option>
+                    <option value="silver">{language === 'en' ? 'Silver' : 'Plata'}</option>
+                    <option value="gold">{language === 'en' ? 'Gold' : 'Oro'}</option>
+                    <option value="platinum">{language === 'en' ? 'Platinum' : 'Platino'}</option>
+                    <option value="diamond">{language === 'en' ? 'Diamond' : 'Diamante'}</option>
+                    <option value="master">{language === 'en' ? 'Master' : 'Maestro'}</option>
+                    <option value="grandmaster">{language === 'en' ? 'Grandmaster' : 'Gran Maestro'}</option>
+                    <option value="champion">{language === 'en' ? 'Champion' : 'Campeón'}</option>
                     <option value="top500">Top 500</option>
                   </select>
 
@@ -1400,7 +1401,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <div className="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Crosshair className="w-4 h-4 text-red-400" />
-                  <span className="text-xs font-bold">Daño (DPS)</span>
+                  <span className="text-xs font-bold">{t.damageDps}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <select
@@ -1408,15 +1409,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     onChange={e => setManualDamageTier(e.target.value as any)}
                     className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
                   >
-                    <option value="none">Sin rango</option>
-                    <option value="bronze">Bronce</option>
-                    <option value="silver">Plata</option>
-                    <option value="gold">Oro</option>
-                    <option value="platinum">Platino</option>
-                    <option value="diamond">Diamante</option>
-                    <option value="master">Maestro</option>
-                    <option value="grandmaster">Gran Maestro</option>
-                    <option value="champion">Campeón</option>
+                    <option value="none">{language === 'en' ? 'Unranked' : 'Sin rango'}</option>
+                    <option value="bronze">{language === 'en' ? 'Bronze' : 'Bronce'}</option>
+                    <option value="silver">{language === 'en' ? 'Silver' : 'Plata'}</option>
+                    <option value="gold">{language === 'en' ? 'Gold' : 'Oro'}</option>
+                    <option value="platinum">{language === 'en' ? 'Platinum' : 'Platino'}</option>
+                    <option value="diamond">{language === 'en' ? 'Diamond' : 'Diamante'}</option>
+                    <option value="master">{language === 'en' ? 'Master' : 'Maestro'}</option>
+                    <option value="grandmaster">{language === 'en' ? 'Grandmaster' : 'Gran Maestro'}</option>
+                    <option value="champion">{language === 'en' ? 'Champion' : 'Campeón'}</option>
                     <option value="top500">Top 500</option>
                   </select>
 
@@ -1440,7 +1441,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <div className="p-3 rounded-2xl border border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Heart className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs font-bold">Apoyo</span>
+                  <span className="text-xs font-bold">{t.support}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <select
@@ -1448,15 +1449,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     onChange={e => setManualSupportTier(e.target.value as any)}
                     className="px-2 py-1 rounded-lg border border-slate-700 bg-slate-900 text-xs font-bold text-slate-200"
                   >
-                    <option value="none">Sin rango</option>
-                    <option value="bronze">Bronce</option>
-                    <option value="silver">Plata</option>
-                    <option value="gold">Oro</option>
-                    <option value="platinum">Platino</option>
-                    <option value="diamond">Diamante</option>
-                    <option value="master">Maestro</option>
-                    <option value="grandmaster">Gran Maestro</option>
-                    <option value="champion">Campeón</option>
+                    <option value="none">{language === 'en' ? 'Unranked' : 'Sin rango'}</option>
+                    <option value="bronze">{language === 'en' ? 'Bronze' : 'Bronce'}</option>
+                    <option value="silver">{language === 'en' ? 'Silver' : 'Plata'}</option>
+                    <option value="gold">{language === 'en' ? 'Gold' : 'Oro'}</option>
+                    <option value="platinum">{language === 'en' ? 'Platinum' : 'Platino'}</option>
+                    <option value="diamond">{language === 'en' ? 'Diamond' : 'Diamante'}</option>
+                    <option value="master">{language === 'en' ? 'Master' : 'Maestro'}</option>
+                    <option value="grandmaster">{language === 'en' ? 'Grandmaster' : 'Gran Maestro'}</option>
+                    <option value="champion">{language === 'en' ? 'Champion' : 'Campeón'}</option>
                     <option value="top500">Top 500</option>
                   </select>
 
@@ -1481,9 +1482,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono font-bold uppercase text-slate-400">
-                  Tus 3 Mains principales ({manualMains.length}/3)
+                  {language === 'en' ? `Your top 3 Mains (${manualMains.length}/3)` : `Tus 3 Mains principales (${manualMains.length}/3)`}
                 </span>
-                <span className="text-[10px] text-orange-400">Toca para añadir o cambiar</span>
+                <span className="text-[10px] text-orange-400">
+                  {language === 'en' ? 'Tap to add or replace' : 'Toca para añadir o cambiar'}
+                </span>
               </div>
 
               <div className="flex items-center gap-1.5 flex-wrap max-h-36 overflow-y-auto p-2 rounded-2xl border border-slate-800 bg-slate-950/60">
@@ -1526,14 +1529,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 onClick={() => setShowManualModal(false)}
                 className="px-4 py-2 rounded-xl border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-800"
               >
-                Cancelar
+                {language === 'en' ? 'Cancel' : 'Cancelar'}
               </button>
               <button
                 type="button"
                 onClick={handleSaveManualProfile}
                 className="px-5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-orange-600/30 active:scale-95 transition"
               >
-                Guardar y Vincular al Coach
+                {language === 'en' ? 'Save and Link to Coach' : 'Guardar y Vincular al Coach'}
               </button>
             </div>
           </div>

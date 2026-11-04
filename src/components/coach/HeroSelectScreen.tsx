@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import type { Hero, Role } from '../../types/game';
+import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import { Shield, Swords, Heart, Lock, Star, Zap, Flame, Crosshair, Layers, Users } from 'lucide-react';
 import { useFavoriteHeroes } from '../../utils/favorites';
 import {
@@ -9,6 +10,9 @@ import {
   setStoredHeroGroupingMode,
   type HeroGroupingMode,
   getSubroleForHero,
+  getSubroleDisplayName,
+  getSubrolePassiveName,
+  getSubrolePassiveDescription,
 } from '../../games/overwatch/subroles';
 
 interface HeroSelectScreenProps {
@@ -16,6 +20,7 @@ interface HeroSelectScreenProps {
   onSelectHero: (heroId: string) => void;
   allyHeroIds?: string[]; // Heroes already taken in ally team (cannot be repeated)
   theme?: 'dark' | 'light';
+  language?: Language;
   playerRole?: Role;
   onPlayerRoleChange?: (role: Role) => void;
   title?: string;
@@ -55,9 +60,10 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
   onSelectHero,
   allyHeroIds = [],
   theme = 'dark',
+  language = 'es',
   playerRole,
   onPlayerRoleChange,
-  title = 'SELECCIÓN DE TU HÉROE',
+  title,
   hideRoleLock = false,
   preloadFullKits = false,
   accentColor,
@@ -65,6 +71,8 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
   onToggleFavorite: propToggle,
 }) => {
   const isDark = theme === 'dark';
+  const t = TRANSLATIONS[language];
+  const displayTitle = title ?? t.heroSelectTitle;
   const hookFavs = useFavoriteHeroes();
   const favoriteHeroIds = propFavs ?? hookFavs.favoriteHeroIds;
   const toggleFavorite = propToggle ?? hookFavs.toggleFavorite;
@@ -95,28 +103,28 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
     () =>
       OVERWATCH_HEROES.filter(h => h.role === 'tank')
         .slice()
-        .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })),
-    []
+        .sort((a, b) => a.name.localeCompare(b.name, language, { sensitivity: 'base' })),
+    [language]
   );
   const damage = useMemo(
     () =>
       OVERWATCH_HEROES.filter(h => h.role === 'damage')
         .slice()
-        .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })),
-    []
+        .sort((a, b) => a.name.localeCompare(b.name, language, { sensitivity: 'base' })),
+    [language]
   );
   const supports = useMemo(
     () =>
       OVERWATCH_HEROES.filter(h => h.role === 'support')
         .slice()
-        .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })),
-    []
+        .sort((a, b) => a.name.localeCompare(b.name, language, { sensitivity: 'base' })),
+    [language]
   );
 
   const roleCategories: Array<{ role: Role; label: string; icon: React.ReactNode; heroes: Hero[] }> = [
-    { role: 'tank', label: 'TANQUES', icon: <Shield className="w-3 h-3 text-blue-400" />, heroes: tanks },
-    { role: 'damage', label: 'DAÑO (DPS)', icon: <Swords className="w-3 h-3 text-rose-400" />, heroes: damage },
-    { role: 'support', label: 'APOYO', icon: <Heart className="w-3 h-3 text-emerald-400" />, heroes: supports },
+    { role: 'tank', label: t.tanks.toUpperCase(), icon: <Shield className="w-3 h-3 text-blue-400" />, heroes: tanks },
+    { role: 'damage', label: t.damageDps.toUpperCase(), icon: <Swords className="w-3 h-3 text-rose-400" />, heroes: damage },
+    { role: 'support', label: t.supportHealers.toUpperCase(), icon: <Heart className="w-3 h-3 text-emerald-400" />, heroes: supports },
   ];
 
   const renderStyleIcon = (style: Hero['style']) => {
@@ -163,7 +171,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
               }
             : undefined
         }
-        title={`${hero.name} • ${hero.subrole} • ${isMain ? '★ TU MAIN • ' : ''}Composición ${hero.style.toUpperCase()}`}
+        title={`${hero.name} • ${getSubroleDisplayName(getSubroleForHero(hero.id), language)} • ${isMain ? `★ ${t.mainActive.replace('★ ', '')} • ` : ''}${language === 'en' ? 'Comp Style' : 'Composición'} ${hero.style.toUpperCase()}`}
         className={`group relative flex-shrink-0 w-9.5 sm:w-12 md:w-14 h-13 sm:h-16 md:h-18 rounded-md overflow-hidden border transition-all duration-150 select-none ${
           isSelected
             ? heroHex
@@ -209,7 +217,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
         <span
           role="button"
           tabIndex={0}
-          aria-label={isMain ? `Quitar ${hero.name} de tus Mains` : `Marcar ${hero.name} como Main`}
+          aria-label={isMain ? (language === 'en' ? `Remove ${hero.name} from Mains` : `Quitar ${hero.name} de tus Mains`) : (language === 'en' ? `Mark ${hero.name} as Main` : `Marcar ${hero.name} como Main`)}
           onClick={(e) => {
             e.stopPropagation();
             toggleFavorite(hero.id);
@@ -220,7 +228,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
               toggleFavorite(hero.id);
             }
           }}
-          title={isMain ? '★ Es tu Main (Toca para desmarcar)' : '☆ Toca para marcar como Main'}
+          title={isMain ? t.mainActiveTooltip : t.mainMarkTooltip}
           className={`absolute top-0 right-0 z-30 w-4.5 h-4.5 rounded-bl-md flex items-center justify-center cursor-pointer transition active:scale-125 ${
             isMain
               ? 'bg-amber-500 text-slate-950 shadow-md ring-1 ring-amber-300'
@@ -235,7 +243,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
           <div className="absolute inset-0 bg-black/65 flex flex-col items-center justify-center z-20 p-0.5 text-center">
             <Lock className="w-2.5 h-2.5 text-slate-300 mb-0.5" />
             <span className="text-[6px] font-bold text-slate-300 uppercase leading-none">
-              {isTakenByAlly ? 'En Equipo' : 'Bloq'}
+              {isTakenByAlly ? t.inTeam : t.locked}
             </span>
           </div>
         )}
@@ -281,7 +289,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
               isDark ? 'text-white' : 'text-slate-900'
             }`}
           >
-            <span>{title}</span>
+            <span>{displayTitle}</span>
             <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/30 font-mono">
               {OVERWATCH_HEROES.length}
             </span>
@@ -299,10 +307,10 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   ? 'bg-slate-800/90 text-amber-400 border-slate-700 hover:border-amber-400'
                   : 'bg-slate-100 text-amber-600 border-slate-300 hover:border-amber-400'
               }`}
-              title="Toca para marcar o desmarcar el héroe seleccionado como tu Main"
+              title={isFavorite(selectedHeroId) ? t.mainActiveTooltip : t.mainMarkTooltip}
             >
               <Star className={`w-3 h-3 ${isFavorite(selectedHeroId) ? 'fill-current text-slate-950' : 'text-amber-400'}`} />
-              <span>{isFavorite(selectedHeroId) ? '★ Tu Main' : '☆ Marcar como Main'}</span>
+              <span>{isFavorite(selectedHeroId) ? t.mainActive : t.mainMark}</span>
             </button>
           )}
 
@@ -338,10 +346,10 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   ? 'text-slate-400 hover:text-white'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
-              title="Segmentar héroes por sus subroles y pasivas especiales (Iniciador, Flanqueador, Reconocimiento, etc.)"
+              title={t.subroleTooltip}
             >
               <Layers className="w-3 h-3" />
-              <span>Por Subrol</span>
+              <span>{t.groupBySubrole}</span>
             </button>
             <button
               type="button"
@@ -353,10 +361,10 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   ? 'text-slate-400 hover:text-white'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
-              title="Mostrar todos los héroes del rol mezclados juntos en orden alfabético"
+              title={t.roleOnlyTooltip}
             >
               <Users className="w-3 h-3" />
-              <span>Solo por Rol</span>
+              <span>{t.groupByRoleOnly}</span>
             </button>
           </div>
 
@@ -376,7 +384,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Todos
+              {t.all}
             </button>
             <button
               type="button"
@@ -392,10 +400,10 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   ? 'text-slate-400 hover:text-white'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
-              title="Filtrar solo los héroes que tienes marcados como Mains"
+              title={t.mains}
             >
               <Star className={`w-3 h-3 ${favoriteHeroIds.length > 0 ? 'fill-current text-amber-400' : ''}`} />
-              <span>Mains ({favoriteHeroIds.length})</span>
+              <span>{t.mains} ({favoriteHeroIds.length})</span>
             </button>
             {roleCategories.map(cat => (
               <button
@@ -428,10 +436,10 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   ? 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white'
                   : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'
               }`}
-              title="Simula la cola de roles competitiva bloqueando los demás roles"
+              title={t.roleQueueTooltip}
             >
               <Lock className={`w-2.5 h-2.5 ${roleQueueLocked ? 'text-amber-500' : 'text-slate-400'}`} />
-              <span>Role Queue {roleQueueLocked ? 'Fijo' : 'Libre'}</span>
+              <span>Role Queue {roleQueueLocked ? t.roleQueueFixed : t.roleQueueFree}</span>
             </button>
           )}
         </div>
@@ -444,10 +452,10 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
         }`}>
           <Star className="w-8 h-8 text-amber-400 mx-auto mb-2 opacity-80" />
           <h4 className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            No has marcado ningún Main todavía
+            {t.noMainsTitle}
           </h4>
           <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-            Toca la estrella <strong>⭐</strong> en la esquina superior de cualquier héroe para añadirlo a tus Mains. Así el Coach evaluará cómo rendirían tus personajes preferidos en esta partida.
+            {t.noMainsSubtitle}
           </p>
         </div>
       )}
@@ -475,7 +483,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                       </span>
                     </div>
                     <span className="text-[9px] text-slate-400 lowercase">
-                      todos mezclados en orden alfabético
+                      {t.allAlphabetical}
                     </span>
                   </div>
 
@@ -494,7 +502,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
             });
 
             Object.keys(subroleMap).forEach(k => {
-              subroleMap[k].sort((a, b) => a.name.localeCompare(b.name, 'es'));
+              subroleMap[k].sort((a, b) => a.name.localeCompare(b.name, language, { sensitivity: 'base' }));
             });
 
             const subroleKeys = Object.keys(subroleMap);
@@ -509,7 +517,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                     </span>
                   </div>
                   <span className="text-[9px] text-slate-400 lowercase">
-                    {subroleKeys.length} subroles con pasivas de rol
+                    {subroleKeys.length} {t.subrolesWithPassives}
                   </span>
                 </div>
 
@@ -517,12 +525,15 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                   {subroleKeys.map((sub, index) => {
                     const heroesInSub = subroleMap[sub];
                     const subMeta = getSubroleForHero(heroesInSub[0]?.id || '');
+                    const subName = getSubroleDisplayName(subMeta, language);
+                    const passiveName = getSubrolePassiveName(subMeta, language);
+                    const passiveDesc = getSubrolePassiveDescription(subMeta, language);
 
                     return (
                       <React.Fragment key={sub}>
                         <div className="flex flex-col items-center max-w-full">
                           <div
-                            title={`${subMeta.name} (${subMeta.englishName}) — Pasiva: ${subMeta.passiveName}\n${subMeta.passiveDescription}`}
+                            title={`${subName} (${subMeta.englishName}) — ${passiveName}\n${passiveDesc}`}
                             className={`flex items-center space-x-1 text-[7.5px] sm:text-[8.5px] font-mono uppercase tracking-wider font-bold mb-0.5 px-1.5 py-0.5 rounded border truncate max-w-[140px] cursor-help transition ${
                               isDark
                                 ? 'text-slate-300 bg-slate-800/60 border-slate-700/60 hover:border-slate-500'
@@ -530,7 +541,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                             }`}
                           >
                             <span style={{ color: subMeta.accentColor }}>●</span>
-                            <span className="truncate">{subMeta.name}</span>
+                            <span className="truncate">{subName}</span>
                             <span className="opacity-60">({heroesInSub.length})</span>
                           </div>
 

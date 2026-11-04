@@ -3,11 +3,16 @@ import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import { getHeroMapBreakdown } from '../../games/overwatch/mapSynergies';
 import { getEnrichedHeroPerks } from '../../games/overwatch/heroPerksMeta';
-import { getSubroleForHero } from '../../games/overwatch/subroles';
+import {
+  getSubroleForHero,
+  getSubroleDisplayName,
+  getSubrolePassiveName,
+  getSubrolePassiveDescription,
+} from '../../games/overwatch/subroles';
 import type { Hero, HeroAbilityItem, HeroPerkItem } from '../../types/game';
 import { HeroSelectScreen } from '../coach/HeroSelectScreen';
 import { useFavoriteHeroes } from '../../utils/favorites';
-import type { Language } from '../../utils/i18n';
+import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import {
   Shield,
   Crosshair,
@@ -110,6 +115,7 @@ const KitIconBadge: React.FC<{
 
 export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme = 'dark' }) => {
   const isDark = theme === 'dark';
+  const t = TRANSLATIONS[language];
   const { favoriteHeroIds, isFavorite, toggleFavorite } = useFavoriteHeroes();
 
   const [selectedHeroId, setSelectedHeroId] = useState<string>('freja');
@@ -503,6 +509,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
         selectedHeroId={selectedHeroId}
         onSelectHero={setSelectedHeroId}
         theme={theme}
+        language={language}
         title={language === 'es' ? 'GALERÍA DE HÉROES — SELECCIONA UN PERSONAJE' : 'HERO GALLERY — SELECT A CHARACTER'}
         hideRoleLock={true}
         preloadFullKits={true}
@@ -577,17 +584,17 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                         ? 'bg-slate-900/80 border-slate-700 text-amber-400 hover:border-amber-400'
                         : 'bg-white border-slate-300 text-amber-600 hover:border-amber-400'
                     }`}
-                    title={isFavorite(selectedHero.id) ? '★ Es tu Main (Toca para desmarcar)' : '☆ Toca para marcar como tu Main'}
+                    title={isFavorite(selectedHero.id) ? t.mainActiveTooltip : t.mainMarkTooltip}
                   >
                     <Star className={`w-3.5 h-3.5 ${isFavorite(selectedHero.id) ? 'fill-current text-slate-950' : 'text-amber-400'}`} />
-                    <span>{isFavorite(selectedHero.id) ? '★ Tu Main' : '☆ Marcar Main'}</span>
+                    <span>{isFavorite(selectedHero.id) ? t.mainActive : t.mainMark}</span>
                   </button>
 
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => stepHero(-1)}
-                      title="Héroe anterior"
+                      title={language === 'en' ? 'Previous hero' : 'Héroe anterior'}
                       className={`p-1.5 rounded-lg border transition ${
                         isDark
                           ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
@@ -599,7 +606,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     <button
                       type="button"
                       onClick={() => stepHero(1)}
-                      title="Siguiente héroe"
+                      title={language === 'en' ? 'Next hero' : 'Siguiente héroe'}
                       className={`p-1.5 rounded-lg border transition ${
                         isDark
                           ? 'bg-slate-900/80 border-slate-700 text-slate-300 hover:text-white hover:border-slate-500'
@@ -636,10 +643,10 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                   }}
                   title={
                     selectedHero.role === 'tank'
-                      ? 'Rol: Tanque'
+                      ? `${t.roleLabel}: ${t.tank}`
                       : selectedHero.role === 'damage'
-                      ? 'Rol: Daño (DPS)'
-                      : 'Rol: Apoyo'
+                      ? `${t.roleLabel}: ${t.damageDps}`
+                      : `${t.roleLabel}: ${t.support}`
                   }
                   className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 p-0.5 flex items-center justify-center flex-shrink-0 bg-slate-950 text-white transition-all duration-300"
                 >
@@ -660,12 +667,12 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     borderColor: `color-mix(in oklab, ${heroColor} 50%, transparent)`,
                     backgroundColor: `color-mix(in oklab, ${heroColor} 14%, transparent)`,
                   }}
-                  title={`Subrol: ${subMeta.name} (${subMeta.englishName})\nPasiva de Rol: ${subMeta.passiveName}\n${subMeta.passiveDescription}`}
+                  title={`${t.subroleLabel}: ${getSubroleDisplayName(subMeta, language)} (${subMeta.englishName})\n${t.passiveLabel}: ${getSubrolePassiveName(subMeta, language)}\n${getSubrolePassiveDescription(subMeta, language)}`}
                   className="inline-flex items-center space-x-1 text-[10px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full border transition-colors duration-300 cursor-help"
                 >
                   <span style={{ color: subMeta.accentColor }}>●</span>
-                  <span>{subMeta.name}</span>
-                  <span className="opacity-75 font-normal">({subMeta.passiveName})</span>
+                  <span>{getSubroleDisplayName(subMeta, language)}</span>
+                  <span className="opacity-75 font-normal">({getSubrolePassiveName(subMeta, language)})</span>
                 </span>
                 <span
                   className={`text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-full border ${
@@ -716,15 +723,15 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               >
                 <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase mb-1.5">
                   <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-                    SALUD TOTAL:{' '}
+                    {t.totalHealth}:{' '}
                     <strong style={{ color: sectionTitleColor }} className="text-xs">
                       {hp.total} HP
                     </strong>
                   </span>
                   <span className="text-slate-400">
-                    {hp.health} Vida
-                    {hp.armor > 0 ? ` · ${hp.armor} Armadura` : ''}
-                    {hp.shields > 0 ? ` · ${hp.shields} Escudo` : ''}
+                    {hp.health} {t.healthHp}
+                    {hp.armor > 0 ? ` · ${hp.armor} ${t.armorHp}` : ''}
+                    {hp.shields > 0 ? ` · ${hp.shields} ${t.shieldsHp}` : ''}
                   </span>
                 </div>
                 <div className="w-full h-2.5 rounded-full overflow-hidden flex gap-0.5 bg-slate-800/50 p-0.5">
@@ -810,7 +817,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <Calendar className="w-3 h-3 text-emerald-400" />
-                  Debut {selectedHero.releaseYear} · {selectedHero.age} años
+                  Debut {selectedHero.releaseYear} · {selectedHero.age} {language === 'en' ? 'years old' : 'años'}
                 </span>
               </div>
             </div>
@@ -831,7 +838,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 className="text-slate-950 px-3 py-1.5 flex items-center justify-center sm:hidden transition-all duration-300"
               >
                 <span className="font-black uppercase tracking-[0.2em] text-xs select-none">
-                  {language === 'es' ? 'KIT DE HABILIDADES' : 'ABILITY KIT'}
+                  {t.heroKit}
                 </span>
               </div>
 
@@ -841,7 +848,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 className="hidden sm:flex text-slate-950 px-3 py-6 items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
               >
                 <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm [writing-mode:vertical-rl] rotate-180 select-none">
-                  {language === 'es' ? 'KIT DE HABILIDADES' : 'ABILITY KIT'}
+                  {t.heroKit}
                 </span>
               </div>
 
@@ -853,7 +860,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                       style={{ color: sectionTitleColor }}
                       className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
-                      {language === 'es' ? 'ARMA' : 'WEAPON'}
+                      {t.weaponSection}
                     </h3>
                     <div className="space-y-3.5 sm:space-y-4">
                       {(kit?.weapons || []).map(w => renderKitItem(w, 'weapon', false))}
@@ -865,7 +872,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                       style={{ color: sectionTitleColor }}
                       className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
-                      {language === 'es' ? 'DEFINITIVA' : 'ULTIMATE'}
+                      {t.ultimateSection}
                     </h3>
                     <div className="space-y-3.5 sm:space-y-4">
                       {(kit?.ultimate || []).map(u => renderKitItem(u, 'ult', true))}
@@ -881,7 +888,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                         style={{ color: sectionTitleColor }}
                         className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                       >
-                        {language === 'es' ? 'HABILIDADES' : 'ABILITIES'}
+                        {t.abilitiesSection}
                       </h3>
                       <div className="space-y-3.5 sm:space-y-4">
                         {kit.abilities.map(ab => renderKitItem(ab, 'ability', false))}
@@ -894,7 +901,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                       style={{ color: sectionTitleColor }}
                       className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
                     >
-                      {language === 'es' ? 'PASIVAS' : 'PASSIVES'}
+                      {t.passivesSection}
                     </h3>
                     <div className="space-y-3.5 sm:space-y-4">
                       {(kit?.passives || []).map(pa => renderKitItem(pa, 'passive', false))}
@@ -917,7 +924,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 className="text-slate-950 px-3 py-1.5 flex items-center justify-center sm:hidden transition-all duration-300"
               >
                 <span className="font-black uppercase tracking-[0.2em] text-xs select-none">
-                  PERKS
+                  {t.perksSection}
                 </span>
               </div>
 
@@ -927,21 +934,21 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 className="hidden sm:flex text-slate-950 px-3 py-6 items-center justify-center sm:w-10 flex-shrink-0 transition-all duration-300"
               >
                 <span className="font-black uppercase tracking-[0.22em] text-xs sm:text-sm [writing-mode:vertical-rl] rotate-180 select-none">
-                  PERKS
+                  {t.perksSection}
                 </span>
               </div>
 
               <div className="flex-1 p-3.5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                 {renderPerkTier(
-                  language === 'es' ? 'MENOR (NIVEL 2)' : 'MINOR (LEVEL 2)',
-                  language === 'es' ? 'Elige 1 de 2 talentos en combate' : 'Choose 1 of 2 combat perks',
+                  t.minorPerkLevel,
+                  t.minorPerkSubtitle,
                   enrichedPerks.minor,
                   false
                 )}
 
                 {renderPerkTier(
-                  language === 'es' ? 'MAYOR (NIVEL 3)' : 'MAJOR (LEVEL 3)',
-                  language === 'es' ? 'Elige 1 de 2 talentos avanzados' : 'Choose 1 of 2 advanced perks',
+                  t.majorPerkLevel,
+                  t.majorPerkSubtitle,
                   enrichedPerks.major,
                   true
                 )}
@@ -963,7 +970,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                 style={{ color: sectionTitleColor }}
                 className="text-xs sm:text-sm font-black uppercase tracking-[0.14em]"
               >
-                SINERGIA TÁCTICA DE MAPAS ({selectedHero.name.toUpperCase()})
+                {t.tacticalMapSynergies} ({selectedHero.name.toUpperCase()})
               </h3>
             </div>
             <p className={`text-xs max-w-2xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
@@ -981,9 +988,9 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-black uppercase tracking-wider text-emerald-500 flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Mapas Favorables / Ideales</span>
+                  <span>{t.favorableMaps}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">Impulsan su calificación en Coach</span>
+                <span className="text-[10px] font-mono text-slate-400">{t.favorableMapsSub}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1032,9 +1039,9 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-black uppercase tracking-wider text-rose-500 flex items-center gap-1.5">
                   <AlertOctagon className="w-3.5 h-3.5" />
-                  <span>Mapas Desfavorables / Incómodos</span>
+                  <span>{t.unfavorableMaps}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">Penalizan su calificación en Coach</span>
+                <span className="text-[10px] font-mono text-slate-400">{t.unfavorableMapsSub}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1085,7 +1092,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           <div>
             <div className="flex items-center space-x-1.5 text-xs font-black uppercase tracking-wider text-emerald-500 mb-2">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Favorable contra ({selectedHero.counters.strongAgainst.length})</span>
+              <span>{t.favoredAgainstCount} ({selectedHero.counters.strongAgainst.length})</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {topStrong.map(target => {
@@ -1127,7 +1134,7 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
           <div>
             <div className="flex items-center space-x-1.5 text-xs font-black uppercase tracking-wider text-rose-500 mb-2">
               <AlertOctagon className="w-3.5 h-3.5" />
-              <span>Sufre contra / Counters ({selectedHero.counters.weakAgainst.length})</span>
+              <span>{t.counteredByCount} ({selectedHero.counters.weakAgainst.length})</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {topWeak.map(threat => {

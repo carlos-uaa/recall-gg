@@ -1,9 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { OVERWATCH_PATCHES, type PatchNote, type ChangeImpact, type HeroPatchChange } from '../../games/overwatch/patchNotes';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
-import { getSubroleForHero } from '../../games/overwatch/subroles';
+import {
+  getSubroleForHero,
+  getSubroleDisplayName,
+  getSubrolePassiveName,
+  getSubrolePassiveDescription,
+} from '../../games/overwatch/subroles';
 import { HeroAvatar } from '../common/HeroAvatar';
-import type { Language } from '../../utils/i18n';
+import { TRANSLATIONS, type Language } from '../../utils/i18n';
 import {
   FileText,
   ChevronDown,
@@ -31,6 +36,7 @@ interface PatchesViewProps {
 
 export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme = 'dark' }) => {
   const isDark = theme === 'dark';
+  const t = TRANSLATIONS[language];
 
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
@@ -124,7 +130,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
         return (
           <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-black uppercase bg-sky-500/15 text-sky-400 border border-sky-500/30">
             <SlidersHorizontal className="w-3 h-3 text-sky-400" />
-            <span>AJUSTE</span>
+            <span>{language === 'en' ? 'ADJUSTMENT' : 'AJUSTE'}</span>
           </span>
         );
     }
@@ -148,18 +154,17 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
           <div>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold mb-2">
               <FileText className="w-4 h-4" />
-              <span>HISTORIAL OFICIAL DE PARCHES & CAMBIOS DE BALANCE</span>
+              <span>{t.patchesBadge}</span>
             </div>
             <h1
               className={`text-2xl sm:text-3xl font-black tracking-tight ${
                 isDark ? 'text-white' : 'text-slate-900'
               }`}
             >
-              Notas de Parche & Evolución del Meta
+              {t.patchesTitle}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-              Consulta el historial completo de cambios por parche, segmentado bajo demanda. Revisa los buffs, nerfs,
-              reajustes de pasivas de subrol y comentarios de los desarrolladores para entender cada cambio competitivo.
+              {t.patchesSubtitle}
             </p>
           </div>
 
@@ -170,12 +175,12 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
             }`}
           >
             <div className="text-center">
-              <div className="text-[10px] text-slate-400 uppercase font-mono font-bold">Parches</div>
+              <div className="text-[10px] text-slate-400 uppercase font-mono font-bold">{t.patchesCountLabel}</div>
               <div className="text-lg font-black text-orange-500">{OVERWATCH_PATCHES.length}</div>
             </div>
             <div className="h-6 w-px bg-slate-700/60" />
             <div className="text-center">
-              <div className="text-[10px] text-slate-400 uppercase font-mono font-bold">Último Parche</div>
+              <div className="text-[10px] text-slate-400 uppercase font-mono font-bold">{t.latestPatchLabel}</div>
               <div className="text-xs font-black text-emerald-400 font-mono">v2.14.2</div>
             </div>
           </div>
@@ -194,7 +199,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Buscar por versión (v2.14.2), héroe, habilidad o cambio..."
+              placeholder={t.searchPatchPlaceholder}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className={`w-full pl-9 pr-4 py-2 rounded-xl text-xs sm:text-sm border transition focus:outline-none focus:ring-2 focus:ring-orange-500 ${
@@ -218,7 +223,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                   : 'text-slate-600 hover:text-slate-900 bg-slate-100'
               }`}
             >
-              Todos ({OVERWATCH_PATCHES.length})
+              {t.all} ({OVERWATCH_PATCHES.length})
             </button>
             <button
               type="button"
@@ -231,7 +236,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                   : 'text-slate-600 hover:text-slate-900 bg-slate-100'
               }`}
             >
-              Mid-Season
+              {t.filterMidSeason}
             </button>
             <button
               type="button"
@@ -244,7 +249,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                   : 'text-slate-600 hover:text-slate-900 bg-slate-100'
               }`}
             >
-              Inicio de Temporada
+              {t.filterSeasonLaunch}
             </button>
             <button
               type="button"
@@ -257,7 +262,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                   : 'text-slate-600 hover:text-slate-900 bg-slate-100'
               }`}
             >
-              Balance General
+              {t.filterBalance}
             </button>
           </div>
 
@@ -272,12 +277,12 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                   : 'bg-slate-100 border-slate-300 text-slate-800'
               }`}
             >
-              <option value="all">Filtrar por Héroe: Todos</option>
+              <option value="all">{t.filterByHeroAll}</option>
               {OVERWATCH_HEROES.slice()
-                .sort((a, b) => a.name.localeCompare(b.name, 'es'))
+                .sort((a, b) => a.name.localeCompare(b.name, language))
                 .map(hero => (
                   <option key={hero.id} value={hero.id}>
-                    {hero.name} ({hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'})
+                    {hero.name} ({hero.role === 'damage' ? t.damage : hero.role === 'tank' ? t.tank : t.support})
                   </option>
                 ))}
             </select>
@@ -291,9 +296,9 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                   ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
               }`}
-              title="Desplegar todos los parches"
+              title={t.openAll}
             >
-              Abrir todos
+              {t.openAll}
             </button>
             <button
               type="button"
@@ -303,9 +308,9 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                   ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                   : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
               }`}
-              title="Colapsar todos los parches"
+              title={t.closeAll}
             >
-              Cerrar todos
+              {t.closeAll}
             </button>
           </div>
         </div>
@@ -320,10 +325,10 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
         >
           <FileText className="w-12 h-12 text-slate-500 mx-auto mb-3 opacity-60" />
           <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            No se encontraron parches con los filtros seleccionados
+            {t.noPatchesFoundTitle}
           </h3>
           <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-            Prueba a buscar con otro término o limpia los filtros de tipo de parche y héroe.
+            {t.noPatchesFoundSub}
           </p>
           <button
             type="button"
@@ -334,7 +339,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
             }}
             className="mt-4 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold uppercase transition"
           >
-            Limpiar Filtros
+            {t.clearFilters}
           </button>
         </div>
       ) : (
@@ -395,7 +400,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                     {/* Affected Heroes Mini Avatars Row */}
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">
                       <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 mr-1">
-                        Héroes ({patch.affectedHeroIds.length}):
+                        {t.affectedHeroesLabel} ({patch.affectedHeroIds.length}):
                       </span>
                       {affectedHeroes.map(hero => {
                         const heroChange = patch.heroChanges.find(hc => hc.heroId === hero.id);
@@ -437,7 +442,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                           : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
                       }`}
                     >
-                      <span>{isExpanded ? 'Ocultar detalles' : 'Desplegar cambios'}</span>
+                      <span>{isExpanded ? t.hideDetailsBtn : t.expandDetailsBtn}</span>
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                   </div>
@@ -461,7 +466,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                       >
                         <div className="flex items-center space-x-2 text-orange-400 font-bold mb-1 uppercase font-mono text-[11px]">
                           <Sparkles className="w-3.5 h-3.5" />
-                          <span>Comentario de los Desarrolladores</span>
+                          <span>{t.devCommentsTitle}</span>
                         </div>
                         <p>{patch.developerIntro}</p>
                       </div>
@@ -472,7 +477,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2 text-xs font-mono font-bold uppercase text-slate-400 tracking-wider">
                           <Layers className="w-3.5 h-3.5 text-orange-400" />
-                          <span>Ajustes Generales de Sistema & Pasivas de Rol</span>
+                          <span>{t.systemAdjustmentsTitle}</span>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {patch.systemChanges.map((sys, idx) => (
@@ -507,13 +512,16 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2 text-xs font-mono font-bold uppercase text-slate-400 tracking-wider">
                         <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Detalle de Cambios por Personaje</span>
+                        <span>{t.heroChangesTitle}</span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {patch.heroChanges.map(heroChange => {
                           const heroObj = OVERWATCH_HEROES.find(h => h.id === heroChange.heroId);
                           const subMeta = getSubroleForHero(heroChange.heroId);
+                          const subName = getSubroleDisplayName(subMeta, language);
+                          const passiveName = getSubrolePassiveName(subMeta, language);
+                          const passiveDesc = getSubrolePassiveDescription(subMeta, language);
 
                           return (
                             <div
@@ -545,14 +553,14 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                                     <div className="flex items-center space-x-1.5 text-[10px] font-mono text-slate-400">
                                       <span className="flex items-center space-x-0.5">
                                         {getRoleIcon(heroChange.role)}
-                                        <span className="capitalize">{heroChange.role}</span>
+                                        <span className="capitalize">{heroChange.role === 'damage' ? t.damage : heroChange.role === 'tank' ? t.tank : t.support}</span>
                                       </span>
                                       <span>•</span>
                                       <span
-                                        title={`Pasiva: ${subMeta.passiveName}\n${subMeta.passiveDescription}`}
+                                        title={`${t.passiveLabel}: ${passiveName}\n${passiveDesc}`}
                                         className="font-bold text-orange-400 cursor-help"
                                       >
-                                        {subMeta.name}
+                                        {subName}
                                       </span>
                                     </div>
                                   </div>
@@ -639,7 +647,7 @@ export const PatchesView: React.FC<PatchesViewProps> = ({ language = 'es', theme
                 onClick={() => setVisibleCount(prev => prev + 4)}
                 className="px-6 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-orange-600/30"
               >
-                Cargar Más Parches ({filteredPatches.length - visibleCount} restantes)
+                {t.loadMorePatchesBtn} ({filteredPatches.length - visibleCount} {t.remainingLabel})
               </button>
             </div>
           )}

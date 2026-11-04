@@ -481,6 +481,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         onSelectHero={handleSelectMyHero}
         allyHeroIds={allyHeroIds}
         theme={theme}
+        language={language}
         playerRole={playerHero.role}
         favoriteHeroIds={favoriteHeroIds}
         onToggleFavorite={toggleFavorite}
@@ -1165,17 +1166,19 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                           : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
                       }`}
                     >
-                      {activeSlotTarget.team === 'ally' ? 'Equipo Aliado' : 'Equipo Rival'}
+                      {activeSlotTarget.team === 'ally' ? t.allyTeam : t.enemyTeam}
                     </span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full font-mono bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                      Orden Alfabético A-Z
+                      {language === 'en' ? 'Alphabetical A-Z' : 'Orden Alfabético A-Z'}
                     </span>
                   </div>
                   <h3 className={`font-black text-base sm:text-xl truncate mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    Seleccionar {targetSlot?.label || (activeSlotTarget.role === 'tank' ? 'Tanque' : activeSlotTarget.role === 'damage' ? 'DPS' : 'Apoyo')}
+                    {targetSlot?.isMyPick
+                      ? t.myHeroSection
+                      : `${t.selectRoleSlotPrefix} ${targetSlot?.label || (activeSlotTarget.role === 'tank' ? t.tank : activeSlotTarget.role === 'damage' ? t.damage : t.support)}`}
                   </h3>
                   <p className="text-[11px] sm:text-xs text-slate-400 hidden xs:block">
-                    Toca la imagen del héroe para asignarlo de inmediato sin escribir.
+                    {language === 'en' ? 'Tap hero portrait to assign instantly without typing.' : 'Toca la imagen del héroe para asignarlo de inmediato sin escribir.'}
                   </p>
                 </div>
 
@@ -1188,10 +1191,10 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         setActiveSlotTarget(null);
                       }}
                       className="px-2.5 sm:px-3 py-1.5 rounded-xl border border-rose-500/40 text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition flex items-center gap-1.5"
-                      title="Dejar esta casilla vacía"
+                      title={language === 'en' ? 'Leave slot empty' : 'Dejar esta casilla vacía'}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Quitar héroe</span>
+                      <span className="hidden sm:inline">{language === 'en' ? 'Remove hero' : 'Quitar héroe'}</span>
                     </button>
                   )}
                   <button
@@ -1223,7 +1226,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     }`}
                   >
                     <Shield className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Tanques</span>
+                    <span>{t.tanks}</span>
                   </button>
 
                   <button
@@ -1238,7 +1241,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     }`}
                   >
                     <Swords className="w-3.5 h-3.5 text-rose-400" />
-                    <span>DPS</span>
+                    <span>{t.damage}</span>
                   </button>
 
                   <button
@@ -1253,7 +1256,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     }`}
                   >
                     <Heart className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Apoyo</span>
+                    <span>{t.support}</span>
                   </button>
 
                   <button
@@ -1268,7 +1271,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     }`}
                   >
                     <Users className="w-3.5 h-3.5" />
-                    <span>Todos</span>
+                    <span>{t.all}</span>
                   </button>
 
                   {favoriteHeroIds.length > 0 && (
@@ -1284,7 +1287,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       }`}
                     >
                       <Star className="w-3.5 h-3.5 fill-current" />
-                      <span>Mains ({favoriteHeroIds.length})</span>
+                      <span>{t.mains} ({favoriteHeroIds.length})</span>
                     </button>
                   )}
                 </div>
@@ -1294,7 +1297,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Filtrar..."
+                    placeholder={language === 'en' ? 'Filter...' : 'Filtrar...'}
                     value={searchFilter}
                     onChange={e => setSearchFilter(e.target.value)}
                     className={`w-full text-xs rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-orange-500 border ${
@@ -1310,7 +1313,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               <div className="p-3 sm:p-5 overflow-y-auto flex-1">
                 {candidateHeroes.length === 0 ? (
                   <div className="text-center py-10 text-slate-400 text-xs">
-                    No se encontraron héroes con el filtro actual.
+                    {language === 'en' ? 'No heroes found matching the current filter.' : 'No se encontraron héroes con el filtro actual.'}
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 sm:gap-2.5">
@@ -1328,7 +1331,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                           type="button"
                           disabled={isTaken}
                           onClick={() => assignHeroToSlot(hero.id)}
-                          title={isTaken ? `${hero.name} (Ya en el equipo)` : `${hero.name} (${hero.role})`}
+                          title={isTaken ? `${hero.name} (${t.inTeam})` : `${hero.name} (${hero.role})`}
                           className={`group relative rounded-2xl overflow-hidden border flex flex-col items-center transition active:scale-95 text-left ${
                             isCurrent
                               ? 'ring-2 ring-orange-500 border-orange-500 scale-[1.02]'

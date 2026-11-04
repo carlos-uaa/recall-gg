@@ -115,7 +115,7 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
           <div>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold mb-2">
               <BarChart3 className="w-4 h-4" />
-              <span>TIER LIST COMPETITIVA & META ACTUAL</span>
+              <span>{language === 'en' ? 'COMPETITIVE TIER LIST & CURRENT META' : 'TIER LIST COMPETITIVA & META ACTUAL'}</span>
             </div>
             <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               {t.metaTitle}
@@ -145,15 +145,15 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
 
         {/* Legend for Stars Difficulty */}
         <div className="mt-4 pt-4 border-t border-slate-800 flex items-center space-x-4 text-xs text-slate-400">
-          <span className="font-semibold text-slate-300">Dificultad de Uso:</span>
+          <span className="font-semibold text-slate-300">{t.difficultyLegend}:</span>
           <span className="flex items-center text-amber-400 text-[11px]">
-            ★☆☆ <span className="ml-1 text-slate-400">Baja / Fácil</span>
+            ★☆☆ <span className="ml-1 text-slate-400">{t.diffEasy}</span>
           </span>
           <span className="flex items-center text-amber-400 text-[11px]">
-            ★★☆ <span className="ml-1 text-slate-400">Media</span>
+            ★★☆ <span className="ml-1 text-slate-400">{t.diffMedium}</span>
           </span>
           <span className="flex items-center text-amber-400 text-[11px]">
-            ★★★ <span className="ml-1 text-slate-400">Alta / Exigente mecánicamente</span>
+            ★★★ <span className="ml-1 text-slate-400">{t.diffHard}</span>
           </span>
         </div>
       </div>
@@ -171,15 +171,15 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center gap-1">
                 <Flame className="w-3 h-3 text-orange-500 animate-pulse" />
-                PARCHE MID-SEASON (NOVIEMBRE 2026)
+                {t.metaBadge}
               </span>
-              <span className="text-xs text-slate-400 font-mono">Actualizado con cambios de balance</span>
+              <span className="text-xs text-slate-400 font-mono">{t.metaUpdatedWithBalance}</span>
             </div>
             <h2 className={`text-base sm:text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Impacto del Parche en el Meta & Movimientos en la Tier List
+              {t.metaPatchTitle}
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed">
-              Junker Queen y Reaper lideran el resurgir de composiciones Brawl y Rush. Illari y Mauga se benefician de mayor sustain, mientras Doctrine, Genji y Ana reciben ajustes a sus capacidades de burst individual.
+              {t.metaPatchDescription}
             </p>
           </div>
 
@@ -264,9 +264,9 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-900 text-slate-400">
-                          {hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
+                          {hero.role === 'damage' ? t.damage : hero.role === 'tank' ? t.tank : t.support}
                         </span>
-                        <div className="flex items-center text-amber-400" title={`Dificultad de uso: ${hero.difficulty}/3`}>
+                        <div className="flex items-center text-amber-400" title={`${t.difficultyLegend}: ${hero.difficulty}/3`}>
                           {Array.from({ length: 3 }).map((_, i) => (
                             <Star
                               key={i}

@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
-import { getSubroleForHero } from '../../games/overwatch/subroles';
+import {
+  getSubroleForHero,
+  getSubroleDisplayName,
+  getSubrolePassiveName,
+  getSubrolePassiveDescription,
+} from '../../games/overwatch/subroles';
 import type { Hero } from '../../types/game';
 import { HeroAvatar } from '../common/HeroAvatar';
 import { TRANSLATIONS, type Language } from '../../utils/i18n';
@@ -31,6 +36,10 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
   const softWeakAgainstHeroes = weakAgainstHeroes.filter(h => !selectedHero.counters.hardWeakAgainst?.includes(h.id));
 
   const synergyHeroes = OVERWATCH_HEROES.filter(h => selectedHero.synergies.includes(h.id));
+  const subMeta = getSubroleForHero(selectedHero.id);
+  const subName = getSubroleDisplayName(subMeta, language);
+  const passiveName = getSubrolePassiveName(subMeta, language);
+  const passiveDesc = getSubrolePassiveDescription(subMeta, language);
 
   const filteredRoster = OVERWATCH_HEROES.filter(h =>
     h.name.toLowerCase().includes(search.toLowerCase())
@@ -59,13 +68,13 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
       }`}>
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-2">
           <Swords className="w-4 h-4" />
-          <span>MATRIZ DE ENFRENTAMIENTOS & COUNTERS OFICIALES</span>
+          <span>{t.countersBadge}</span>
         </div>
         <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
           {t.countersTitle}
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          {t.countersSubtitle} — Matriz 100% coherente y antisimétrica de los 54 héroes, con counters duros, motivos tácticos y consejos directos.
+          {t.countersSubtitleFull}
         </p>
       </div>
 
@@ -77,7 +86,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
           <div className="mb-3">
             <input
               type="text"
-              placeholder="Buscar héroe..."
+              placeholder={language === 'en' ? 'Search hero...' : 'Buscar héroe...'}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className={`w-full border rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 transition ${
@@ -107,7 +116,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                   <span className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded ${
                     hero.id === selectedHeroId ? 'bg-black/20 text-white' : 'bg-slate-900 text-slate-400'
                   }`}>
-                    {hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
+                    {hero.role === 'damage' ? t.damage : hero.role === 'tank' ? t.tank : t.support}
                   </span>
                   <span className={`text-[9px] font-mono font-black px-1.5 py-0.5 rounded ${getTierColor(hero.tier)}`}>
                     {hero.tier || 'B'}
@@ -133,7 +142,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                       {selectedHero.name}
                     </h2>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono uppercase">
-                      {selectedHero.role === 'damage' ? 'DPS' : selectedHero.role === 'tank' ? 'Tanque' : 'Apoyo'}
+                      {selectedHero.role === 'damage' ? t.damage : selectedHero.role === 'tank' ? t.tank : t.support}
                     </span>
                     <span className={`text-xs px-2.5 py-0.5 rounded-full font-black border shadow-sm ${getTierColor(selectedHero.tier)}`}>
                       Tier {selectedHero.tier || 'B'}
@@ -141,19 +150,19 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                   </div>
                   <div className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-1.5">
                     <span>
-                      Subrol: <span className="text-orange-400 font-bold">{selectedHero.subrole}</span>
+                      {t.subroleLabel}: <span className="text-orange-400 font-bold">{subName}</span>
                     </span>
                     <span>•</span>
                     <span
-                      title={getSubroleForHero(selectedHero.id).passiveDescription}
+                      title={`${subName} (${subMeta.englishName})\n${passiveDesc}`}
                       className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-mono cursor-help"
                     >
-                      <span>Pasiva:</span>
-                      <span className="font-bold">{getSubroleForHero(selectedHero.id).passiveName}</span>
+                      <span>{t.passiveLabel}:</span>
+                      <span className="font-bold">{passiveName}</span>
                     </span>
                     <span>•</span>
                     <span>
-                      Estilo: <span className="text-emerald-400 font-bold uppercase">{selectedHero.style}</span>
+                      {t.styleLabel}: <span className="text-emerald-400 font-bold uppercase">{selectedHero.style}</span>
                     </span>
                     <span>•</span>
                     <span>{selectedHero.country}</span>
@@ -164,7 +173,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
               <div className={`rounded-2xl p-3 border text-right ${
                 isDark ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-200'
               }`}>
-                <div className="text-[10px] uppercase text-slate-400 font-semibold">Dificultad de Uso</div>
+                <div className="text-[10px] uppercase text-slate-400 font-semibold">{t.difficultyLegend}</div>
                 <div className="text-sm font-bold text-amber-400 flex items-center justify-end space-x-1 mt-0.5">
                   <div className="flex">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -175,7 +184,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                     ))}
                   </div>
                   <span className="text-xs font-semibold text-slate-300 ml-1">
-                    {selectedHero.difficulty === 1 ? 'Baja' : selectedHero.difficulty === 2 ? 'Media' : 'Alta'}
+                    {selectedHero.difficulty === 1 ? t.diffLow : selectedHero.difficulty === 2 ? t.diffMed : t.diffHigh}
                   </span>
                 </div>
               </div>
@@ -195,7 +204,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                 <MessageSquare className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <div className="text-xs font-black uppercase tracking-wide text-amber-400 mb-1">
-                    Consejos del Coach: Cómo jugarle en contra a {selectedHero.name}
+                    {t.coachAdviceTitle} {selectedHero.name}
                   </div>
                   <p className="text-xs leading-relaxed opacity-95">
                     "{selectedHero.counterAdvice}"
@@ -232,12 +241,12 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                 </div>
                 {hardStrongAgainstHeroes.length > 0 && (
                   <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                    {hardStrongAgainstHeroes.length} duro{hardStrongAgainstHeroes.length > 1 ? 's' : ''}
+                    {hardStrongAgainstHeroes.length} {hardStrongAgainstHeroes.length > 1 ? t.hardPlural : t.hardSingular}
                   </span>
                 )}
               </div>
               <p className="text-[11px] text-slate-400 mb-3">
-                Tu kit ofrece ventajas tácticas directas para cazar o neutralizar a estos objetivos:
+                {t.strongAgainstLead}
               </p>
 
               <div className="space-y-2">
@@ -282,7 +291,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                   })
                 ) : (
                   <div className="text-xs text-slate-400 italic p-3 text-center bg-slate-800/40 rounded-xl">
-                    Héroe neutral / enfocado en utilidad situacional y sinergias.
+                    {language === 'en' ? 'Neutral hero / focused on situational utility and team synergies.' : 'Héroe neutral / enfocado en utilidad situacional y sinergias.'}
                   </div>
                 )}
               </div>
@@ -299,12 +308,12 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                 </div>
                 {hardWeakAgainstHeroes.length > 0 && (
                   <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40">
-                    {hardWeakAgainstHeroes.length} duro{hardWeakAgainstHeroes.length > 1 ? 's' : ''}
+                    {hardWeakAgainstHeroes.length} {hardWeakAgainstHeroes.length > 1 ? t.hardPlural : t.hardSingular}
                   </span>
                 )}
               </div>
               <p className="text-[11px] text-slate-400 mb-3">
-                Si el equipo rival cuenta con estos personajes, tu efectividad caerá drásticamente:
+                {t.weakAgainstLead}
               </p>
 
               <div className="space-y-2">
@@ -349,7 +358,7 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                   })
                 ) : (
                   <div className="text-xs text-slate-400 italic p-3 text-center bg-slate-800/40 rounded-xl">
-                    ¡Sin counters directos en el meta actual!
+                    {language === 'en' ? 'No direct counters in the current meta!' : '¡Sin counters directos en el meta actual!'}
                   </div>
                 )}
               </div>
