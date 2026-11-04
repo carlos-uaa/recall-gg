@@ -1,6 +1,6 @@
 import type { GameMap } from '../../types/game';
 
-export const OVERWATCH_MAPS: GameMap[] = [
+const RAW_OVERWATCH_MAPS: GameMap[] = [
   {
     "id": "kings-row",
     "name": "King's Row",
@@ -412,3 +412,7 @@ export const OVERWATCH_MAPS: GameMap[] = [
     "longSightlines": false
   }
 ];
+
+export const OVERWATCH_MAPS: GameMap[] = [...RAW_OVERWATCH_MAPS].sort((a, b) =>
+  a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+);

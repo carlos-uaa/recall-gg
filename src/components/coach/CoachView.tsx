@@ -28,7 +28,11 @@ import {
   AlertOctagon, 
   Lock,
   Flame,
-  Award
+  Award,
+  Search,
+  Trash2,
+  Users,
+  Crosshair
 } from 'lucide-react';
 
 interface CoachViewProps {
@@ -138,7 +142,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
   // Modal selection state
   const [activeSlotTarget, setActiveSlotTarget] = useState<{ team: 'ally' | 'enemy'; slotId: string; role: Role } | null>(null);
+  const [slotModalRoleFilter, setSlotModalRoleFilter] = useState<Role | 'all' | 'mains'>('all');
   const [searchFilter, setSearchFilter] = useState('');
+
+  const openSlotModal = (team: 'ally' | 'enemy', slotId: string, role: Role) => {
+    setActiveSlotTarget({ team, slotId, role });
+    setSlotModalRoleFilter(role);
+    setSearchFilter('');
+  };
 
   // Selected Map
   const selectedMap: GameMap = useMemo(() => {
@@ -523,7 +534,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
                   {hero ? (
                     <div
-                      onClick={() => setActiveSlotTarget({ team: 'ally', slotId: slot.id, role: slot.role })}
+                      onClick={() => openSlotModal('ally', slot.id, slot.role)}
                       className="cursor-pointer flex flex-col items-center w-full"
                     >
                       <HeroAvatar hero={hero} size="md" />
@@ -538,7 +549,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     </div>
                   ) : (
                     <button
-                      onClick={() => setActiveSlotTarget({ team: 'ally', slotId: slot.id, role: slot.role })}
+                      onClick={() => openSlotModal('ally', slot.id, slot.role)}
                       className="w-full py-2.5 sm:py-4 flex flex-col items-center justify-center text-slate-400 hover:text-blue-400 transition"
                     >
                       <Plus className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" />
@@ -621,7 +632,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
                   {hero ? (
                     <div
-                      onClick={() => setActiveSlotTarget({ team: 'enemy', slotId: slot.id, role: slot.role })}
+                      onClick={() => openSlotModal('enemy', slot.id, slot.role)}
                       className="cursor-pointer flex flex-col items-center w-full"
                     >
                       <HeroAvatar hero={hero} size="md" />
@@ -636,7 +647,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     </div>
                   ) : (
                     <button
-                      onClick={() => setActiveSlotTarget({ team: 'enemy', slotId: slot.id, role: slot.role })}
+                      onClick={() => openSlotModal('enemy', slot.id, slot.role)}
                       className="w-full py-2.5 sm:py-4 flex flex-col items-center justify-center text-slate-400 hover:text-rose-400 transition"
                     >
                       <Plus className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" />
@@ -1109,104 +1120,303 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         </div>
       )}
 
-      {/* 5. MODAL CON VALIDACIÓN DE NO-REPETICIÓN */}
-      {activeSlotTarget && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
-          <div className={`border rounded-3xl w-full max-w-2xl max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden ${
-            isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-          }`}>
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
-              <div>
-                <h3 className={`font-black text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Seleccionar {activeSlotTarget.role === 'tank' ? 'Tanque' : activeSlotTarget.role === 'damage' ? 'DPS' : 'Apoyo'} ({activeSlotTarget.team === 'ally' ? 'Aliado' : 'Rival'})
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Los héroes ya seleccionados en este equipo se muestran bloqueados para evitar repeticiones.
-                </p>
-              </div>
-              <button
-                onClick={() => setActiveSlotTarget(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* 5. SELECTOR VISUAL DE HÉROES CON IMÁGENES ORDENADAS ALFABÉTICAMENTE */}
+      {activeSlotTarget && (() => {
+        const targetSlot = (activeSlotTarget.team === 'ally' ? allySlots : enemySlots).find(
+          s => s.id === activeSlotTarget.slotId
+        );
+        const currentHero = targetSlot?.heroId ? OVERWATCH_HEROES.find(h => h.id === targetSlot.heroId) : null;
 
-            <div className="p-4 border-b border-slate-800">
-              <input
-                type="text"
-                placeholder="Buscar por nombre..."
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                className={`w-full text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 border ${
-                  isDark
-                    ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500'
-                    : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400'
+        const candidateHeroes = OVERWATCH_HEROES
+          .filter(h => {
+            if (searchFilter.trim()) {
+              if (!h.name.toLowerCase().includes(searchFilter.toLowerCase().trim())) return false;
+            }
+            if (slotModalRoleFilter === 'mains') {
+              return favoriteHeroIds.includes(h.id);
+            }
+            if (slotModalRoleFilter !== 'all') {
+              return h.role === slotModalRoleFilter;
+            }
+            return true;
+          })
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+
+        return (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+            <div
+              className={`border rounded-3xl w-full max-w-4xl max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden transition ${
+                isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+              }`}
+            >
+              {/* Modal Header */}
+              <div
+                className={`p-3.5 sm:p-5 border-b flex items-center justify-between gap-3 ${
+                  isDark ? 'border-slate-800' : 'border-slate-200'
                 }`}
-                autoFocus
-              />
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {OVERWATCH_HEROES.filter(
-                  h => h.role === activeSlotTarget.role && h.name.toLowerCase().includes(searchFilter.toLowerCase())
-                ).map(hero => {
-                  const targetSlot = allySlots.find(s => s.id === activeSlotTarget.slotId);
-                  const isTaken = activeSlotTarget.team === 'ally'
-                    ? allyHeroIds.includes(hero.id) || (!targetSlot?.isMyPick && hero.id === playerHeroId)
-                    : enemyHeroIds.includes(hero.id);
-
-                  return (
-                    <button
-                      key={hero.id}
-                      disabled={isTaken}
-                      onClick={() => assignHeroToSlot(hero.id)}
-                      className={`relative p-3 rounded-2xl border flex items-center space-x-3 transition text-left group overflow-hidden ${
-                        isTaken
-                          ? 'opacity-35 grayscale cursor-not-allowed border-slate-800 bg-slate-900/40'
-                          : isDark
-                          ? 'bg-slate-800/80 border-slate-700/80 hover:bg-slate-700 hover:border-orange-500'
-                          : 'bg-slate-50 border-slate-200 hover:bg-orange-50 hover:border-orange-400'
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-black uppercase tracking-wider border ${
+                        activeSlotTarget.team === 'ally'
+                          ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                          : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
                       }`}
                     >
-                      {/* Top-right corner style pill */}
-                      {isTaken ? (
-                        <div className="absolute top-1.5 right-1.5">
-                          <Lock className="w-3.5 h-3.5 text-slate-500" />
-                        </div>
-                      ) : (
-                        <span
-                          className={`absolute top-0 right-0 px-1.5 py-0.5 rounded-bl-lg text-[8px] font-mono font-black uppercase leading-none border-b border-l ${
-                            hero.style === 'dive'
-                              ? 'bg-purple-950/90 text-purple-200 border-purple-500/40'
-                              : hero.style === 'brawl'
-                              ? 'bg-amber-950/90 text-amber-200 border-amber-500/40'
-                              : 'bg-cyan-950/90 text-cyan-200 border-cyan-500/40'
+                      {activeSlotTarget.team === 'ally' ? 'Equipo Aliado' : 'Equipo Rival'}
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-mono bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                      Orden Alfabético A-Z
+                    </span>
+                  </div>
+                  <h3 className={`font-black text-base sm:text-xl truncate mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    Seleccionar {targetSlot?.label || (activeSlotTarget.role === 'tank' ? 'Tanque' : activeSlotTarget.role === 'damage' ? 'DPS' : 'Apoyo')}
+                  </h3>
+                  <p className="text-[11px] sm:text-xs text-slate-400 hidden xs:block">
+                    Toca la imagen del héroe para asignarlo de inmediato sin escribir.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  {currentHero && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearSlot(activeSlotTarget.team, activeSlotTarget.slotId);
+                        setActiveSlotTarget(null);
+                      }}
+                      className="px-2.5 sm:px-3 py-1.5 rounded-xl border border-rose-500/40 text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition flex items-center gap-1.5"
+                      title="Dejar esta casilla vacía"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Quitar héroe</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setActiveSlotTarget(null)}
+                    className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Role Filter Tabs & Optional Quick Search */}
+              <div
+                className={`p-2.5 sm:p-3 border-b flex flex-wrap items-center justify-between gap-2 ${
+                  isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'
+                }`}
+              >
+                {/* Role Filter Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setSlotModalRoleFilter('tank')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 ${
+                      slotModalRoleFilter === 'tank'
+                        ? 'bg-blue-600 text-white shadow'
+                        : isDark
+                        ? 'bg-slate-800/80 text-slate-400 hover:text-white'
+                        : 'bg-slate-200/80 text-slate-700 hover:text-slate-900'
+                    }`}
+                  >
+                    <Shield className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Tanques</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSlotModalRoleFilter('damage')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 ${
+                      slotModalRoleFilter === 'damage'
+                        ? 'bg-rose-600 text-white shadow'
+                        : isDark
+                        ? 'bg-slate-800/80 text-slate-400 hover:text-white'
+                        : 'bg-slate-200/80 text-slate-700 hover:text-slate-900'
+                    }`}
+                  >
+                    <Swords className="w-3.5 h-3.5 text-rose-400" />
+                    <span>DPS</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSlotModalRoleFilter('support')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 ${
+                      slotModalRoleFilter === 'support'
+                        ? 'bg-emerald-600 text-white shadow'
+                        : isDark
+                        ? 'bg-slate-800/80 text-slate-400 hover:text-white'
+                        : 'bg-slate-200/80 text-slate-700 hover:text-slate-900'
+                    }`}
+                  >
+                    <Heart className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Apoyo</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSlotModalRoleFilter('all')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 ${
+                      slotModalRoleFilter === 'all'
+                        ? 'bg-orange-500 text-white shadow'
+                        : isDark
+                        ? 'bg-slate-800/80 text-slate-400 hover:text-white'
+                        : 'bg-slate-200/80 text-slate-700 hover:text-slate-900'
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>Todos</span>
+                  </button>
+
+                  {favoriteHeroIds.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSlotModalRoleFilter('mains')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 ${
+                        slotModalRoleFilter === 'mains'
+                          ? 'bg-amber-500 text-slate-950 font-black shadow'
+                          : isDark
+                          ? 'bg-slate-800/80 text-amber-400 hover:text-amber-300'
+                          : 'bg-slate-200/80 text-amber-700 hover:text-amber-800'
+                      }`}
+                    >
+                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <span>Mains ({favoriteHeroIds.length})</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Non-intrusive optional filter */}
+                <div className="relative w-full sm:w-48">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Filtrar..."
+                    value={searchFilter}
+                    onChange={e => setSearchFilter(e.target.value)}
+                    className={`w-full text-xs rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-orange-500 border ${
+                      isDark
+                        ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500'
+                        : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Visual Heroes Grid (Big portrait cards, sorted A-Z) */}
+              <div className="p-3 sm:p-5 overflow-y-auto flex-1">
+                {candidateHeroes.length === 0 ? (
+                  <div className="text-center py-10 text-slate-400 text-xs">
+                    No se encontraron héroes con el filtro actual.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 sm:gap-2.5">
+                    {candidateHeroes.map(hero => {
+                      const isTaken =
+                        activeSlotTarget.team === 'ally'
+                          ? allyHeroIds.includes(hero.id) || (!targetSlot?.isMyPick && hero.id === playerHeroId)
+                          : enemyHeroIds.includes(hero.id);
+
+                      const isCurrent = targetSlot?.heroId === hero.id;
+
+                      return (
+                        <button
+                          key={hero.id}
+                          type="button"
+                          disabled={isTaken}
+                          onClick={() => assignHeroToSlot(hero.id)}
+                          title={isTaken ? `${hero.name} (Ya en el equipo)` : `${hero.name} (${hero.role})`}
+                          className={`group relative rounded-2xl overflow-hidden border flex flex-col items-center transition active:scale-95 text-left ${
+                            isCurrent
+                              ? 'ring-2 ring-orange-500 border-orange-500 scale-[1.02]'
+                              : isTaken
+                              ? 'opacity-30 grayscale cursor-not-allowed border-slate-800 bg-slate-900/40'
+                              : isDark
+                              ? 'bg-slate-800/80 border-slate-700/80 hover:border-orange-500 hover:scale-[1.03]'
+                              : 'bg-white border-slate-300 hover:border-orange-500 hover:scale-[1.03] shadow-sm'
                           }`}
                         >
-                          {hero.style}
-                        </span>
-                      )}
-                      <HeroAvatar hero={hero} size="sm" />
-                      <div className="truncate pr-4">
-                        <div className={`text-xs font-bold group-hover:text-orange-500 transition truncate ${
-                          isDark ? 'text-white' : 'text-slate-900'
-                        }`}>
-                          {hero.name}
-                        </div>
-                        <div className="text-[10px] text-slate-400 uppercase font-mono truncate">
-                          {hero.subrole}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+                          {/* Hero Portrait Picture */}
+                          <div className="w-full aspect-square relative overflow-hidden bg-slate-950">
+                            <img
+                              src={hero.icon}
+                              alt={hero.name}
+                              className="w-full h-full object-cover object-center transition duration-200 group-hover:scale-110"
+                              loading="lazy"
+                            />
+
+                            {/* Lock Overlay if Taken */}
+                            {isTaken && (
+                              <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                                <Lock className="w-5 h-5 text-slate-300" />
+                              </div>
+                            )}
+
+                            {/* Main / Favorite Star */}
+                            {isFavorite(hero.id) && (
+                              <div className="absolute top-1 left-1 z-10 w-4 h-4 rounded-full bg-amber-500/90 text-slate-950 flex items-center justify-center shadow">
+                                <Star className="w-2.5 h-2.5 fill-current" />
+                              </div>
+                            )}
+
+                            {/* Role Indicator in "Todos" or "Mains" mode */}
+                            {(slotModalRoleFilter === 'all' || slotModalRoleFilter === 'mains') && (
+                              <span
+                                className={`absolute bottom-1 left-1 px-1 py-0.2 rounded text-[7.5px] font-mono font-black uppercase shadow ${
+                                  hero.role === 'tank'
+                                    ? 'bg-blue-600/90 text-white'
+                                    : hero.role === 'damage'
+                                    ? 'bg-rose-600/90 text-white'
+                                    : 'bg-emerald-600/90 text-white'
+                                }`}
+                              >
+                                {hero.role === 'tank' ? 'TAN' : hero.role === 'damage' ? 'DPS' : 'SUP'}
+                              </span>
+                            )}
+
+                            {/* Style Pill (Dive / Brawl / Poke) */}
+                            {!isTaken && (
+                              <span
+                                className={`absolute top-1 right-1 px-1 py-0.2 rounded text-[7.5px] font-mono font-black uppercase border leading-none shadow ${
+                                  hero.style === 'dive'
+                                    ? 'bg-purple-950/90 text-purple-200 border-purple-500/40'
+                                    : hero.style === 'brawl'
+                                    ? 'bg-amber-950/90 text-amber-200 border-amber-500/40'
+                                    : 'bg-cyan-950/90 text-cyan-200 border-cyan-500/40'
+                                }`}
+                              >
+                                {hero.style}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Hero Name Tag */}
+                          <div
+                            className={`w-full py-1 px-1 text-center border-t truncate transition ${
+                              isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
+                            }`}
+                          >
+                            <span
+                              className={`text-[11px] sm:text-xs font-bold truncate block group-hover:text-orange-500 transition ${
+                                isDark ? 'text-slate-200' : 'text-slate-800'
+                              }`}
+                            >
+                              {hero.name}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 6. GENERAL ROLE VIABILITY RECOMMENDATIONS */}
       <div className="space-y-4">
@@ -1364,6 +1574,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 }`}>
                   {OVERWATCH_MAPS.length} MAPAS · Sinergia para {playerHero.name}
                 </span>
+                <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                  Orden Alfabético A-Z
+                </span>
               </div>
               <button
                 onClick={() => setMapPickerOpen(false)}
@@ -1394,10 +1607,12 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               ))}
             </div>
 
-            {/* Maps Grid with Large Images + Per-Hero Map Synergy Score */}
+            {/* Maps Grid with Large Images + Per-Hero Map Synergy Score (Sorted A-Z) */}
             <div className="p-4 overflow-y-auto flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {OVERWATCH_MAPS
                 .filter(m => mapFilterMode === 'all' || m.mode === mapFilterMode)
+                .slice()
+                .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }))
                 .map(m => {
                   const heroMapSyn = evaluateHeroMapSynergy(playerHero, m);
                   return (

@@ -67,10 +67,28 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
   const [activeTab, setActiveTab] = useState<Role | 'all' | 'mains'>('all');
   const [roleQueueLocked, setRoleQueueLocked] = useState(false);
 
-  // Group heroes by role for the authentic Overwatch select screen look
-  const tanks = useMemo(() => OVERWATCH_HEROES.filter(h => h.role === 'tank'), []);
-  const damage = useMemo(() => OVERWATCH_HEROES.filter(h => h.role === 'damage'), []);
-  const supports = useMemo(() => OVERWATCH_HEROES.filter(h => h.role === 'support'), []);
+  // Group heroes by role for the authentic Overwatch select screen look, sorted alphabetically A-Z
+  const tanks = useMemo(
+    () =>
+      OVERWATCH_HEROES.filter(h => h.role === 'tank')
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })),
+    []
+  );
+  const damage = useMemo(
+    () =>
+      OVERWATCH_HEROES.filter(h => h.role === 'damage')
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })),
+    []
+  );
+  const supports = useMemo(
+    () =>
+      OVERWATCH_HEROES.filter(h => h.role === 'support')
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })),
+    []
+  );
 
   const roleCategories: Array<{ role: Role; label: string; icon: React.ReactNode; heroes: Hero[] }> = [
     { role: 'tank', label: 'TANQUES', icon: <Shield className="w-3 h-3 text-blue-400" />, heroes: tanks },
