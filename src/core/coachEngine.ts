@@ -1,16 +1,18 @@
 import type { GameMap, Hero, HeroMapEvaluation, RankTier, RecommendationResult, Role } from '../types/game';
 import type { UserProfileData } from '../types/userProfile';
+import type { Language } from '../utils/i18n';
 import { OVERWATCH_HEROES } from '../games/overwatch/heroes';
 import { evaluateHeroMapSynergy } from '../games/overwatch/mapSynergies';
 import { getRankInfo } from '../games/overwatch/ranks';
 
-interface CoachOptions {
+export interface CoachOptions {
   role?: Role | 'all';
   gameMap: GameMap | null;
   allyHeroIds: string[];
   enemyHeroIds: string[];
   rankTier: RankTier;
   userProfile?: UserProfileData | null;
+  language?: Language;
 }
 
 // Special pairs verified from Toniki / competitive meta
@@ -232,15 +234,24 @@ export function calculateRecommendations(options: CoachOptions): RecommendationR
     let totalScore = 50 + tierBaseScore + rawCounterScore + rawSynergyScore + rawMapScore + rankModifier + profileModifier;
     totalScore = Math.max(5, Math.min(99, Math.round(totalScore)));
 
+    const isEn = options.language === 'en';
     let tacticalVerdict = '';
     if (totalScore >= 82) {
-      tacticalVerdict = `Pick dominante: Destruye la composición enemiga y explota al máximo el mapa.`;
+      tacticalVerdict = isEn
+        ? `Dominant pick: Destroys the enemy composition and takes full advantage of the map.`
+        : `Pick dominante: Destruye la composición enemiga y explota al máximo el mapa.`;
     } else if (totalScore >= 68) {
-      tacticalVerdict = `Sólida elección: Ventajas tácticas claras y buena adaptación a ${gameMap?.name || 'la partida'}.`;
+      tacticalVerdict = isEn
+        ? `Solid choice: Clear tactical advantages and strong fit for ${gameMap?.name || 'the match'}.`
+        : `Sólida elección: Ventajas tácticas claras y buena adaptación a ${gameMap?.name || 'la partida'}.`;
     } else if (totalScore >= 48) {
-      tacticalVerdict = `Elección neutral: Viable, pero dependerá fuertemente de tu posicionamiento individual.`;
+      tacticalVerdict = isEn
+        ? `Neutral choice: Viable, but heavily depends on individual positioning.`
+        : `Elección neutral: Viable, pero dependerá fuertemente de tu posicionamiento individual.`;
     } else {
-      tacticalVerdict = `Riesgo alto: El mapa o los counters enemigos reducen drásticamente tu impacto.`;
+      tacticalVerdict = isEn
+        ? `High risk: Map geometry or enemy counters severely diminish your effectiveness.`
+        : `Riesgo alto: El mapa o los counters enemigos reducen drásticamente tu impacto.`;
     }
 
     return {
@@ -300,8 +311,10 @@ export function analyzePlayerPick(
   gameMap: GameMap | null,
   rankTier: RankTier,
   favoriteHeroIds: string[] = [],
-  userProfile?: UserProfileData | null
+  userProfile?: UserProfileData | null,
+  language: Language = 'es'
 ): PlayerHeroDiagnosis | null {
+  const isEn = language === 'en';
   const playerHero = OVERWATCH_HEROES.find(h => h.id === playerHeroId);
   if (!playerHero) return null;
 
@@ -319,6 +332,7 @@ export function analyzePlayerPick(
     enemyHeroIds,
     rankTier,
     userProfile,
+    language,
   });
 
   const currentPickData = allRoleRecommendations.find(r => r.hero.id === playerHeroId);
@@ -345,27 +359,43 @@ export function analyzePlayerPick(
   );
 
   let verdict = '';
-  const mapName = gameMap?.name || 'este mapa';
+  const mapName = gameMap?.name || (isEn ? 'this map' : 'este mapa');
   if (currentScore >= 80) {
     verdict =
       mapEvaluation && mapEvaluation.score >= 10
-        ? `¡Pick letal! ${playerHero.name} domina ${mapName} y tiene clara ventaja frente al rival.`
-        : `¡Excelente elección! Tu ${playerHero.name} tiene ventaja táctica directa en esta partida.`;
+        ? (isEn
+            ? `Lethal pick! ${playerHero.name} dominates ${mapName} and holds a clear edge over the enemy.`
+            : `¡Pick letal! ${playerHero.name} domina ${mapName} y tiene clara ventaja frente al rival.`)
+        : (isEn
+            ? `Excellent choice! Your ${playerHero.name} has a direct tactical advantage in this match.`
+            : `¡Excelente elección! Tu ${playerHero.name} tiene ventaja táctica directa en esta partida.`);
   } else if (currentScore >= 62) {
     verdict =
       mapEvaluation && mapEvaluation.score <= -8
-        ? `Pick jugable por enfrentamientos, aunque la geometría de ${mapName} (${mapEvaluation.score} pts) limita tus ángulos.`
-        : `Elección sólida y viable. Aprovecha tus ángulos en ${mapName} junto a tu equipo.`;
+        ? (isEn
+            ? `Playable pick in matchups, though ${mapName}'s geometry (${mapEvaluation.score} pts) limits your angles.`
+            : `Pick jugable por enfrentamientos, aunque la geometría de ${mapName} (${mapEvaluation.score} pts) limita tus ángulos.`)
+        : (isEn
+            ? `Solid, viable choice. Take advantage of your angles on ${mapName} alongside your team.`
+            : `Elección sólida y viable. Aprovecha tus ángulos en ${mapName} junto a tu equipo.`);
   } else if (currentScore >= 46) {
     verdict =
       mapEvaluation && mapEvaluation.score <= -10
-        ? `Mapa adverso: ${mapName} penaliza el kit de ${playerHero.name} (${mapEvaluation.score} pts). Juega con mucha cautela o valora rotar.`
-        : `Situación neutral/exigente. Cuida tus enfriamientos frente a la presión rival.`;
+        ? (isEn
+            ? `Adverse map: ${mapName} penalizes ${playerHero.name}'s kit (${mapEvaluation.score} pts). Play with great caution or consider switching.`
+            : `Mapa adverso: ${mapName} penaliza el kit de ${playerHero.name} (${mapEvaluation.score} pts). Juega con mucha cautela o valora rotar.`)
+        : (isEn
+            ? `Neutral / demanding situation. Watch your cooldowns against enemy pressure.`
+            : `Situación neutral/exigente. Cuida tus enfriamientos frente a la presión rival.`);
   } else {
     verdict =
       mapEvaluation && mapEvaluation.score <= -10 && directThreats.length === 0
-        ? `⚠️ Mapa muy desfavorable: ${mapName} anula las fortalezas de ${playerHero.name}. Se recomienda cambiar a un héroe favorecido por el escenario.`
-        : `⚠️ Elección de alto riesgo por counters rivales y geometría de ${mapName}. Se sugiere cambio urgente.`;
+        ? (isEn
+            ? `⚠️ Very unfavorable map: ${mapName} negates ${playerHero.name}'s strengths. Switching to a favored hero is strongly recommended.`
+            : `⚠️ Mapa muy desfavorable: ${mapName} anula las fortalezas de ${playerHero.name}. Se recomienda cambiar a un héroe favorecido por el escenario.`)
+        : (isEn
+            ? `⚠️ High-risk choice due to enemy counters and ${mapName} geometry. Urgent switch recommended.`
+            : `⚠️ Elección de alto riesgo por counters rivales y geometría de ${mapName}. Se sugiere cambio urgente.`);
   }
 
   // 1. Evaluate player's Mains/Favorites in the same role (for one-trick / small hero pool players)
@@ -389,18 +419,28 @@ export function analyzePlayerPick(
     if (scoreDiff >= 8 || (scoreDiff > 0 && alt.totalScore >= 74)) {
       verdictType = 'ideal';
       if (hardCounteredThreats.length > 0) {
-        reason = `¡Cambio ideal con tu Main! Destruye a ${hardCounteredThreats.join(' y ')} (+${scoreDiff} pts)`;
+        reason = isEn
+          ? `Ideal switch with your Main! Shreds ${hardCounteredThreats.join(' & ')} (+${scoreDiff} pts)`
+          : `¡Cambio ideal con tu Main! Destruye a ${hardCounteredThreats.join(' y ')} (+${scoreDiff} pts)`;
       } else if (altMapEval && altMapEval.score >= 8) {
-        reason = `¡Tu Main domina ${gameMap?.name}! (+${altMapEval.score} pts en mapa, +${scoreDiff} pts total)`;
+        reason = isEn
+          ? `Your Main dominates ${gameMap?.name}! (+${altMapEval.score} map pts, +${scoreDiff} total pts)`
+          : `¡Tu Main domina ${gameMap?.name}! (+${altMapEval.score} pts en mapa, +${scoreDiff} pts total)`;
       } else {
-        reason = `Supera a tu pick actual (+${scoreDiff} pts) con mejor rendimiento contra la composición rival`;
+        reason = isEn
+          ? `Outperforms your current pick (+${scoreDiff} pts) with better output vs the enemy comp`
+          : `Supera a tu pick actual (+${scoreDiff} pts) con mejor rendimiento contra la composición rival`;
       }
     } else if (scoreDiff >= -3) {
       verdictType = 'viable';
       if (softCounteredThreats.length > 0) {
-        reason = `Alternativa viable de tu pool: neutraliza a ${softCounteredThreats.join(' y ')} (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`;
+        reason = isEn
+          ? `Viable pool option: counters ${softCounteredThreats.join(' & ')} (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`
+          : `Alternativa viable de tu pool: neutraliza a ${softCounteredThreats.join(' y ')} (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`;
       } else {
-        reason = `Rendimiento equilibrado frente al equipo rival (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`;
+        reason = isEn
+          ? `Balanced performance vs enemy team (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`
+          : `Rendimiento equilibrado frente al equipo rival (${scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff} pts)`;
       }
     } else {
       verdictType = 'risky';
@@ -408,9 +448,13 @@ export function analyzePlayerPick(
         .filter(enemy => alt.hero.counters.weakAgainst.includes(enemy.id))
         .map(t => t.name);
       if (enemyCountersToMain.length > 0) {
-        reason = `Riesgoso para tu Main: el rival tiene counters activos (${enemyCountersToMain.slice(0, 2).join(', ')}) (${scoreDiff} pts)`;
+        reason = isEn
+          ? `Risky for your Main: enemy has active counters (${enemyCountersToMain.slice(0, 2).join(', ')}) (${scoreDiff} pts)`
+          : `Riesgoso para tu Main: el rival tiene counters activos (${enemyCountersToMain.slice(0, 2).join(', ')}) (${scoreDiff} pts)`;
       } else {
-        reason = `Menor efectividad en esta partida (${scoreDiff} pts frente a tu pick actual)`;
+        reason = isEn
+          ? `Lower effectiveness in this match (${scoreDiff} pts vs current pick)`
+          : `Menor efectividad en esta partida (${scoreDiff} pts frente a tu pick actual)`;
       }
     }
 
@@ -437,7 +481,9 @@ export function analyzePlayerPick(
   });
 
   const alternativePicks = candidateSwitches.slice(0, 3).map(alt => {
-    let reason = `Ofrece mayor impacto táctico (+${alt.totalScore - currentScore} pts)`;
+    let reason = isEn
+      ? `Offers higher tactical impact (+${alt.totalScore - currentScore} pts)`
+      : `Ofrece mayor impacto táctico (+${alt.totalScore - currentScore} pts)`;
     const isMain = favoriteHeroIds.includes(alt.hero.id);
 
     const hardCounteredThreats = hardThreats
@@ -450,16 +496,22 @@ export function analyzePlayerPick(
     const altMapEval = gameMap ? evaluateHeroMapSynergy(alt.hero, gameMap) : null;
 
     if (hardCounteredThreats.length > 0) {
-      reason = `Destruye a ${hardCounteredThreats.join(' y ')}, que actualmente te hacen counter duro`;
+      reason = isEn
+        ? `Shreds ${hardCounteredThreats.join(' & ')}, who currently hard-counter you`
+        : `Destruye a ${hardCounteredThreats.join(' y ')}, que actualmente te hacen counter duro`;
     } else if (softCounteredThreats.length > 0) {
-      reason = `Gana ventaja sobre ${softCounteredThreats.join(' y ')}, frenando la presión enemiga`;
+      reason = isEn
+        ? `Gains advantage over ${softCounteredThreats.join(' & ')}, halting enemy pressure`
+        : `Gana ventaja sobre ${softCounteredThreats.join(' y ')}, frenando la presión enemiga`;
     } else if (
       gameMap &&
       altMapEval &&
       altMapEval.score >= 10 &&
       (!mapEvaluation || altMapEval.score - mapEvaluation.score >= 12)
     ) {
-      reason = `Domina ${gameMap.name} (+${altMapEval.score} pts): ${altMapEval.reason}`;
+      reason = isEn
+        ? `Dominates ${gameMap.name} (+${altMapEval.score} pts): ${altMapEval.reason}`
+        : `Domina ${gameMap.name} (+${altMapEval.score} pts): ${altMapEval.reason}`;
     } else if (alt.pros.length > 0) {
       reason = alt.pros[0];
     }

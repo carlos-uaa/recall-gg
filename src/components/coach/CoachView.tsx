@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_MAPS } from '../../games/overwatch/maps';
-import { OVERWATCH_RANKS, getRankInfo } from '../../games/overwatch/ranks';
+import { OVERWATCH_RANKS, getRankInfo, getRankDisplayName, getRankSummary, getRankCoachingNote } from '../../games/overwatch/ranks';
+import { getSubroleForHero, getSubroleDisplayName } from '../../games/overwatch/subroles';
 import { evaluateHeroMapSynergy } from '../../games/overwatch/mapSynergies';
 import type { GameMap, RankTier, Role } from '../../types/game';
 import { calculateRecommendations, analyzePlayerPick } from '../../core/coachEngine';
@@ -167,8 +168,8 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
   // Player pick diagnosis (incorporates user profile mastery if present)
   const playerPickDiagnosis = useMemo(() => {
-    return analyzePlayerPick(playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds, profile);
-  }, [playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds, profile]);
+    return analyzePlayerPick(playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds, profile, language);
+  }, [playerHeroId, allyHeroIds, enemyHeroIds, selectedMap, rankTier, favoriteHeroIds, profile, language]);
 
   // General recommendations for the player's role (boosts comfort mains if user profile active)
   const recommendations = useMemo(() => {
@@ -179,8 +180,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
       enemyHeroIds,
       rankTier,
       userProfile: profile,
+      language,
     });
-  }, [playerHero.role, selectedMap, allyHeroIds, enemyHeroIds, rankTier, profile]);
+  }, [playerHero.role, selectedMap, allyHeroIds, enemyHeroIds, rankTier, profile, language]);
 
   // Assign hero to a slot with DUPLICATE PREVENTION
   const assignHeroToSlot = (heroId: string) => {
@@ -356,14 +358,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
                 <MapPin className="w-3.5 h-3.5 text-orange-400" />
-                <span>MAPA DE LA PARTIDA</span>
+                <span>{language === 'en' ? 'MATCH MAP' : 'MAPA DE LA PARTIDA'}</span>
               </label>
               <button
                 type="button"
                 onClick={() => setMapPickerOpen(true)}
                 className="text-xs font-bold text-orange-400 hover:text-orange-300 transition"
               >
-                Cambiar Mapa →
+                {language === 'en' ? 'Change Map →' : 'Cambiar Mapa →'}
               </button>
             </div>
 
@@ -413,14 +415,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <div className="flex items-center justify-between mb-1.5">
               <label className={`text-xs font-bold flex items-center space-x-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                <span>RANGO COMPETITIVO INDIVIDUAL</span>
+                <span>{language === 'en' ? 'INDIVIDUAL COMPETITIVE RANK' : 'RANGO COMPETITIVO INDIVIDUAL'}</span>
               </label>
               <button
                 type="button"
                 onClick={() => setRankPickerOpen(true)}
                 className="text-xs font-bold text-amber-500 hover:text-amber-400 transition"
               >
-                Elegir Rango →
+                {language === 'en' ? 'Choose Rank →' : 'Elegir Rango →'}
               </button>
             </div>
 
@@ -447,7 +449,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 >
                   <img
                     src={selectedRank.icon}
-                    alt={selectedRank.name}
+                    alt={getRankDisplayName(selectedRank, language)}
                     className="w-full h-full object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.65)]"
                   />
                 </div>
@@ -460,13 +462,13 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     }}
                     className="text-[9px] sm:text-[10px] font-mono uppercase font-black tracking-wider block"
                   >
-                    RANGO {selectedRank.englishName.toUpperCase()}
+                    {language === 'en' ? `RANK ${selectedRank.englishName.toUpperCase()}` : `RANGO ${selectedRank.englishName.toUpperCase()}`}
                   </span>
                   <h3 className={`text-base sm:text-xl font-black leading-tight truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    {selectedRank.name}
+                    {getRankDisplayName(selectedRank, language)}
                   </h3>
                   <p className={`text-[11px] sm:text-xs mt-0.5 line-clamp-1 sm:line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    {selectedRank.summary}
+                    {getRankSummary(selectedRank, language)}
                   </p>
                 </div>
               </div>
@@ -690,7 +692,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 />
               </div>
               <div className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full bg-orange-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow">
-                TU ELECCIÓN
+                {language === 'en' ? 'YOUR PICK' : 'TU ELECCIÓN'}
               </div>
             </div>
 
@@ -703,12 +705,12 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
             <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
               <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-orange-500/10 text-orange-500 border border-orange-500/30">
-                {playerPickDiagnosis.hero.role === 'damage' ? 'DPS' : playerPickDiagnosis.hero.role === 'tank' ? 'Tanque' : 'Apoyo'}
+                {playerPickDiagnosis.hero.role === 'damage' ? 'DPS' : playerPickDiagnosis.hero.role === 'tank' ? (language === 'en' ? 'Tank' : 'Tanque') : (language === 'en' ? 'Support' : 'Apoyo')}
               </span>
               <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-[11px] sm:text-xs font-mono font-semibold border ${
                 isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-300'
               }`}>
-                {playerPickDiagnosis.hero.subrole}
+                {getSubroleDisplayName(getSubroleForHero(playerPickDiagnosis.hero.id), language)}
               </span>
               <span className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl text-[11px] sm:text-xs font-mono font-bold uppercase border ${
                 playerPickDiagnosis.hero.style === 'dive'
@@ -732,10 +734,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   ? 'bg-slate-800/90 text-amber-400 border-slate-700 hover:border-amber-500/60'
                   : 'bg-white text-amber-600 border-slate-300 hover:border-amber-500'
               }`}
-              title="Toca para marcar o desmarcar este héroe como tu Main"
+              title={language === 'en' ? 'Tap to mark or unmark this hero as your Main' : 'Toca para marcar o desmarcar este héroe como tu Main'}
             >
               <Star className={`w-3.5 h-3.5 ${isFavorite(playerPickDiagnosis.hero.id) ? 'fill-current text-slate-950' : 'text-amber-400'}`} />
-              <span>{isFavorite(playerPickDiagnosis.hero.id) ? '★ Es tu Main (Toca para desmarcar)' : '☆ Marcar como tu Main'}</span>
+              <span>
+                {isFavorite(playerPickDiagnosis.hero.id)
+                  ? (language === 'en' ? '★ Your Main (Tap to unmark)' : '★ Es tu Main (Toca para desmarcar)')
+                  : (language === 'en' ? '☆ Mark as your Main' : '☆ Marcar como tu Main')}
+              </span>
             </button>
 
             {/* Prominent Score Metric + Map & Rank Breakdown */}
@@ -745,7 +751,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               <div className="flex items-center space-x-4 sm:space-x-6">
                 <div className="text-center">
                   <span className="block text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                    Calificación Final
+                    {language === 'en' ? 'Overall Score' : 'Calificación Final'}
                   </span>
                   <span className={`text-3xl sm:text-5xl font-black font-mono leading-none ${
                     playerPickDiagnosis.score >= 70 ? 'text-emerald-500' : playerPickDiagnosis.score >= 50 ? 'text-amber-500' : 'text-rose-500'
@@ -756,12 +762,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 <div className="h-8 sm:h-10 w-[1px] bg-slate-500/30"></div>
                 <div className="text-left">
                   <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                    Estado del Pick
+                    {language === 'en' ? 'Pick Status' : 'Estado del Pick'}
                   </span>
                   <span className={`text-base sm:text-lg font-black uppercase ${
                     playerPickDiagnosis.score >= 70 ? 'text-emerald-500' : playerPickDiagnosis.score >= 50 ? 'text-amber-500' : 'text-rose-500'
                   }`}>
-                    {playerPickDiagnosis.score >= 78 ? 'Dominante' : playerPickDiagnosis.score >= 60 ? 'Viable' : 'En Riesgo'}
+                    {language === 'en'
+                      ? (playerPickDiagnosis.score >= 78 ? 'Dominant' : playerPickDiagnosis.score >= 60 ? 'Viable' : 'At Risk')
+                      : (playerPickDiagnosis.score >= 78 ? 'Dominante' : playerPickDiagnosis.score >= 60 ? 'Viable' : 'En Riesgo')}
                   </span>
                 </div>
               </div>
@@ -771,7 +779,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   <div className="hidden sm:block h-10 w-[1px] bg-slate-500/30"></div>
                   <div className="text-center sm:text-left">
                     <span className="block text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                      Sinergia en {selectedMap.name}
+                      {language === 'en' ? `Synergy on ${selectedMap.name}` : `Sinergia en ${selectedMap.name}`}
                     </span>
                     <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-0.5">
                       <span
@@ -802,14 +810,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                           : 'text-slate-400'
                       }`}>
                         {playerPickDiagnosis.mapEvaluation.rating === 'ideal'
-                          ? 'Mapa Ideal'
+                          ? (language === 'en' ? 'Ideal Map' : 'Mapa Ideal')
                           : playerPickDiagnosis.mapEvaluation.rating === 'favorable'
-                          ? 'Favorable'
+                          ? (language === 'en' ? 'Favorable' : 'Favorable')
                           : playerPickDiagnosis.mapEvaluation.rating === 'poor'
-                          ? 'Muy Cerrado / Adverso'
+                          ? (language === 'en' ? 'Adverse / Tight' : 'Muy Cerrado / Adverso')
                           : playerPickDiagnosis.mapEvaluation.rating === 'unfavorable'
-                          ? 'Incómodo'
-                          : 'Neutral'}
+                          ? (language === 'en' ? 'Unfavorable' : 'Incómodo')
+                          : (language === 'en' ? 'Neutral' : 'Neutral')}
                       </span>
                     </div>
                   </div>
@@ -846,11 +854,17 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center space-x-2 text-rose-500 font-bold text-xs">
                   <AlertOctagon className="w-4 h-4" />
-                  <span>Counters rivales que te amenazan ({playerPickDiagnosis.directThreats.length})</span>
+                  <span>
+                    {language === 'en'
+                      ? `Enemy counters threatening you (${playerPickDiagnosis.directThreats.length})`
+                      : `Counters rivales que te amenazan (${playerPickDiagnosis.directThreats.length})`}
+                  </span>
                 </div>
                 {playerPickDiagnosis.hardThreats.length > 0 && (
                   <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40">
-                    {playerPickDiagnosis.hardThreats.length} crítico{playerPickDiagnosis.hardThreats.length > 1 ? 's' : ''}
+                    {language === 'en'
+                      ? `${playerPickDiagnosis.hardThreats.length} critical`
+                      : `${playerPickDiagnosis.hardThreats.length} crítico${playerPickDiagnosis.hardThreats.length > 1 ? 's' : ''}`}
                   </span>
                 )}
               </div>
@@ -873,7 +887,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         <span className="text-xs font-semibold">{threat.name}</span>
                         {isHard && (
                           <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-500 text-white font-black">
-                            ★ DURO
+                            {language === 'en' ? '★ HARD' : '★ DURO'}
                           </span>
                         )}
                       </div>
@@ -881,7 +895,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   })
                 ) : (
                   <span className="text-xs text-emerald-500 font-medium italic">
-                    ¡Ningún héroe rival te hace counter directo en este momento!
+                    {language === 'en'
+                      ? 'No enemy heroes directly counter you right now!'
+                      : '¡Ningún héroe rival te hace counter directo en este momento!'}
                   </span>
                 )}
               </div>
@@ -894,11 +910,17 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center space-x-2 text-emerald-500 font-bold text-xs">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Objetivos a los que dominas ({playerPickDiagnosis.favorableTargets.length})</span>
+                  <span>
+                    {language === 'en'
+                      ? `Targets you dominate (${playerPickDiagnosis.favorableTargets.length})`
+                      : `Objetivos a los que dominas (${playerPickDiagnosis.favorableTargets.length})`}
+                  </span>
                 </div>
                 {playerPickDiagnosis.hardTargets.length > 0 && (
                   <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                    {playerPickDiagnosis.hardTargets.length} duro{playerPickDiagnosis.hardTargets.length > 1 ? 's' : ''}
+                    {language === 'en'
+                      ? `${playerPickDiagnosis.hardTargets.length} hard`
+                      : `${playerPickDiagnosis.hardTargets.length} duro${playerPickDiagnosis.hardTargets.length > 1 ? 's' : ''}`}
                   </span>
                 )}
               </div>
@@ -921,7 +943,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         <span className="text-xs font-semibold">{target.name}</span>
                         {isHard && (
                           <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500 text-slate-950 font-black">
-                            ★ DURO
+                            {language === 'en' ? '★ HARD' : '★ DURO'}
                           </span>
                         )}
                       </div>
@@ -929,7 +951,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                   })
                 ) : (
                   <span className="text-xs text-slate-400 italic">
-                    Enfócate en desgastar escudos o coordinar con tus tanques.
+                    {language === 'en'
+                      ? 'Focus on shield pressure or coordinating with your tanks.'
+                      : 'Enfócate en desgastar escudos o coordinar con tus tanques.'}
                   </span>
                 )}
               </div>
@@ -947,14 +971,18 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     <span className={`text-sm font-black uppercase tracking-tight ${
                       isDark ? 'text-white' : 'text-slate-900'
                     }`}>
-                      Alternativas entre tus Mains ({playerPickDiagnosis.mainSwitches.length})
+                      {language === 'en'
+                        ? `Alternatives among your Mains (${playerPickDiagnosis.mainSwitches.length})`
+                        : `Alternativas entre tus Mains (${playerPickDiagnosis.mainSwitches.length})`}
                     </span>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
-                      Héroes que juegas
+                      {language === 'en' ? 'Heroes you play' : 'Héroes que juegas'}
                     </span>
                   </div>
                   <span className="text-[11px] text-slate-400">
-                    Calculados vs la composición rival y {selectedMap.name}
+                    {language === 'en'
+                      ? `Calculated vs enemy team comp & ${selectedMap.name}`
+                      : `Calculados vs la composición rival y ${selectedMap.name}`}
                   </span>
                 </div>
 
@@ -997,13 +1025,13 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                                   {mainAlt.hero.name}
                                 </span>
                                 <span className="text-[8.5px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-black">
-                                  TU MAIN
+                                  {language === 'en' ? 'YOUR MAIN' : 'TU MAIN'}
                                 </span>
                               </div>
                               <span className={`text-[10px] font-mono font-black ${
                                 mainAlt.score >= 70 ? 'text-emerald-400' : mainAlt.score >= 50 ? 'text-amber-400' : 'text-rose-400'
                               }`}>
-                                {mainAlt.score} pts ({mainAlt.scoreDiff >= 0 ? `+${mainAlt.scoreDiff}` : mainAlt.scoreDiff} vs actual)
+                                {mainAlt.score} pts ({mainAlt.scoreDiff >= 0 ? `+${mainAlt.scoreDiff}` : mainAlt.scoreDiff} {language === 'en' ? 'vs current' : 'vs actual'})
                               </span>
                             </div>
                           </div>
@@ -1015,7 +1043,11 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                               ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
                               : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
                           }`}>
-                            {isIdeal ? '¡Recomendado!' : isRisky ? 'Riesgoso' : 'Viable'}
+                            {isIdeal
+                              ? (language === 'en' ? 'Recommended!' : '¡Recomendado!')
+                              : isRisky
+                              ? (language === 'en' ? 'Risky' : 'Riesgoso')
+                              : (language === 'en' ? 'Viable' : 'Viable')}
                           </span>
                         </div>
 
@@ -1027,10 +1059,10 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
                         <div className="pt-2 border-t border-slate-700/30 flex items-center justify-between">
                           <span className="text-[10px] font-mono text-slate-400 uppercase">
-                            {mainAlt.hero.style} · {mainAlt.hero.subrole}
+                            {mainAlt.hero.style} · {getSubroleDisplayName(getSubroleForHero(mainAlt.hero.id), language)}
                           </span>
                           <span className="text-[11px] font-black uppercase text-amber-500 group-hover:underline flex items-center">
-                            Cambiar a mi Main →
+                            {language === 'en' ? 'Switch to my Main →' : 'Cambiar a mi Main →'}
                           </span>
                         </div>
                       </div>
@@ -1045,7 +1077,11 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 <div className="flex items-center space-x-2">
                   <Star className="w-4 h-4 text-amber-400 flex-shrink-0" />
                   <span>
-                    ¿Juegas pocos personajes? <strong>Toca la estrella ⭐ en cualquier héroe</strong> para marcarlo como tu Main y verás aquí su viabilidad exacta en cada partida.
+                    {language === 'en' ? (
+                      <>Play only a few heroes? <strong>Tap the star ⭐ on any hero</strong> to mark them as your Main and see their viability here every match.</>
+                    ) : (
+                      <>¿Juegas pocos personajes? <strong>Toca la estrella ⭐ en cualquier héroe</strong> para marcarlo como tu Main y verás aquí su viabilidad exacta en cada partida.</>
+                    )}
                   </span>
                 </div>
               </div>
@@ -1062,7 +1098,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 </span>
               </div>
               <span className="text-[11px] text-slate-400">
-                Opciones dentro de tu rol ({playerHero.role.toUpperCase()})
+                {language === 'en'
+                  ? `Options within your role (${playerHero.role.toUpperCase()})`
+                  : `Opciones dentro de tu rol (${playerHero.role.toUpperCase()})`}
               </span>
             </div>
 
@@ -1099,7 +1137,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         </span>
                         {alt.isMain && (
                           <span className="text-[8.5px] px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 font-black tracking-wider shadow-sm">
-                            ★ TU MAIN
+                            {language === 'en' ? '★ YOUR MAIN' : '★ TU MAIN'}
                           </span>
                         )}
                         <span className="text-[10px] font-mono text-emerald-500 font-black">
@@ -1112,7 +1150,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                     </div>
                   </div>
                   <span className="text-[10px] text-orange-500 font-bold uppercase opacity-0 group-hover:opacity-100 transition">
-                    Cambiar
+                    {language === 'en' ? 'Switch' : 'Cambiar'}
                   </span>
                 </div>
               ))}
@@ -1427,7 +1465,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
           <div className="flex items-center space-x-2">
             <Sparkles className="w-5 h-5 text-orange-400" />
             <h2 className={`text-xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Otras Opciones en tu Rol: {playerHero.role.toUpperCase()} ({recommendations.length} Héroes)
+              {language === 'en'
+                ? `Other Options in your Role: ${playerHero.role.toUpperCase()} (${recommendations.length} Heroes)`
+                : `Otras Opciones en tu Rol: ${playerHero.role.toUpperCase()} (${recommendations.length} Héroes)`}
             </h2>
           </div>
 
@@ -1484,11 +1524,11 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                           </span>
                         </div>
                         <div className="flex items-center space-x-2 text-xs text-slate-400">
-                          <span className="capitalize">{hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? 'Tanque' : 'Apoyo'}</span>
+                          <span className="capitalize">{hero.role === 'damage' ? 'DPS' : hero.role === 'tank' ? (language === 'en' ? 'Tank' : 'Tanque') : (language === 'en' ? 'Support' : 'Apoyo')}</span>
                           <span>•</span>
                           <span className="uppercase text-orange-400 font-semibold">{hero.style}</span>
                           <span>•</span>
-                          <div className="flex items-center text-amber-400" title={`Dificultad de uso: ${hero.difficulty}/3`}>
+                          <div className="flex items-center text-amber-400" title={language === 'en' ? `Difficulty: ${hero.difficulty}/3` : `Dificultad de uso: ${hero.difficulty}/3`}>
                             {Array.from({ length: 3 }).map((_, i) => (
                               <Star
                                 key={i}
@@ -1516,7 +1556,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
                   {/* Tactical Verdict */}
                   <div className="bg-slate-800/60 rounded-xl p-2.5 text-xs text-slate-300 mb-3 border border-slate-700/50">
-                    <span className="font-semibold text-orange-400">Dictamen: </span>
+                    <span className="font-semibold text-orange-400">{language === 'en' ? 'Verdict: ' : 'Dictamen: '}</span>
                     {tacticalVerdict}
                   </div>
 
@@ -1542,13 +1582,13 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 {/* Footer: Perks / Talents preview */}
                 <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
                   <div className="truncate max-w-[200px]" title={hero.perks.join(', ')}>
-                    <span className="font-semibold text-slate-300">Perk clave:</span> {hero.perks[0]}
+                    <span className="font-semibold text-slate-300">{language === 'en' ? 'Key Perk:' : 'Perk clave:'}</span> {hero.perks[0]}
                   </div>
                   <button
                     onClick={() => handleSelectMyHero(hero.id)}
                     className="text-orange-400 font-semibold hover:text-orange-300 transition flex items-center"
                   >
-                    Elegir <ChevronRight className="w-3 h-3 ml-0.5" />
+                    {language === 'en' ? 'Choose' : 'Elegir'} <ChevronRight className="w-3 h-3 ml-0.5" />
                   </button>
                 </div>
               </div>
@@ -1570,15 +1610,17 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                 <MapPin className="w-5 h-5 text-orange-500" />
                 <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  SELECCIONA EL MAPA
+                  {language === 'en' ? 'SELECT MATCH MAP' : 'SELECCIONA EL MAPA'}
                 </h3>
                 <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
                   isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'
                 }`}>
-                  {OVERWATCH_MAPS.length} MAPAS · Sinergia para {playerHero.name}
+                  {language === 'en'
+                    ? `${OVERWATCH_MAPS.length} MAPS · Synergy for ${playerHero.name}`
+                    : `${OVERWATCH_MAPS.length} MAPAS · Sinergia para ${playerHero.name}`}
                 </span>
                 <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                  Orden Alfabético A-Z
+                  {language === 'en' ? 'Alphabetical A-Z' : 'Orden Alfabético A-Z'}
                 </span>
               </div>
               <button
@@ -1593,19 +1635,27 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
             <div className={`p-3 border-b flex flex-wrap gap-1.5 ${
               isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'
             }`}>
-              {['all', 'Híbrido', 'Escolta', 'Control', 'Avance', 'Punto Caliente', 'Invasión / Clash'].map(m => (
+              {[
+                { id: 'all', label: language === 'en' ? 'All modes' : 'Todos los modos' },
+                { id: 'Híbrido', label: language === 'en' ? 'Hybrid' : 'Híbrido' },
+                { id: 'Escolta', label: language === 'en' ? 'Escort' : 'Escolta' },
+                { id: 'Control', label: language === 'en' ? 'Control' : 'Control' },
+                { id: 'Avance', label: language === 'en' ? 'Push' : 'Avance' },
+                { id: 'Punto Caliente', label: language === 'en' ? 'Flashpoint' : 'Punto Caliente' },
+                { id: 'Invasión / Clash', label: language === 'en' ? 'Clash / Invasion' : 'Invasión / Clash' },
+              ].map(modeItem => (
                 <button
-                  key={m}
-                  onClick={() => setMapFilterMode(m)}
+                  key={modeItem.id}
+                  onClick={() => setMapFilterMode(modeItem.id)}
                   className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
-                    mapFilterMode === m
+                    mapFilterMode === modeItem.id
                       ? 'bg-orange-500 text-white shadow'
                       : isDark
                       ? 'text-slate-400 hover:text-white bg-slate-800/60'
                       : 'text-slate-600 hover:text-slate-900 bg-slate-200/70'
                   }`}
                 >
-                  {m === 'all' ? 'Todos los modos' : m}
+                  {modeItem.label}
                 </button>
               ))}
             </div>
@@ -1656,7 +1706,9 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-2.5">
                         <span className="text-[9px] font-mono text-orange-400 font-bold uppercase leading-none">
-                          {m.mode}
+                          {language === 'en'
+                            ? (m.mode === 'Híbrido' ? 'Hybrid' : m.mode === 'Escolta' ? 'Escort' : m.mode === 'Control' ? 'Control' : m.mode === 'Avance' ? 'Push' : m.mode === 'Punto Caliente' ? 'Flashpoint' : m.mode === 'Invasión / Clash' ? 'Clash / Invasion' : m.mode)
+                            : m.mode}
                         </span>
                         <span className="text-xs font-black text-white truncate mt-0.5">
                           {m.name}
@@ -1691,11 +1743,13 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 <div className="flex items-center space-x-2">
                   <Trophy className="w-5 h-5 text-amber-500" />
                   <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    ELIGE TU RANGO COMPETITIVO INDIVIDUAL
+                    {language === 'en' ? 'CHOOSE YOUR COMPETITIVE RANK' : 'ELIGE TU RANGO COMPETITIVO INDIVIDUAL'}
                   </h3>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Cada división ajusta individualmente el peso del techo mecánico y la coordinación táctica.
+                  {language === 'en'
+                    ? 'Each tier individually adjusts mechanical skill ceiling and tactical coordination weight.'
+                    : 'Cada división ajusta individualmente el peso del techo mecánico y la coordinación táctica.'}
                 </p>
               </div>
               <button
@@ -1740,7 +1794,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                       >
                         <img
                           src={r.icon}
-                          alt={r.name}
+                          alt={getRankDisplayName(r, language)}
                           className="w-full h-full object-contain drop-shadow-[0_3px_8px_rgba(0,0,0,0.65)]"
                         />
                       </div>
@@ -1756,13 +1810,13 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                           {r.englishName}
                         </span>
                         <h4 className={`text-base font-black leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                          {r.name}
+                          {getRankDisplayName(r, language)}
                         </h4>
                       </div>
                     </div>
 
                     <p className={`text-[11px] leading-snug ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                      {r.coachingNote}
+                      {getRankCoachingNote(r, language)}
                     </p>
 
                     {isSelected && (
@@ -1770,7 +1824,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                         style={{ backgroundColor: r.accentColor }}
                         className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-slate-950 text-[9px] font-black uppercase shadow"
                       >
-                        Activo
+                        {language === 'en' ? 'Active' : 'Activo'}
                       </span>
                     )}
                   </button>

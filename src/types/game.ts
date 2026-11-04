@@ -24,7 +24,9 @@ export interface RankInfo {
   icon: string;
   accentColor: string;
   summary: string;
+  summaryEn?: string;
   coachingNote: string;
+  coachingNoteEn?: string;
 }
 
 export type MapSynergyRating = 'ideal' | 'favorable' | 'neutral' | 'unfavorable' | 'poor';
