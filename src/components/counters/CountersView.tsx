@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
+import { getSubroleForHero } from '../../games/overwatch/subroles';
 import type { Hero } from '../../types/game';
 import { HeroAvatar } from '../common/HeroAvatar';
 import { TRANSLATIONS, type Language } from '../../utils/i18n';
@@ -138,8 +139,24 @@ export const CountersView: React.FC<CountersViewProps> = ({ language = 'es', the
                       Tier {selectedHero.tier || 'B'}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    Subrol: <span className="text-orange-400 font-bold">{selectedHero.subrole}</span> • Estilo: <span className="text-emerald-400 font-bold uppercase">{selectedHero.style}</span> • {selectedHero.country}
+                  <div className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-1.5">
+                    <span>
+                      Subrol: <span className="text-orange-400 font-bold">{selectedHero.subrole}</span>
+                    </span>
+                    <span>•</span>
+                    <span
+                      title={getSubroleForHero(selectedHero.id).passiveDescription}
+                      className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-mono cursor-help"
+                    >
+                      <span>Pasiva:</span>
+                      <span className="font-bold">{getSubroleForHero(selectedHero.id).passiveName}</span>
+                    </span>
+                    <span>•</span>
+                    <span>
+                      Estilo: <span className="text-emerald-400 font-bold uppercase">{selectedHero.style}</span>
+                    </span>
+                    <span>•</span>
+                    <span>{selectedHero.country}</span>
                   </div>
                 </div>
               </div>

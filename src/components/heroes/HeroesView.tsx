@@ -3,6 +3,7 @@ import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import { getHeroMapBreakdown } from '../../games/overwatch/mapSynergies';
 import { getEnrichedHeroPerks } from '../../games/overwatch/heroPerksMeta';
+import { getSubroleForHero } from '../../games/overwatch/subroles';
 import type { Hero, HeroAbilityItem, HeroPerkItem } from '../../types/game';
 import { HeroSelectScreen } from '../coach/HeroSelectScreen';
 import { useFavoriteHeroes } from '../../utils/favorites';
@@ -146,6 +147,8 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
     const nextIdx = (selectedIndex + delta + OVERWATCH_HEROES.length) % OVERWATCH_HEROES.length;
     setSelectedHeroId(OVERWATCH_HEROES[nextIdx].id);
   };
+
+  const subMeta = getSubroleForHero(selectedHero.id);
 
   const hp = kit?.hitpoints || { health: 250, armor: 0, shields: 0, total: 250 };
   const healthPct = Math.round((hp.health / hp.total) * 100);
@@ -657,9 +660,12 @@ export const HeroesView: React.FC<HeroesViewProps> = ({ language = 'es', theme =
                     borderColor: `color-mix(in oklab, ${heroColor} 50%, transparent)`,
                     backgroundColor: `color-mix(in oklab, ${heroColor} 14%, transparent)`,
                   }}
-                  className="text-[10px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full border transition-colors duration-300"
+                  title={`Subrol: ${subMeta.name} (${subMeta.englishName})\nPasiva de Rol: ${subMeta.passiveName}\n${subMeta.passiveDescription}`}
+                  className="inline-flex items-center space-x-1 text-[10px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full border transition-colors duration-300 cursor-help"
                 >
-                  {selectedHero.subrole}
+                  <span style={{ color: subMeta.accentColor }}>●</span>
+                  <span>{subMeta.name}</span>
+                  <span className="opacity-75 font-normal">({subMeta.passiveName})</span>
                 </span>
                 <span
                   className={`text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-full border ${

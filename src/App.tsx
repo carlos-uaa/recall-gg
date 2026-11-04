@@ -8,6 +8,7 @@ import { HeroesView } from './components/heroes/HeroesView';
 import { GuesserView } from './components/guesser/GuesserView';
 import { MetaView } from './components/meta/MetaView';
 import { CountersView } from './components/counters/CountersView';
+import { PatchesView } from './components/patches/PatchesView';
 import { Gamepad2 } from 'lucide-react';
 
 export function App() {
@@ -59,6 +60,7 @@ export function App() {
             {activeTab === 'guesser' && <GuesserView language={language} theme={theme} />}
             {activeTab === 'meta' && <MetaView language={language} theme={theme} />}
             {activeTab === 'counters' && <CountersView language={language} theme={theme} />}
+            {activeTab === 'patches' && <PatchesView language={language} theme={theme} />}
           </>
         ) : (
           /* Multi-game Teaser */

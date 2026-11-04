@@ -9,6 +9,7 @@ import {
   Gamepad2, 
   BarChart3, 
   Swords, 
+  FileText,
   ChevronDown, 
   Sun, 
   Moon, 
@@ -221,6 +222,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               type="button"
+              onClick={() => onSelectTab('patches')}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+                activeTab === 'patches'
+                  ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/25'
+                  : isDark
+                  ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>{t.patchesTab}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+            </button>
+
+            <button
+              type="button"
               onClick={() => onSelectTab('guesser')}
               className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap ${
                 activeTab === 'guesser'
@@ -344,6 +361,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" />
             <span>{t.metaTab}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectTab('patches')}
+            className={`flex items-center space-x-1.5 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex-shrink-0 whitespace-nowrap active:scale-95 ${
+              activeTab === 'patches'
+                ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
+                : isDark
+                ? 'bg-slate-800/80 text-slate-300 border border-slate-700/80 hover:bg-slate-700'
+                : 'bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400" />
+            <span>{t.patchesTab}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
           </button>
 
           <button

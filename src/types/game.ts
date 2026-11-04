@@ -4,7 +4,7 @@ export type CompStyle = 'brawl' | 'dive' | 'poke';
 
 export type GameId = 'overwatch' | 'valorant' | 'marvel-rivals';
 
-export type AppTab = 'coach' | 'heroes' | 'counters' | 'meta' | 'guesser' | 'profile';
+export type AppTab = 'coach' | 'heroes' | 'counters' | 'meta' | 'patches' | 'guesser' | 'profile';
 
 export type RankTier =
   | 'bronze'

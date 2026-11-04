@@ -1,9 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import { OVERWATCH_HERO_KITS } from '../../games/overwatch/heroKits';
 import type { Hero, Role } from '../../types/game';
-import { Shield, Swords, Heart, Lock, Star, Zap, Flame, Crosshair } from 'lucide-react';
+import { Shield, Swords, Heart, Lock, Star, Zap, Flame, Crosshair, Layers, Users } from 'lucide-react';
 import { useFavoriteHeroes } from '../../utils/favorites';
+import {
+  getStoredHeroGroupingMode,
+  setStoredHeroGroupingMode,
+  type HeroGroupingMode,
+  getSubroleForHero,
+} from '../../games/overwatch/subroles';
 
 interface HeroSelectScreenProps {
   selectedHeroId: string | null;
@@ -66,6 +72,23 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
 
   const [activeTab, setActiveTab] = useState<Role | 'all' | 'mains'>('all');
   const [roleQueueLocked, setRoleQueueLocked] = useState(false);
+  const [groupingMode, setGroupingModeState] = useState<HeroGroupingMode>(getStoredHeroGroupingMode);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail === 'role' || detail === 'subrole') {
+        setGroupingModeState(detail);
+      }
+    };
+    window.addEventListener('recall-grouping-mode-change', handler);
+    return () => window.removeEventListener('recall-grouping-mode-change', handler);
+  }, []);
+
+  const handleSetGroupingMode = (mode: HeroGroupingMode) => {
+    setGroupingModeState(mode);
+    setStoredHeroGroupingMode(mode);
+  };
 
   // Group heroes by role for the authentic Overwatch select screen look, sorted alphabetically A-Z
   const tanks = useMemo(
@@ -299,6 +322,44 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
 
         {/* Role & Mains Filter Tabs */}
         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+          {/* Mode Switch: Subroles vs Rol completo */}
+          <div
+            className={`p-0.5 rounded-lg flex items-center border ${
+              isDark ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-300'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => handleSetGroupingMode('subrole')}
+              className={`flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold transition ${
+                groupingMode === 'subrole'
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : isDark
+                  ? 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              title="Segmentar héroes por sus subroles y pasivas especiales (Iniciador, Flanqueador, Reconocimiento, etc.)"
+            >
+              <Layers className="w-3 h-3" />
+              <span>Por Subrol</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetGroupingMode('role')}
+              className={`flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold transition ${
+                groupingMode === 'role'
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : isDark
+                  ? 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+              title="Mostrar todos los héroes del rol mezclados juntos en orden alfabético"
+            >
+              <Users className="w-3 h-3" />
+              <span>Solo por Rol</span>
+            </button>
+          </div>
+
           <div
             className={`p-0.5 rounded-lg flex items-center border ${
               isDark ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-300'
@@ -391,7 +452,7 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
         </div>
       )}
 
-      {/* Hero Rosters with Subrole Clusters & Small Spacers */}
+      {/* Hero Rosters with Subrole Clusters or Unified Role Roster */}
       <div className="space-y-3">
         {roleCategories
           .map(cat => {
@@ -402,6 +463,30 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
           })
           .filter(cat => (activeTab === 'all' || activeTab === 'mains' || activeTab === cat.role) && cat.heroes.length > 0)
           .map(cat => {
+            if (groupingMode === 'role') {
+              // Unified alphabetical view for the role (all DPS/Tanks/Supports mixed together)
+              return (
+                <div key={cat.role} className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] font-mono font-bold tracking-wider uppercase text-slate-400 px-1">
+                    <div className="flex items-center space-x-1.5">
+                      {cat.icon}
+                      <span className={isDark ? 'text-slate-300' : 'text-slate-800'}>
+                        {cat.label} ({cat.heroes.length})
+                      </span>
+                    </div>
+                    <span className="text-[9px] text-slate-400 lowercase">
+                      todos mezclados en orden alfabético
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full py-1">
+                    {cat.heroes.map(hero => renderHeroPortrait(hero))}
+                  </div>
+                </div>
+              );
+            }
+
+            // Subrole segmented view with official passives
             const subroleMap: Record<string, Hero[]> = {};
             cat.heroes.forEach(h => {
               if (!subroleMap[h.subrole]) subroleMap[h.subrole] = [];
@@ -424,27 +509,30 @@ export const HeroSelectScreen: React.FC<HeroSelectScreenProps> = ({
                     </span>
                   </div>
                   <span className="text-[9px] text-slate-400 lowercase">
-                    {subroleKeys.length} subroles agrupados
+                    {subroleKeys.length} subroles con pasivas de rol
                   </span>
                 </div>
 
                 <div className="flex flex-wrap items-end justify-center gap-y-2 gap-x-1 sm:gap-x-2 max-w-full">
                   {subroleKeys.map((sub, index) => {
                     const heroesInSub = subroleMap[sub];
-                    const subLabel = sub.split('/')[0].trim();
+                    const subMeta = getSubroleForHero(heroesInSub[0]?.id || '');
 
                     return (
                       <React.Fragment key={sub}>
                         <div className="flex flex-col items-center max-w-full">
-                          <span
-                            className={`text-[7.5px] font-mono uppercase tracking-wider font-bold mb-0.5 px-1 py-0.2 rounded border truncate max-w-[110px] ${
+                          <div
+                            title={`${subMeta.name} (${subMeta.englishName}) — Pasiva: ${subMeta.passiveName}\n${subMeta.passiveDescription}`}
+                            className={`flex items-center space-x-1 text-[7.5px] sm:text-[8.5px] font-mono uppercase tracking-wider font-bold mb-0.5 px-1.5 py-0.5 rounded border truncate max-w-[140px] cursor-help transition ${
                               isDark
-                                ? 'text-slate-400 bg-slate-800/40 border-slate-700/40'
-                                : 'text-slate-600 bg-slate-100 border-slate-200'
+                                ? 'text-slate-300 bg-slate-800/60 border-slate-700/60 hover:border-slate-500'
+                                : 'text-slate-700 bg-slate-100 border-slate-300 hover:border-slate-400'
                             }`}
                           >
-                            {subLabel} ({heroesInSub.length})
-                          </span>
+                            <span style={{ color: subMeta.accentColor }}>●</span>
+                            <span className="truncate">{subMeta.name}</span>
+                            <span className="opacity-60">({heroesInSub.length})</span>
+                          </div>
 
                           <div className="flex flex-wrap items-center justify-center gap-0.5 sm:gap-1 max-w-full">
                             {heroesInSub.map(hero => renderHeroPortrait(hero))}
