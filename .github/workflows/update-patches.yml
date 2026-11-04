@@ -1,0 +1,56 @@
+name: Auto Sync Overwatch Patch Notes
+
+on:
+  schedule:
+    # Martes (horario habitual de parches de Blizzard: 18:00, 19:00 y 20:30 UTC / 11am-1:30pm PT)
+    - cron: '0 18,19,20 * * 2'
+    # Fines de semana (sábados y domingos a las 19:00 UTC) para hotfixes y torneos
+    - cron: '0 19 * * 0,6'
+  # Permite ejecutarlo manualmente en cualquier momento desde la pestaña "Actions" de GitHub
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-patches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar script de sincronización de parches
+        run: node scripts/sync-patches.mjs
+
+      - name: Verificar cambios
+        id: git_status
+        run: |
+          if [[ -n $(git status --porcelain src/games/overwatch/patchNotes.ts) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validar build de TypeScript y Vite
+        if: steps.git_status.outputs.has_changes == 'true'
+        run: npm run build
+
+      - name: Commit y Push de nuevo parche
+        if: steps.git_status.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add src/games/overwatch/patchNotes.ts
+          git commit -m "chore(patches): auto-sync new Overwatch 2 patch notes [skip ci]"
+          git push origin main
