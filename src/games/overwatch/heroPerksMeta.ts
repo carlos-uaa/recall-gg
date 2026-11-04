@@ -498,14 +498,14 @@ export const HERO_PERKS_METADATA: Record<string, HeroPerkMetaGroup> = {
     ],
     "major": [
       {
-        "pickRate": 52,
+        "pickRate": 41,
         "proPick": false,
-        "proReason": "Mayor radio de Sol cautivo."
+        "proReason": "Mayor radio de Sol cautivo para TF abiertas."
       },
       {
-        "pickRate": 48,
+        "pickRate": 59,
         "proPick": true,
-        "proReason": "Recarga acelerada del rifle solar para maximizar el DPS y headshots de dos golpes."
+        "proReason": "Sinergia brutal con el nuevo buff de recarga del rifle solar en el parche mid-season, convirtiendo a Illari en una máquina de headshots a larga distancia."
       }
     ]
   },
@@ -550,12 +550,12 @@ export const HERO_PERKS_METADATA: Record<string, HeroPerkMetaGroup> = {
     ],
     "major": [
       {
-        "pickRate": 62,
+        "pickRate": 74,
         "proPick": true,
-        "proReason": "Reducción de enfriamiento de Carnicería por cada objetivo golpeado para encadenar hachazos sin parar."
+        "proReason": "Tras el parche mid-season con Carnicería reducida a 7s, esta perk permite resetear el hacha casi instantáneamente al conectar con 2 o más enemigos."
       },
       {
-        "pickRate": 38,
+        "pickRate": 26,
         "proPick": false,
         "proReason": "Mayor sanación de Adrenalina pero menor presión ofensiva."
       }

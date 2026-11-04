@@ -3,7 +3,18 @@ import { OVERWATCH_HEROES } from '../../games/overwatch/heroes';
 import type { Role } from '../../types/game';
 import { HeroAvatar } from '../common/HeroAvatar';
 import { TRANSLATIONS, type Language } from '../../utils/i18n';
-import { BarChart3, Star } from 'lucide-react';
+import {
+  BarChart3,
+  Star,
+  Flame,
+  TrendingUp,
+  TrendingDown,
+  Sparkles,
+  Zap,
+  Shield,
+  Crosshair,
+  Heart
+} from 'lucide-react';
 
 interface MetaViewProps {
   language?: Language;
@@ -17,11 +28,65 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
   const [selectedRole, setSelectedRole] = useState<Role | 'all'>('all');
   const [search] = useState('');
 
+  // Tier List actualizada tras el Parche Oficial Mid-Season (Noviembre 2026)
   const metaTiers: Record<string, string[]> = {
-    S: ['winston', 'tracer', 'sombra', 'doctrine'],
-    A: ['dva', 'hazard', 'dmon', 'shion', 'cassidy', 'sojourn', 'genji', 'torbjorn', 'vendetta', 'ana', 'kiriko'],
-    B: ['zarya', 'orisa', 'sigma', 'ramattra', 'doomfist', 'wrecking-ball', 'bastion', 'hanzo', 'reaper', 'freja', 'soldier76', 'symmetra', 'widowmaker', 'lucio', 'baptiste', 'juno', 'wuyang', 'jetpack-cat'],
-    C: ['mauga', 'domina', 'reinhardt', 'junker-queen', 'roadhog', 'anran', 'ashe', 'venture', 'junkrat', 'mei', 'pharah', 'echo', 'emre', 'sierra', 'brigitte', 'mizuki', 'moira', 'zenyatta', 'lifeweaver', 'illari', 'mercy'],
+    S: ['winston', 'tracer', 'sombra', 'kiriko'],
+    A: [
+      'junker-queen',
+      'dva',
+      'hazard',
+      'reaper',
+      'illari',
+      'dmon',
+      'shion',
+      'cassidy',
+      'sojourn',
+      'genji',
+      'torbjorn',
+      'vendetta',
+      'ana',
+      'doctrine',
+    ],
+    B: [
+      'mauga',
+      'zarya',
+      'orisa',
+      'sigma',
+      'ramattra',
+      'doomfist',
+      'wrecking-ball',
+      'bastion',
+      'hanzo',
+      'freja',
+      'soldier76',
+      'symmetra',
+      'widowmaker',
+      'lucio',
+      'baptiste',
+      'juno',
+      'wuyang',
+    ],
+    C: [
+      'jetpack-cat',
+      'domina',
+      'reinhardt',
+      'roadhog',
+      'anran',
+      'ashe',
+      'venture',
+      'junkrat',
+      'mei',
+      'pharah',
+      'echo',
+      'emre',
+      'sierra',
+      'brigitte',
+      'mizuki',
+      'moira',
+      'zenyatta',
+      'lifeweaver',
+      'mercy',
+    ],
     D: [],
   };
 
@@ -90,6 +155,75 @@ export const MetaView: React.FC<MetaViewProps> = ({ language = 'es', theme = 'da
           <span className="flex items-center text-amber-400 text-[11px]">
             ★★★ <span className="ml-1 text-slate-400">Alta / Exigente mecánicamente</span>
           </span>
+        </div>
+      </div>
+
+      {/* Mid-Season Patch Balance Impact Banner */}
+      <div
+        className={`border rounded-3xl p-5 shadow-xl transition relative overflow-hidden ${
+          isDark
+            ? 'bg-gradient-to-br from-slate-900 via-slate-900 to-orange-950/20 border-orange-500/30'
+            : 'bg-gradient-to-br from-orange-50/70 via-white to-amber-50/70 border-orange-200'
+        }`}
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center gap-1">
+                <Flame className="w-3 h-3 text-orange-500 animate-pulse" />
+                PARCHE MID-SEASON (NOVIEMBRE 2026)
+              </span>
+              <span className="text-xs text-slate-400 font-mono">Actualizado con cambios de balance</span>
+            </div>
+            <h2 className={`text-base sm:text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              Impacto del Parche en el Meta & Movimientos en la Tier List
+            </h2>
+            <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed">
+              Junker Queen y Reaper lideran el resurgir de composiciones Brawl y Rush. Illari y Mauga se benefician de mayor sustain, mientras Doctrine, Genji y Ana reciben ajustes a sus capacidades de burst individual.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {/* Buffs Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                Junker Queen (+50 HP · Carnicería 7s) → Tier A
+              </span>
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                Mauga (+25 Armadura = 150) → Tier B
+              </span>
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                Reaper (+25 HP) → Tier A
+              </span>
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5" />
+                Illari (Pilón & Recarga solar) → Tier A
+              </span>
+            </div>
+
+            {/* Nerfs Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                <TrendingDown className="w-3.5 h-3.5" />
+                Doctrine (Cooldowns & Infuse) → Tier A
+              </span>
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                <TrendingDown className="w-3.5 h-3.5" />
+                Genji (Desvío 1.5s)
+              </span>
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                <TrendingDown className="w-3.5 h-3.5" />
+                Ana (Granada 60 dmg)
+              </span>
+              <span className="px-2 py-0.5 rounded-xl text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                <TrendingDown className="w-3.5 h-3.5" />
+                Jetpack Cat (200 HP) → Tier C
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
