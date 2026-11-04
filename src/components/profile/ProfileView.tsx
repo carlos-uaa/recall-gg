@@ -237,10 +237,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     setErrorMessage(null);
   };
 
-  // Active or Fallback Profile (if none is loaded, we can preview KarQ as a soft demo)
+  // Active or Fallback Profile (defaults to Nano#13824 Ángel Celestial)
   const activeProfile: UserProfileData = useMemo(() => {
     if (profile) return profile;
-    return DEMO_PROFILES.karq;
+    return DEMO_PROFILES.nano || DEMO_PROFILES.karq;
   }, [profile]);
 
   const hasLoadedProfile = Boolean(profile);
@@ -341,6 +341,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               {language === 'es' ? 'Perfiles de prueba disponibles:' : 'Preset demo profiles:'}
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={() => {
+                  loadDemoProfile('nano');
+                  setErrorMessage(null);
+                }}
+                className={`px-3 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 active:scale-95 ${
+                  activeProfile.username === 'Nano' && (activeProfile.title === 'Ángel Celestial' || activeProfile.title === 'Celestial Angel')
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-orange-400 shadow-md shadow-orange-500/30'
+                    : isDark
+                    ? 'bg-slate-800/80 hover:bg-slate-700 text-amber-300 border-slate-700'
+                    : 'bg-slate-100 hover:bg-slate-200 text-amber-800 border-slate-300'
+                }`}
+                title="Cargar perfil oficial verificado de Nano#13824 (Ángel Celestial)"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Nano#13824 (Ángel Celestial)</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => {

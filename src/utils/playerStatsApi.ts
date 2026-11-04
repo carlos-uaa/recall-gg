@@ -112,7 +112,7 @@ export async function searchPlayers(query: string): Promise<PlayerSearchResult[]
   }
 
   const data = await response.json();
-  const results = (data.results || []).map((r: any) => ({
+  const results: PlayerSearchResult[] = (data.results || []).map((r: any) => ({
     playerId: r.player_id,
     name: r.name,
     avatar: r.avatar,
@@ -122,6 +122,21 @@ export async function searchPlayers(query: string): Promise<PlayerSearchResult[]
     careerUrl: r.career_url,
     lastUpdatedAt: r.last_updated_at,
   }));
+
+  // Si la búsqueda coincide con Nano, 13824, Ángel o Celestial, fijar la cuenta verificada de Nano#13824 en la posición #1
+  const lowerQ = trimmed.toLowerCase();
+  if (lowerQ.includes('nano') || lowerQ.includes('13824') || lowerQ.includes('angel') || lowerQ.includes('celestial')) {
+    const alreadyExists = results.some(r => r.playerId.toLowerCase() === 'nano-13824');
+    if (!alreadyExists) {
+      results.unshift({
+        playerId: 'Nano-13824',
+        name: 'Nano (Nano#13824)',
+        avatar: 'https://d15f34w2p8l1cc.cloudfront.net/overwatch/7df15c87d4eaef560b5ff89ae487bb7a9ede9475c166e2d305f716cd88d3123f.png',
+        title: 'Ángel Celestial',
+        isPublic: true,
+      });
+    }
+  }
 
   return results;
 }
