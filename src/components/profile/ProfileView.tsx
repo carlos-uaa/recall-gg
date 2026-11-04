@@ -82,15 +82,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     setSearchResults(null);
 
     try {
-      // 1. Detectar si el usuario pegó un enlace directo de Blizzard (overwatch.blizzard.com/career/...) o un ID cifrado
+      // 1. Detectar si el usuario pegó un enlace directo de Blizzard o un BattleTag exacto (ej: Nano#13824 -> Nano-13824)
       const extracted = extractPlayerIdFromInput(query);
       if (extracted.type === 'id') {
-        setLoadingPlayerId(extracted.value);
-        const fullProfile = await fetchPlayerProfile(extracted.value, 'Mi Perfil');
-        setProfile(fullProfile);
-        setSearchResults(null);
-        setSearchQuery('');
-        return;
+        try {
+          setLoadingPlayerId(extracted.value);
+          const fullProfile = await fetchPlayerProfile(extracted.value, query);
+          setProfile(fullProfile);
+          setSearchResults(null);
+          setSearchQuery('');
+          return;
+        } catch (idErr: any) {
+          console.warn('Direct ID/BattleTag lookup failed, falling through to search:', idErr);
+        }
       }
 
       // 2. Búsqueda por nombre o BattleTag
@@ -769,6 +773,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 )}
               </div>
             </div>
+
+            {/* Open Queue / Cola Abierta Rank if present */}
+            {activeProfile.ranks.open?.rankName && (
+              <div
+                className={`p-2.5 sm:p-3 rounded-2xl border flex items-center gap-2.5 min-w-[130px] ${
+                  isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 flex-shrink-0">
+                  <Trophy className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block">Cola Abierta</span>
+                  <span className="text-xs font-black truncate block text-slate-200">
+                    {activeProfile.ranks.open.rankName.replace('Cola Abierta: ', '')}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -72,6 +72,15 @@ export function extractPlayerIdFromInput(input: string): { type: 'id' | 'name'; 
   if (trimmed.includes('%7C') || (trimmed.includes('|') && trimmed.length > 20)) {
     return { type: 'id', value: trimmed.replace('|', '%7C') };
   }
+  // Formato BattleTag directo (ej: Nano#13824 -> Nano-13824)
+  if (trimmed.includes('#')) {
+    const formatted = trimmed.replace('#', '-');
+    return { type: 'id', value: formatted };
+  }
+  // Formato BattleTag con guion y número (ej: Nano-13824)
+  if (trimmed.includes('-') && /-[0-9]+$/.test(trimmed)) {
+    return { type: 'id', value: trimmed };
+  }
   return { type: 'name', value: trimmed };
 }
 
@@ -177,6 +186,20 @@ export async function fetchPlayerProfile(
       };
     }
   });
+
+  // Open Queue rank (Cola Abierta / Rango Competitivo de Consola o PC)
+  const openData = competitive.open;
+  if (openData && (openData.division || openData.tier)) {
+    const tier = normalizeRankTier(openData.division || openData.tier);
+    const divisionNum = typeof openData.tier === 'number' ? openData.tier : 1;
+    ranks.open = {
+      role: 'damage',
+      tier,
+      division: divisionNum,
+      rankName: `Cola Abierta: ${formatRankName(tier, divisionNum)}`,
+      iconUrl: openData.icon_url,
+    };
+  }
 
   // Parse General Stats
   const generalSummary = statsData?.general || {};

@@ -40,6 +40,7 @@ export interface UserProfileData {
     tank?: RoleRankInfo;
     damage?: RoleRankInfo;
     support?: RoleRankInfo;
+    open?: RoleRankInfo;
   };
   general: {
     totalGames: number;
