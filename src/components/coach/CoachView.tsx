@@ -49,6 +49,49 @@ interface RoleSlot {
   isMyPick?: boolean;
 }
 
+const normalizeSearchStr = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+};
+
+const MAP_ALIASES: Record<string, string[]> = {
+  'watchpoint-gibraltar': ['gibraltar', 'observatorio', 'watchpoint'],
+  'lijiang-tower': ['lijiang', 'torre', 'tower'],
+  'shambali-monastery': ['shambali', 'monasterio', 'monastery'],
+  'throne-of-anubis': ['anubis', 'trono', 'throne'],
+  'antarctic-peninsula': ['antartica', 'antarctica', 'peninsula'],
+  'route-66': ['route', 'ruta', '66'],
+  'esperanca': ['esperanza', 'esperanca'],
+  'paraiso': ['paraiso', 'paradise'],
+  'colosseo': ['coliseo', 'colosseo'],
+  'havana': ['habana', 'havana'],
+  'grimsvotn': ['grimsvotn', 'grímsvötn'],
+  'new-junk-city': ['junk city', 'new junk'],
+  'new-queen-street': ['queen street', 'new queen'],
+  'kings-row': ["king's", 'kings', 'row'],
+  'blizzard-world': ['blizzard', 'world'],
+  'circuit-royal': ['circuit', 'royal'],
+};
+
+const getMapModeDisplay = (mode: string, lang: Language = 'es') => {
+  if (mode === 'all') return lang === 'en' ? 'All modes' : 'Todos los modos';
+  if (lang === 'en') {
+    switch (mode) {
+      case 'Híbrido': return 'Hybrid';
+      case 'Escolta': return 'Escort';
+      case 'Control': return 'Control';
+      case 'Avance': return 'Push';
+      case 'Punto Caliente': return 'Flashpoint';
+      case 'Invasión / Clash': return 'Clash / Invasion';
+      default: return mode;
+    }
+  }
+  return mode;
+};
+
 export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = 'dark' }) => {
   const t = TRANSLATIONS[language];
   const isDark = theme === 'dark';
@@ -156,6 +199,80 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
   const selectedMap: GameMap = useMemo(() => {
     return OVERWATCH_MAPS.find(m => m.id === selectedMapId) || OVERWATCH_MAPS[0];
   }, [selectedMapId]);
+
+  // Map Picker State & Alphabetical Grouping
+  const [mapSearch, setMapSearch] = useState<string>('');
+  const [mapLetterFilter, setMapLetterFilter] = useState<string>('all');
+  const [mapSortMode, setMapSortMode] = useState<'alpha' | 'synergy'>('alpha');
+
+  const handleOpenMapPicker = () => {
+    setMapSearch('');
+    setMapLetterFilter('all');
+    setMapPickerOpen(true);
+  };
+
+  // Available initial letters for alphabetical filter
+  const availableMapLetters = useMemo(() => {
+    const letters = new Set<string>();
+    OVERWATCH_MAPS.forEach(m => {
+      if (mapFilterMode === 'all' || m.mode === mapFilterMode) {
+        const initial = m.name.charAt(0).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (initial) letters.add(initial);
+      }
+    });
+    return Array.from(letters).sort();
+  }, [mapFilterMode]);
+
+  // Filtered & sorted maps (Guaranteed strictly alphabetical A-Z by default)
+  const filteredAndSortedMaps = useMemo(() => {
+    return [...OVERWATCH_MAPS]
+      .filter(m => {
+        // Mode filter
+        if (mapFilterMode !== 'all' && m.mode === mapFilterMode) return false;
+        
+        // Search filter (name, id, aliases)
+        if (mapSearch.trim()) {
+          const q = normalizeSearchStr(mapSearch);
+          const nameNorm = normalizeSearchStr(m.name);
+          const idNorm = normalizeSearchStr(m.id);
+          const aliases = (MAP_ALIASES[m.id] || []).map(normalizeSearchStr);
+          const matches = nameNorm.includes(q) || idNorm.includes(q) || aliases.some(a => a.includes(q));
+          if (!matches) return false;
+        }
+
+        // Letter filter
+        if (mapLetterFilter !== 'all') {
+          const initial = m.name.charAt(0).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (initial !== mapLetterFilter) return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (mapSortMode === 'synergy') {
+          const synA = evaluateHeroMapSynergy(playerHero, a).score;
+          const synB = evaluateHeroMapSynergy(playerHero, b).score;
+          if (synB !== synA) return synB - synA;
+        }
+        return a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
+      });
+  }, [mapFilterMode, mapSearch, mapLetterFilter, mapSortMode, playerHero]);
+
+  // Group maps by letter if sorting by A-Z
+  const mapsGroupedByLetter = useMemo(() => {
+    if (mapSortMode !== 'alpha') return null;
+    const groups: { letter: string; maps: GameMap[] }[] = [];
+    filteredAndSortedMaps.forEach(map => {
+      const letter = map.name.charAt(0).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      let group = groups.find(g => g.letter === letter);
+      if (!group) {
+        group = { letter, maps: [] };
+        groups.push(group);
+      }
+      group.maps.push(map);
+    });
+    return groups;
+  }, [filteredAndSortedMaps, mapSortMode]);
 
   // Flattened teammate IDs (excluding player's own slot so candidate switches don't count replaced hero as a teammate)
   const allyHeroIds = useMemo(() => {
@@ -362,7 +479,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               </label>
               <button
                 type="button"
-                onClick={() => setMapPickerOpen(true)}
+                onClick={handleOpenMapPicker}
                 className="text-xs font-bold text-orange-400 hover:text-orange-300 transition"
               >
                 {language === 'en' ? 'Change Map →' : 'Cambiar Mapa →'}
@@ -371,7 +488,7 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
 
             {/* Clickable Map Hero Banner */}
             <div
-              onClick={() => setMapPickerOpen(true)}
+              onClick={handleOpenMapPicker}
               className="group relative h-24 sm:h-32 rounded-2xl overflow-hidden border border-slate-700/80 cursor-pointer shadow-lg transition hover:border-orange-500 hover:scale-[1.01]"
             >
               <img
@@ -1597,14 +1714,14 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
         </div>
       </div>
 
-      {/* 5. MODAL SELECTOR VISUAL DE MAPAS (CON SINERGIA DE TU HÉROE EN TIEMPO REAL) */}
+      {/* 5. MODAL SELECTOR VISUAL DE MAPAS (ORDENADO ALFABÉTICAMENTE A-Z CON BUSCADOR Y SECCIONES) */}
       {mapPickerOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4">
           <div className={`w-full max-w-4xl max-h-[92dvh] rounded-3xl border shadow-2xl flex flex-col overflow-hidden transition ${
             isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
           }`}>
             {/* Modal Header */}
-            <div className={`p-4 sm:p-5 border-b flex items-center justify-between ${
+            <div className={`p-4 sm:p-5 border-b flex items-center justify-between gap-3 ${
               isDark ? 'border-slate-800' : 'border-slate-200'
             }`}>
               <div className="flex items-center space-x-2 flex-wrap gap-y-1">
@@ -1612,28 +1729,87 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {language === 'en' ? 'SELECT MATCH MAP' : 'SELECCIONA EL MAPA'}
                 </h3>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
-                  isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono ${
+                  isDark ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-slate-100 text-slate-700 border border-slate-300'
                 }`}>
-                  {language === 'en'
-                    ? `${OVERWATCH_MAPS.length} MAPS · Synergy for ${playerHero.name}`
-                    : `${OVERWATCH_MAPS.length} MAPAS · Sinergia para ${playerHero.name}`}
+                  {filteredAndSortedMaps.length} / {OVERWATCH_MAPS.length} {language === 'en' ? 'MAPS' : 'MAPAS'}
                 </span>
-                <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                  {language === 'en' ? 'Alphabetical A-Z' : 'Orden Alfabético A-Z'}
+                <span className="text-xs px-2 py-0.5 rounded-full font-mono bg-orange-500/20 text-orange-400 border border-orange-500/30 font-bold">
+                  {mapSortMode === 'alpha'
+                    ? (language === 'en' ? 'Alphabetical Order A-Z' : 'Orden Alfabético A-Z')
+                    : (language === 'en' ? 'Sorted by Hero Synergy' : 'Ordenado por Sinergia')}
                 </span>
               </div>
               <button
                 onClick={() => setMapPickerOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Mode Filters */}
-            <div className={`p-3 border-b flex flex-wrap gap-1.5 ${
-              isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'
+            {/* Search Input Bar + Sorting Mode */}
+            <div className={`p-3 sm:p-4 border-b flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 ${
+              isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-200 bg-slate-50'
+            }`}>
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={mapSearch}
+                  onChange={e => setMapSearch(e.target.value)}
+                  placeholder={
+                    language === 'en'
+                      ? "Quick search: King's Row, Dorado, Gibraltar, Lijiang..."
+                      : "Búsqueda rápida: King's Row, Dorado, Gibraltar, Lijiang..."
+                  }
+                  className={`w-full pl-9 pr-8 py-2 rounded-xl text-xs font-semibold border transition outline-none ${
+                    isDark
+                      ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500 focus:border-orange-500 focus:ring-1 focus:ring-orange-500'
+                      : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500'
+                  }`}
+                  autoFocus
+                />
+                {mapSearch && (
+                  <button
+                    onClick={() => setMapSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-0.5 rounded-full hover:bg-slate-700 transition"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Sort Switch */}
+              <div className={`p-1 rounded-xl border flex items-center gap-1 self-start sm:self-auto text-xs font-bold ${
+                isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              }`}>
+                <button
+                  onClick={() => setMapSortMode('alpha')}
+                  className={`px-3 py-1.5 rounded-lg transition ${
+                    mapSortMode === 'alpha'
+                      ? 'bg-orange-500 text-white shadow'
+                      : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {language === 'en' ? 'A-Z Alphabetical' : 'A-Z Alfabético'}
+                </button>
+                <button
+                  onClick={() => setMapSortMode('synergy')}
+                  className={`px-3 py-1.5 rounded-lg transition ${
+                    mapSortMode === 'synergy'
+                      ? 'bg-orange-500 text-white shadow'
+                      : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {language === 'en' ? 'Synergy' : 'Sinergia'}
+                </button>
+              </div>
+            </div>
+
+            {/* Mode Filters Ribbon */}
+            <div className={`px-3 py-2 border-b flex items-center gap-1.5 overflow-x-auto scrollbar-none ${
+              isDark ? 'border-slate-800 bg-slate-950/30' : 'border-slate-200 bg-slate-100/60'
             }`}>
               {[
                 { id: 'all', label: language === 'en' ? 'All modes' : 'Todos los modos' },
@@ -1647,12 +1823,12 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
                 <button
                   key={modeItem.id}
                   onClick={() => setMapFilterMode(modeItem.id)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex-shrink-0 ${
                     mapFilterMode === modeItem.id
                       ? 'bg-orange-500 text-white shadow'
                       : isDark
                       ? 'text-slate-400 hover:text-white bg-slate-800/60'
-                      : 'text-slate-600 hover:text-slate-900 bg-slate-200/70'
+                      : 'text-slate-600 hover:text-slate-900 bg-white border border-slate-200'
                   }`}
                 >
                   {modeItem.label}
@@ -1660,70 +1836,217 @@ export const CoachView: React.FC<CoachViewProps> = ({ language = 'es', theme = '
               ))}
             </div>
 
-            {/* Maps Grid with Large Images + Per-Hero Map Synergy Score (Sorted A-Z) */}
-            <div className="p-4 overflow-y-auto flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {OVERWATCH_MAPS
-                .filter(m => mapFilterMode === 'all' || m.mode === mapFilterMode)
-                .slice()
-                .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }))
-                .map(m => {
-                  const heroMapSyn = evaluateHeroMapSynergy(playerHero, m);
-                  return (
-                    <button
-                      key={m.id}
-                      title={`${m.name}: ${heroMapSyn.reason}`}
-                      onClick={() => {
-                        setSelectedMapId(m.id);
-                        setMapPickerOpen(false);
-                      }}
-                      className={`group relative h-28 rounded-2xl overflow-hidden border-2 text-left transition ${
-                        m.id === selectedMapId
-                          ? 'border-orange-500 ring-2 ring-orange-500 scale-[1.02]'
-                          : isDark
-                          ? 'border-slate-800 hover:border-slate-600'
-                          : 'border-slate-300 hover:border-orange-400'
-                      }`}
-                    >
-                      <img
-                        src={m.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
-                        alt={m.name}
-                        className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
-                        loading="lazy"
-                      />
+            {/* Quick Alphabet Jump Bar (when in A-Z mode) */}
+            {mapSortMode === 'alpha' && availableMapLetters.length > 1 && (
+              <div className={`px-3 py-1.5 border-b flex items-center gap-1 overflow-x-auto scrollbar-none text-[11px] font-mono font-bold ${
+                isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'
+              }`}>
+                <span className="text-[10px] text-slate-500 font-bold uppercase mr-1 flex-shrink-0">
+                  {language === 'en' ? 'Jump to:' : 'Saltar a:'}
+                </span>
+                <button
+                  onClick={() => setMapLetterFilter('all')}
+                  className={`px-2 py-0.5 rounded-md transition flex-shrink-0 ${
+                    mapLetterFilter === 'all'
+                      ? 'bg-orange-500 text-white shadow-sm font-black'
+                      : isDark ? 'text-slate-400 hover:text-white bg-slate-800/80' : 'text-slate-600 hover:text-slate-900 bg-white'
+                  }`}
+                >
+                  {language === 'en' ? 'ALL' : 'TODOS'}
+                </button>
+                {availableMapLetters.map(letter => (
+                  <button
+                    key={letter}
+                    onClick={() => setMapLetterFilter(prev => prev === letter ? 'all' : letter)}
+                    className={`w-6 h-6 rounded-md transition flex-shrink-0 flex items-center justify-center font-black ${
+                      mapLetterFilter === letter
+                        ? 'bg-orange-500 text-white shadow-sm'
+                        : isDark ? 'text-slate-400 hover:text-white bg-slate-800/80' : 'text-slate-600 hover:text-slate-900 bg-white'
+                    }`}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
+            )}
 
-                      {/* Top-right Hero Synergy Score Pill */}
-                      <span
-                        className={`absolute top-1.5 right-1.5 z-10 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-black shadow backdrop-blur-sm border ${
-                          heroMapSyn.score >= 5
-                            ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/60'
-                            : heroMapSyn.score <= -5
-                            ? 'bg-rose-950/90 text-rose-300 border-rose-500/60'
-                            : 'bg-slate-900/85 text-slate-300 border-slate-600/60'
+            {/* Maps List / Grid with Letter Headers */}
+            <div className="p-4 overflow-y-auto flex-1 space-y-5">
+              {filteredAndSortedMaps.length === 0 ? (
+                <div className="text-center py-12 px-4 space-y-3">
+                  <MapPin className="w-10 h-10 text-slate-500 mx-auto opacity-40" />
+                  <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {language === 'en' ? 'No maps match your search' : 'No se encontraron mapas'}
+                  </h4>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    {language === 'en'
+                      ? `No maps found for "${mapSearch}". Try a different spelling or clear active filters.`
+                      : `No hay mapas que coincidan con "${mapSearch}". Intenta con otro término o limpia los filtros.`}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setMapSearch('');
+                      setMapFilterMode('all');
+                      setMapLetterFilter('all');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 transition shadow"
+                  >
+                    {language === 'en' ? 'Reset All Filters' : 'Restablecer Filtros'}
+                  </button>
+                </div>
+              ) : mapsGroupedByLetter ? (
+                mapsGroupedByLetter.map(group => (
+                  <div key={group.letter} className="space-y-2.5">
+                    {/* Alphabetical Letter Separator Banner */}
+                    <div className={`flex items-center space-x-2.5 sticky top-0 z-10 py-1 px-2.5 rounded-xl backdrop-blur-md border shadow-sm ${
+                      isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'
+                    }`}>
+                      <span className="w-6 h-6 rounded-lg bg-orange-500 text-white font-black text-xs flex items-center justify-center shadow">
+                        {group.letter}
+                      </span>
+                      <div className="h-[1px] flex-1 bg-gradient-to-r from-orange-500/30 to-transparent" />
+                      <span className="text-[10px] font-mono text-slate-400 font-bold">
+                        {group.maps.length} {group.maps.length === 1 ? (language === 'en' ? 'map' : 'mapa') : (language === 'en' ? 'maps' : 'mapas')}
+                      </span>
+                    </div>
+
+                    {/* Grid of maps under this letter */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {group.maps.map(m => {
+                        const heroMapSyn = evaluateHeroMapSynergy(playerHero, m);
+                        const isSelected = m.id === selectedMapId;
+                        return (
+                          <button
+                            key={m.id}
+                            title={`${m.name}: ${heroMapSyn.reason}`}
+                            onClick={() => {
+                              setSelectedMapId(m.id);
+                              setMapPickerOpen(false);
+                            }}
+                            className={`group relative h-28 sm:h-32 rounded-2xl overflow-hidden border-2 text-left transition ${
+                              isSelected
+                                ? 'border-orange-500 ring-2 ring-orange-500 scale-[1.02] shadow-lg shadow-orange-500/20'
+                                : isDark
+                                ? 'border-slate-800 hover:border-slate-600 hover:scale-[1.01]'
+                                : 'border-slate-300 hover:border-orange-400 hover:scale-[1.01]'
+                            }`}
+                          >
+                            <img
+                              src={m.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
+                              alt={m.name}
+                              className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                              loading="lazy"
+                            />
+
+                            {/* Top-left Selected Badge */}
+                            {isSelected && (
+                              <span className="absolute top-1.5 left-1.5 z-10 px-1.5 py-0.5 rounded-md text-[8.5px] font-black uppercase bg-orange-500 text-white shadow tracking-wider">
+                                {language === 'en' ? 'CURRENT' : 'ACTUAL'}
+                              </span>
+                            )}
+
+                            {/* Top-right Hero Synergy Score Pill */}
+                            <span
+                              className={`absolute top-1.5 right-1.5 z-10 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-black shadow backdrop-blur-sm border ${
+                                heroMapSyn.score >= 5
+                                  ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/60'
+                                  : heroMapSyn.score <= -5
+                                  ? 'bg-rose-950/90 text-rose-300 border-rose-500/60'
+                                  : 'bg-slate-900/85 text-slate-300 border-slate-600/60'
+                              }`}
+                            >
+                              {heroMapSyn.score > 0 ? `+${heroMapSyn.score}` : heroMapSyn.score} pts
+                            </span>
+
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-2.5">
+                              <span className="text-[9px] font-mono text-orange-400 font-bold uppercase leading-none">
+                                {getMapModeDisplay(m.mode, language)}
+                              </span>
+                              <span className="text-xs sm:text-sm font-black text-white truncate mt-0.5 group-hover:text-orange-300 transition">
+                                {m.name}
+                              </span>
+                              <div className="flex items-center space-x-1 mt-1">
+                                {m.favoredStyles.map(st => (
+                                  <span key={st} className="text-[8px] uppercase font-mono px-1 py-0.2 rounded bg-black/60 text-slate-300">
+                                    {st}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {filteredAndSortedMaps.map(m => {
+                    const heroMapSyn = evaluateHeroMapSynergy(playerHero, m);
+                    const isSelected = m.id === selectedMapId;
+                    return (
+                      <button
+                        key={m.id}
+                        title={`${m.name}: ${heroMapSyn.reason}`}
+                        onClick={() => {
+                          setSelectedMapId(m.id);
+                          setMapPickerOpen(false);
+                        }}
+                        className={`group relative h-28 sm:h-32 rounded-2xl overflow-hidden border-2 text-left transition ${
+                          isSelected
+                            ? 'border-orange-500 ring-2 ring-orange-500 scale-[1.02] shadow-lg shadow-orange-500/20'
+                            : isDark
+                            ? 'border-slate-800 hover:border-slate-600 hover:scale-[1.01]'
+                            : 'border-slate-300 hover:border-orange-400 hover:scale-[1.01]'
                         }`}
                       >
-                        {heroMapSyn.score > 0 ? `+${heroMapSyn.score}` : heroMapSyn.score} pts
-                      </span>
+                        <img
+                          src={m.image || 'https://tonikiraw.com/assets/img/mapas/kings-row.webp'}
+                          alt={m.name}
+                          className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-2.5">
-                        <span className="text-[9px] font-mono text-orange-400 font-bold uppercase leading-none">
-                          {language === 'en'
-                            ? (m.mode === 'Híbrido' ? 'Hybrid' : m.mode === 'Escolta' ? 'Escort' : m.mode === 'Control' ? 'Control' : m.mode === 'Avance' ? 'Push' : m.mode === 'Punto Caliente' ? 'Flashpoint' : m.mode === 'Invasión / Clash' ? 'Clash / Invasion' : m.mode)
-                            : m.mode}
+                        {/* Top-left Selected Badge */}
+                        {isSelected && (
+                          <span className="absolute top-1.5 left-1.5 z-10 px-1.5 py-0.5 rounded-md text-[8.5px] font-black uppercase bg-orange-500 text-white shadow tracking-wider">
+                            {language === 'en' ? 'CURRENT' : 'ACTUAL'}
+                          </span>
+                        )}
+
+                        {/* Top-right Hero Synergy Score Pill */}
+                        <span
+                          className={`absolute top-1.5 right-1.5 z-10 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-black shadow backdrop-blur-sm border ${
+                            heroMapSyn.score >= 5
+                              ? 'bg-emerald-950/90 text-emerald-300 border-emerald-500/60'
+                              : heroMapSyn.score <= -5
+                              ? 'bg-rose-950/90 text-rose-300 border-rose-500/60'
+                              : 'bg-slate-900/85 text-slate-300 border-slate-600/60'
+                          }`}
+                        >
+                          {heroMapSyn.score > 0 ? `+${heroMapSyn.score}` : heroMapSyn.score} pts
                         </span>
-                        <span className="text-xs font-black text-white truncate mt-0.5">
-                          {m.name}
-                        </span>
-                        <div className="flex items-center space-x-1 mt-1">
-                          {m.favoredStyles.map(st => (
-                            <span key={st} className="text-[8px] uppercase font-mono px-1 py-0.2 rounded bg-black/60 text-slate-300">
-                              {st}
-                            </span>
-                          ))}
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-2.5">
+                          <span className="text-[9px] font-mono text-orange-400 font-bold uppercase leading-none">
+                            {getMapModeDisplay(m.mode, language)}
+                          </span>
+                          <span className="text-xs sm:text-sm font-black text-white truncate mt-0.5 group-hover:text-orange-300 transition">
+                            {m.name}
+                          </span>
+                          <div className="flex items-center space-x-1 mt-1">
+                            {m.favoredStyles.map(st => (
+                              <span key={st} className="text-[8px] uppercase font-mono px-1 py-0.2 rounded bg-black/60 text-slate-300">
+                                {st}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
